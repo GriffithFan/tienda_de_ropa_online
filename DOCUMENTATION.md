@@ -45,44 +45,44 @@ src/
 
 ## Archivos de Configuracion
 
-### `package.json`
+### package.json
 Define las dependencias del proyecto:
-- **Next.js 14**: Framework React con SSR/SSG
-- **TypeScript**: Tipado estatico
-- **Tailwind CSS**: Framework de utilidades CSS
-- **Zustand**: Manejo de estado global
-- **Framer Motion**: Animaciones
-- **React Hook Form + Zod**: Validacion de formularios
-- **MercadoPago SDK**: Integracion de pagos
-- **Swiper**: Carruseles
-- **Lucide React**: Iconos
+- Next.js 14: Framework React con SSR/SSG
+- TypeScript: Tipado estatico
+- Tailwind CSS: Framework de utilidades CSS
+- Zustand: Manejo de estado global
+- Framer Motion: Animaciones
+- React Hook Form + Zod: Validacion de formularios
+- MercadoPago SDK: Integracion de pagos
+- Swiper: Carruseles
+- Lucide React: Iconos
 
-### `tsconfig.json`
+### tsconfig.json
 Configuracion de TypeScript con:
 - Path aliases (`@/` para `src/`)
 - Strict mode habilitado
 - Target ES2022
 - JSX preserve para Next.js
 
-### `next.config.js`
+### next.config.js
 Configuracion de Next.js:
 - Optimizacion de imagenes (AVIF, WebP)
 - Dominios permitidos para imagenes
 - Configuracion experimental
 
-### `tailwind.config.ts`
+### tailwind.config.ts
 Tema personalizado:
 - Paleta de colores oscura (zinc/neutral)
 - Tipografias: Inter (texto), Space Grotesk (titulos)
 - Animaciones personalizadas
 - Breakpoints responsive
 
-### `postcss.config.js`
+### postcss.config.js
 Plugins de PostCSS:
 - Tailwind CSS
 - Autoprefixer
 
-### `.env.example`
+### .env.example
 Variables de entorno requeridas:
 - `NEXT_PUBLIC_APP_URL`: URL de la aplicacion
 - `MERCADOPAGO_ACCESS_TOKEN`: Token privado de MP
@@ -92,7 +92,7 @@ Variables de entorno requeridas:
 
 ## Sistema de Tipos
 
-### `src/types/index.ts`
+### src/types/index.ts
 
 #### Product
 ```typescript
@@ -102,12 +102,12 @@ interface Product {
   slug: string;
   description: string;
   price: number;
-  compareAtPrice?: number;  // Precio anterior para descuentos
+  compareAtPrice?: number;
   category: string;
   subcategory?: string;
   images: string[];
-  sizes: string[];          // ['XS', 'S', 'M', 'L', 'XL']
-  colors: ProductColor[];   // Array de colores con nombre y hex
+  sizes: string[];
+  colors: ProductColor[];
   stock: number;
   isNew?: boolean;
   isFeatured?: boolean;
@@ -157,16 +157,16 @@ interface User {
 
 ### Layout Components
 
-#### `AnnouncementBar`
-**Ubicacion:** `src/components/layout/announcement-bar.tsx`
+#### AnnouncementBar
+Ubicacion: `src/components/layout/announcement-bar.tsx`
 
 Cinta superior animada con anuncios desplazandose.
 - Animacion CSS infinita
 - Pausa en hover
 - Contenido duplicado para loop seamless
 
-#### `Header`
-**Ubicacion:** `src/components/layout/header.tsx`
+#### Header
+Ubicacion: `src/components/layout/header.tsx`
 
 Navegacion principal de la tienda:
 - Logo a la izquierda
@@ -176,8 +176,8 @@ Navegacion principal de la tienda:
 - Menu hamburguesa para mobile
 - Cambio de estilo al hacer scroll
 
-#### `Footer`
-**Ubicacion:** `src/components/layout/footer.tsx`
+#### Footer
+Ubicacion: `src/components/layout/footer.tsx`
 
 Footer completo con:
 - Logo y descripcion
@@ -190,8 +190,8 @@ Footer completo con:
 
 ### Cart Components
 
-#### `CartDrawer`
-**Ubicacion:** `src/components/cart/cart-drawer.tsx`
+#### CartDrawer
+Ubicacion: `src/components/cart/cart-drawer.tsx`
 
 Panel lateral de carrito:
 - Slide desde la derecha
@@ -204,8 +204,8 @@ Panel lateral de carrito:
 
 ### Product Components
 
-#### `ProductCard`
-**Ubicacion:** `src/components/products/product-card.tsx`
+#### ProductCard
+Ubicacion: `src/components/products/product-card.tsx`
 
 Tarjeta individual de producto:
 - Imagen con aspect ratio 3:4
@@ -216,8 +216,8 @@ Tarjeta individual de producto:
 - Boton wishlist
 - Quick add to cart
 
-#### `ProductGrid`
-**Ubicacion:** `src/components/products/product-grid.tsx`
+#### ProductGrid
+Ubicacion: `src/components/products/product-grid.tsx`
 
 Grid responsive de productos:
 - 4 columnas en desktop
@@ -227,8 +227,8 @@ Grid responsive de productos:
 - Estado de carga con skeletons
 - Estado vacio con mensaje
 
-#### `ProductFilters`
-**Ubicacion:** `src/components/products/product-filters.tsx`
+#### ProductFilters
+Ubicacion: `src/components/products/product-filters.tsx`
 
 Panel de filtros lateral:
 - Filtro por categoria
@@ -240,8 +240,8 @@ Panel de filtros lateral:
 
 ### Home Components
 
-#### `HeroBanner`
-**Ubicacion:** `src/components/home/hero-banner.tsx`
+#### HeroBanner
+Ubicacion: `src/components/home/hero-banner.tsx`
 
 Carousel principal:
 - Swiper con autoplay
@@ -250,8 +250,8 @@ Carousel principal:
 - Efecto fade entre slides
 - CTAs personalizables
 
-#### `ProductCarousel`
-**Ubicacion:** `src/components/home/product-carousel.tsx`
+#### ProductCarousel
+Ubicacion: `src/components/home/product-carousel.tsx`
 
 Carrusel horizontal de productos:
 - Titulo de seccion
@@ -260,8 +260,8 @@ Carrusel horizontal de productos:
 - Responsive breakpoints
 - Reutiliza ProductCard
 
-#### `CategoryGrid`
-**Ubicacion:** `src/components/home/category-grid.tsx`
+#### CategoryGrid
+Ubicacion: `src/components/home/category-grid.tsx`
 
 Grid de categorias:
 - Layout asimetrico (2 grandes, 4 pequenas)
@@ -269,8 +269,8 @@ Grid de categorias:
 - Nombre y contador de productos
 - Links a paginas de categoria
 
-#### `FeaturesSection`
-**Ubicacion:** `src/components/home/features-section.tsx`
+#### FeaturesSection
+Ubicacion: `src/components/home/features-section.tsx`
 
 Seccion de caracteristicas:
 - Envio gratis a partir de cierto monto
@@ -281,8 +281,8 @@ Seccion de caracteristicas:
 
 ### Search Component
 
-#### `SearchModal`
-**Ubicacion:** `src/components/search/search-modal.tsx`
+#### SearchModal
+Ubicacion: `src/components/search/search-modal.tsx`
 
 Modal de busqueda:
 - Overlay fullscreen
@@ -296,8 +296,8 @@ Modal de busqueda:
 
 ## Paginas
 
-### Home (`/`)
-**Archivo:** `src/app/page.tsx`
+### Home (/)
+Archivo: `src/app/page.tsx`
 
 Pagina principal compuesta por:
 1. HeroBanner - Carousel promocional
@@ -306,8 +306,8 @@ Pagina principal compuesta por:
 4. ProductCarousel (Novedades) - Productos nuevos
 5. FeaturesSection - Beneficios de comprar
 
-### Productos (`/productos`)
-**Archivo:** `src/app/productos/page.tsx`
+### Productos (/productos)
+Archivo: `src/app/productos/page.tsx`
 
 Catalogo completo con:
 - Breadcrumbs
@@ -316,8 +316,8 @@ Catalogo completo con:
 - Grid de productos
 - Paginacion/infinite scroll
 
-### Categoria (`/categoria/[slug]`)
-**Archivo:** `src/app/categoria/[slug]/page.tsx`
+### Categoria (/categoria/[slug])
+Archivo: `src/app/categoria/[slug]/page.tsx`
 
 Pagina de categoria dinamica:
 - Titulo y descripcion de categoria
@@ -325,8 +325,8 @@ Pagina de categoria dinamica:
 - Misma estructura que catalogo
 - Filtros contextuales
 
-### Producto (`/producto/[slug]`)
-**Archivo:** `src/app/producto/[slug]/page.tsx`
+### Producto (/producto/[slug])
+Archivo: `src/app/producto/[slug]/page.tsx`
 
 Detalle de producto:
 - Galeria de imagenes con thumbnails
@@ -338,8 +338,8 @@ Detalle de producto:
 - Acordeones (descripcion, talles, cuidados)
 - Productos relacionados
 
-### Contacto (`/contacto`)
-**Archivo:** `src/app/contacto/page.tsx`
+### Contacto (/contacto)
+Archivo: `src/app/contacto/page.tsx`
 
 Formulario de contacto:
 - Campos: nombre, email, telefono, asunto, mensaje
@@ -348,8 +348,8 @@ Formulario de contacto:
 - Links a WhatsApp
 - Horarios de atencion
 
-### Guia de Talles (`/guia-de-talles`)
-**Archivo:** `src/app/guia-de-talles/page.tsx`
+### Guia de Talles (/guia-de-talles)
+Archivo: `src/app/guia-de-talles/page.tsx`
 
 Tablas de medidas:
 - Remeras y tops
@@ -358,8 +358,8 @@ Tablas de medidas:
 - Accesorios
 - Instrucciones de medicion
 
-### Checkout (`/checkout`)
-**Archivo:** `src/app/checkout/page.tsx`
+### Checkout (/checkout)
+Archivo: `src/app/checkout/page.tsx`
 
 Proceso de compra multi-paso:
 1. Datos personales
@@ -369,8 +369,8 @@ Proceso de compra multi-paso:
 - Resumen del pedido
 - Calculos de totales
 
-### Confirmacion (`/checkout/confirmacion`)
-**Archivo:** `src/app/checkout/confirmacion/page.tsx`
+### Confirmacion (/checkout/confirmacion)
+Archivo: `src/app/checkout/confirmacion/page.tsx`
 
 Confirmacion de pedido:
 - Animacion de exito
@@ -385,7 +385,7 @@ Confirmacion de pedido:
 
 ### Productos
 
-#### GET `/api/products`
+#### GET /api/products
 Lista productos con filtros:
 - `category`: Filtrar por categoria
 - `size`: Filtrar por talle
@@ -394,19 +394,19 @@ Lista productos con filtros:
 - `sort`: Ordenamiento
 - `page/limit`: Paginacion
 
-#### GET `/api/products/[slug]`
+#### GET /api/products/[slug]
 Detalle de producto:
 - Datos completos del producto
 - Productos relacionados
 
 ### Categorias
 
-#### GET `/api/categories`
+#### GET /api/categories
 Lista todas las categorias.
 
 ### Checkout
 
-#### POST `/api/checkout/mercadopago`
+#### POST /api/checkout/mercadopago
 Crea preferencia de MercadoPago:
 - Items del carrito
 - Datos del comprador
@@ -415,18 +415,18 @@ Crea preferencia de MercadoPago:
 
 ### Ordenes
 
-#### POST `/api/orders/transfer`
+#### POST /api/orders/transfer
 Crea orden para pago por transferencia:
 - Valida datos con Zod
 - Genera ID unico
 - Establece expiracion (48hs)
 
-#### GET `/api/orders/transfer`
+#### GET /api/orders/transfer
 Consulta estado de orden.
 
 ### Webhooks
 
-#### POST `/api/webhooks/mercadopago`
+#### POST /api/webhooks/mercadopago
 Recibe notificaciones de MercadoPago:
 - Verifica estado del pago
 - Actualiza orden en BD
@@ -434,17 +434,17 @@ Recibe notificaciones de MercadoPago:
 
 ### Contacto
 
-#### POST `/api/contact`
+#### POST /api/contact
 Procesa formulario de contacto:
 - Valida datos
-- Envia email (TODO)
+- Envia email
 
 ---
 
 ## Estado Global
 
 ### Cart Store
-**Archivo:** `src/store/cart-store.ts`
+Archivo: `src/store/cart-store.ts`
 
 Estado del carrito con Zustand:
 
@@ -469,7 +469,7 @@ Persistencia con `zustand/middleware`:
 - Key: `kira-cart-storage`
 
 ### Auth Store
-**Archivo:** `src/store/auth-store.ts`
+Archivo: `src/store/auth-store.ts`
 
 Estado de autenticacion:
 
@@ -492,7 +492,7 @@ interface AuthState {
 ## Estilos
 
 ### Variables CSS
-**Archivo:** `src/styles/globals.css`
+Archivo: `src/styles/globals.css`
 
 ```css
 :root {
@@ -526,43 +526,43 @@ interface AuthState {
 
 ## Utilidades
 
-### `src/lib/utils.ts`
+### src/lib/utils.ts
 
-#### `cn(...classes)`
+#### cn(...classes)
 Combina clases con clsx y tailwind-merge.
 
-#### `formatPrice(price)`
+#### formatPrice(price)
 Formatea numero a precio argentino.
 ```typescript
 formatPrice(15000) // "$15.000"
 ```
 
-#### `calculateDiscount(price, compareAtPrice)`
+#### calculateDiscount(price, compareAtPrice)
 Calcula porcentaje de descuento.
 
-#### `generateSlug(text)`
+#### generateSlug(text)
 Genera slug URL-friendly.
 
-#### `calculateTransferPrice(price)`
+#### calculateTransferPrice(price)
 Aplica descuento por transferencia.
 
-### `src/lib/constants.ts`
+### src/lib/constants.ts
 
-#### `SITE_CONFIG`
+#### SITE_CONFIG
 Configuracion general del sitio:
 - Nombre, descripcion, URL
 - Datos de contacto
 - Redes sociales
 
-#### `NAVIGATION_ITEMS`
+#### NAVIGATION_ITEMS
 Items del menu de navegacion.
 
-#### `SHIPPING_CONFIG`
+#### SHIPPING_CONFIG
 Configuracion de envios:
 - Umbral para envio gratis
 - Metodos disponibles
 
-#### `PAYMENT_CONFIG`
+#### PAYMENT_CONFIG
 Configuracion de pagos:
 - Descuento por transferencia
 - Datos bancarios
@@ -572,16 +572,11 @@ Configuracion de pagos:
 
 ## Proximos Pasos
 
-1. **Base de Datos**: Implementar Prisma con PostgreSQL
-2. **Autenticacion**: Agregar NextAuth.js
-3. **Email**: Configurar Resend para notificaciones
-4. **MercadoPago**: Completar integracion con credenciales reales
-5. **Testing**: Agregar tests con Jest/Vitest
-6. **SEO**: Implementar metadata dinamica
-7. **Analytics**: Configurar Google Analytics
-8. **Deploy**: Configurar Vercel
-
----
-
-**Documentacion generada para KIRA Store**
-*Framework: Next.js 14 | TypeScript | Tailwind CSS*
+1. Base de Datos: Implementar Prisma con PostgreSQL
+2. Autenticacion: Agregar NextAuth.js
+3. Email: Configurar Resend para notificaciones
+4. MercadoPago: Completar integracion con credenciales reales
+5. Testing: Agregar tests con Vitest
+6. SEO: Implementar metadata dinamica
+7. Analytics: Configurar Google Analytics
+8. Deploy: Configurar Vercel

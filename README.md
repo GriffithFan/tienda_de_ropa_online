@@ -1,27 +1,27 @@
 # KIRA Store
 
-> Tienda online de ropa alternativa y estilo japones under
+Tienda online de ropa alternativa y estilo japones under
 
 ![Next.js](https://img.shields.io/badge/Next.js-14-black?style=flat-square&logo=next.js)
 ![TypeScript](https://img.shields.io/badge/TypeScript-5-blue?style=flat-square&logo=typescript)
 ![Tailwind CSS](https://img.shields.io/badge/Tailwind-3-38bdf8?style=flat-square&logo=tailwindcss)
 ![MercadoPago](https://img.shields.io/badge/MercadoPago-Integrated-00a0e4?style=flat-square)
 
-## 📋 Descripcion
+## Descripcion
 
 KIRA Store es una plataforma de e-commerce moderna y minimalista, especializada en ropa alternativa con estetica japonesa under. Desarrollada con las tecnologias mas avanzadas para ofrecer una experiencia de compra fluida y responsive.
 
 ### Caracteristicas Principales
 
-- 🎨 **Diseño Dark & Minimalista** - Paleta de colores oscura con acentos cuidadosamente seleccionados
-- 📱 **100% Responsive** - Optimizado para todos los dispositivos
-- ⚡ **Animaciones Fluidas** - Transiciones suaves con Framer Motion
-- 🛒 **Carrito Persistente** - Estado guardado en localStorage
-- 💳 **MercadoPago Integrado** - Pagos con tarjeta, debito y transferencia
-- 🔍 **Busqueda Avanzada** - Busqueda en tiempo real de productos
-- 📦 **Filtros Dinamicos** - Por categoria, talle, color y precio
+- Diseno Dark y Minimalista con paleta de colores oscura
+- 100% Responsive para todos los dispositivos
+- Animaciones fluidas con Framer Motion
+- Carrito persistente con localStorage
+- Integracion con MercadoPago
+- Busqueda en tiempo real
+- Filtros dinamicos por categoria, talle, color y precio
 
-## 🚀 Tecnologias
+## Tecnologias
 
 | Categoria | Tecnologia |
 |-----------|------------|
@@ -35,7 +35,7 @@ KIRA Store es una plataforma de e-commerce moderna y minimalista, especializada 
 | Iconos | Lucide React |
 | Pagos | MercadoPago SDK |
 
-## 📁 Estructura del Proyecto
+## Estructura del Proyecto
 
 ```
 kira-store/
@@ -61,7 +61,7 @@ kira-store/
 └── ...config files
 ```
 
-## 🛠️ Instalacion
+## Instalacion
 
 ### Prerrequisitos
 
@@ -70,20 +70,18 @@ kira-store/
 
 ### Pasos
 
-1. **Clonar el repositorio**
+1. Clonar el repositorio
 ```bash
-git clone https://github.com/tu-usuario/kira-store.git
-cd kira-store
+git clone https://github.com/GriffithFan/tienda_de_ropa_online.git
+cd tienda_de_ropa_online
 ```
 
-2. **Instalar dependencias**
+2. Instalar dependencias
 ```bash
 npm install
-# o
-pnpm install
 ```
 
-3. **Configurar variables de entorno**
+3. Configurar variables de entorno
 ```bash
 cp .env.example .env.local
 ```
@@ -95,17 +93,17 @@ MERCADOPAGO_ACCESS_TOKEN=tu_access_token
 NEXT_PUBLIC_MERCADOPAGO_PUBLIC_KEY=tu_public_key
 ```
 
-4. **Iniciar el servidor de desarrollo**
+4. Iniciar el servidor de desarrollo
 ```bash
 npm run dev
 ```
 
-5. **Abrir en el navegador**
+5. Abrir en el navegador
 ```
 http://localhost:3000
 ```
 
-## 📄 Paginas Disponibles
+## Paginas Disponibles
 
 | Ruta | Descripcion |
 |------|-------------|
@@ -117,7 +115,7 @@ http://localhost:3000
 | `/contacto` | Formulario de contacto |
 | `/guia-de-talles` | Tablas de medidas |
 
-## 🔌 API Endpoints
+## API Endpoints
 
 | Metodo | Ruta | Descripcion |
 |--------|------|-------------|
@@ -128,7 +126,7 @@ http://localhost:3000
 | POST | `/api/orders/transfer` | Crear orden por transferencia |
 | POST | `/api/contact` | Enviar mensaje de contacto |
 
-## 💳 Metodos de Pago
+## Metodos de Pago
 
 1. **MercadoPago**
    - Tarjetas de credito (hasta 12 cuotas)
@@ -143,7 +141,7 @@ http://localhost:3000
    - Al retirar en el local
    - 10% de descuento
 
-## 🎨 Personalizacion
+## Personalizacion
 
 ### Colores
 
@@ -164,14 +162,14 @@ El proyecto usa:
 - **Inter** - Para texto general
 - **Space Grotesk** - Para titulos
 
-## 📦 Build para Produccion
+## Build para Produccion
 
 ```bash
 npm run build
 npm run start
 ```
 
-## 🚢 Deploy
+## Deploy
 
 ### Vercel (Recomendado)
 
@@ -182,17 +180,16 @@ npm run start
 ### Docker
 
 ```dockerfile
-# Dockerfile incluido en el repositorio
 docker build -t kira-store .
 docker run -p 3000:3000 kira-store
 ```
 
-## 📚 Documentacion Adicional
+## Documentacion Adicional
 
 - [DOCUMENTATION.md](./DOCUMENTATION.md) - Documentacion tecnica detallada
 - [CHECKLIST.md](./CHECKLIST.md) - Estado del desarrollo
 
-## 🤝 Contribuir
+## Contribuir
 
 1. Fork del repositorio
 2. Crear branch (`git checkout -b feature/nueva-funcionalidad`)
@@ -200,11 +197,6 @@ docker run -p 3000:3000 kira-store
 4. Push al branch (`git push origin feature/nueva-funcionalidad`)
 5. Abrir Pull Request
 
-## 📄 Licencia
+## Licencia
 
 Este proyecto es privado y propietario de KIRA Store.
-
----
-
-Desarrollado con 🖤 por KIRA Team
-

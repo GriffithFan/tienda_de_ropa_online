@@ -1,10 +1,10 @@
 # KIRA Store - Checklist de Desarrollo
 
-## Estado del Proyecto: ✅ MVP Completo
+## Estado del Proyecto: MVP Completo
 
 ---
 
-## 🏗️ Estructura del Proyecto
+## Estructura del Proyecto
 
 ### Configuracion Inicial
 - [x] Inicializar proyecto Next.js 14
@@ -25,7 +25,7 @@
 
 ---
 
-## 🧩 Componentes
+## Componentes
 
 ### Layout
 - [x] AnnouncementBar - Cinta animada con anuncios
@@ -59,7 +59,7 @@
 
 ---
 
-## 📄 Paginas
+## Paginas
 
 ### Publicas
 - [x] Home (/) - Pagina principal
@@ -68,23 +68,29 @@
 - [x] Producto (/producto/[slug]) - Detalle de producto
 - [x] Contacto (/contacto) - Formulario de contacto
 - [x] Guia de Talles (/guia-de-talles) - Tablas de medidas
+- [x] Favoritos (/favoritos) - Lista de deseos
+- [x] Perfil (/perfil) - Cuenta de usuario
+- [x] Ofertas (/ofertas) - Productos en descuento
+
+### Legales
+- [x] Terminos y Condiciones (/terminos-y-condiciones)
+- [x] Politica de Privacidad (/politica-de-privacidad)
+- [x] Preguntas Frecuentes (/preguntas-frecuentes)
+- [x] Sobre Nosotros (/sobre-nosotros)
 
 ### Checkout
 - [x] Checkout (/checkout) - Proceso de compra multi-paso
 - [x] Confirmacion (/checkout/confirmacion) - Confirmacion de pedido
+- [x] Pendiente (/checkout/pendiente) - Pago pendiente
 
-### Por Implementar (Futuro)
+### Por Implementar
 - [ ] Login (/auth/login)
 - [ ] Registro (/auth/registro)
-- [ ] Mi Cuenta (/cuenta)
 - [ ] Mis Pedidos (/cuenta/pedidos)
-- [ ] Wishlist (/wishlist)
-- [ ] Politicas de privacidad
-- [ ] Terminos y condiciones
 
 ---
 
-## 🔌 API Routes
+## API Routes
 
 ### Productos
 - [x] GET /api/products - Lista de productos con filtros
@@ -108,7 +114,7 @@
 
 ---
 
-## 🎨 Estilos y UI
+## Estilos y UI
 
 ### Tailwind
 - [x] Configurar colores personalizados (negro/zinc)
@@ -124,7 +130,7 @@
 
 ---
 
-## 🛒 Funcionalidades de E-commerce
+## Funcionalidades de E-commerce
 
 ### Carrito
 - [x] Agregar productos al carrito
@@ -149,7 +155,7 @@
 
 ---
 
-## 📦 Datos y Estado
+## Datos y Estado
 
 ### Mock Data
 - [x] Productos de ejemplo (12+)
@@ -164,20 +170,20 @@
 
 ---
 
-## 🔒 Pendiente para Produccion
+## Pendiente para Produccion
 
 ### Base de Datos
-- [ ] Configurar Prisma/Drizzle
+- [ ] Configurar Prisma con PostgreSQL
 - [ ] Modelos de datos
 - [ ] Migraciones
 
 ### Autenticacion
-- [ ] NextAuth.js / Clerk
+- [ ] NextAuth.js
 - [ ] Login con email
-- [ ] Login social (Google, etc.)
+- [ ] Login social (Google)
 
 ### Email
-- [ ] Configurar Resend/SendGrid
+- [ ] Configurar Resend
 - [ ] Templates de email
 - [ ] Email de confirmacion
 - [ ] Email de envio
@@ -200,7 +206,7 @@
 
 ---
 
-## 🚀 Deploy
+## Deploy
 
 ### Vercel
 - [ ] Configurar proyecto
@@ -210,20 +216,15 @@
 
 ### Monitoreo
 - [ ] Error tracking (Sentry)
-- [ ] Analytics (GA4/Posthog)
+- [ ] Analytics (GA4)
 - [ ] Uptime monitoring
 
 ---
 
-## 📝 Documentacion
+## Documentacion
 
 - [x] README.md
 - [x] DOCUMENTATION.md
 - [x] CHECKLIST.md
 - [x] .env.example
-- [ ] Storybook (opcional)
 - [ ] Tests unitarios
-
----
-
-**Ultima actualizacion:** $(date)

@@ -1,54 +1,54 @@
-# 📁 Estructura de Assets - KIRA Store
+# Estructura de Assets - KIRA Store
 
 Este directorio contiene todos los assets estaticos de la tienda.
 
-## 📂 Carpetas
+## Carpetas
 
-### `/images`
+### /images
 Imagenes generales del sitio.
 
-### `/products`
+### /products
 Fotos de productos. Nombrar como: `{slug}-{numero}.jpg`
 Ejemplo: `remera-dragon-spirit-1.jpg`, `remera-dragon-spirit-2.jpg`
 
-### `/categories`
+### /categories
 Imagenes para las categorias. Nombrar como: `{slug}.jpg`
 Ejemplo: `remeras.jpg`, `hoodies.jpg`
 
-### `/banners`
+### /banners
 Imagenes para el carousel principal del home.
 Resolucion recomendada: 1920x800px
 
-### `/icons`
+### /icons
 Iconos personalizados, logos de metodos de pago, etc.
 
-### `/logos`
+### /logos
 Logo de la marca en diferentes versiones y formatos.
 
-## 📐 Especificaciones
+## Especificaciones
 
 ### Productos
-- **Formato**: JPG o WebP (preferido)
-- **Tamano**: 800x1067px (ratio 3:4)
-- **Peso**: Maximo 200KB por imagen
+- Formato: JPG o WebP (preferido)
+- Tamano: 800x1067px (ratio 3:4)
+- Peso: Maximo 200KB por imagen
 
 ### Banners
-- **Formato**: JPG o WebP
-- **Desktop**: 1920x800px
-- **Mobile**: 768x600px
-- **Peso**: Maximo 300KB
+- Formato: JPG o WebP
+- Desktop: 1920x800px
+- Mobile: 768x600px
+- Peso: Maximo 300KB
 
 ### Categorias
-- **Formato**: JPG o WebP
-- **Tamano**: 600x800px
-- **Peso**: Maximo 150KB
+- Formato: JPG o WebP
+- Tamano: 600x800px
+- Peso: Maximo 150KB
 
 ### Iconos
-- **Formato**: SVG (preferido) o PNG
-- **Tamano**: 64x64px para iconos pequenos
-- **Fondo**: Transparente
+- Formato: SVG (preferido) o PNG
+- Tamano: 64x64px para iconos pequenos
+- Fondo: Transparente
 
-## 🎨 Optimizacion
+## Optimizacion
 
 Las imagenes seran optimizadas automaticamente por Next.js.
 Para mejor rendimiento, subir imagenes ya comprimidas.
