@@ -61,6 +61,7 @@ export interface Color {
   id: string;
   name: string;
   hexCode: string;
+  hex?: string; // Alias para compatibilidad con API
 }
 
 export interface CartItem {

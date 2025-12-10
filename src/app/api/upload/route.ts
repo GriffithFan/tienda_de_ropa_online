@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getToken } from 'next-auth/jwt';
-import { uploadImage, deleteImage, uploadMultipleImages } from '@/lib/cloudinary';
+import { uploadImage, deleteImage } from '@/lib/cloudinary';
 
 /**
  * POST /api/upload
@@ -15,22 +15,27 @@ export async function POST(request: NextRequest) {
     }
 
     const formData = await request.formData();
-    const files = formData.getAll('files') as File[];
+    
+    // Aceptar tanto 'file' (singular) como 'files' (plural)
+    const singleFile = formData.get('file') as File | null;
+    const multipleFiles = formData.getAll('files') as File[];
+    
+    const files: File[] = singleFile ? [singleFile] : multipleFiles;
     const folder = formData.get('folder') as string || 'products';
 
-    if (!files || files.length === 0) {
+    if (!files || files.length === 0 || (files.length === 1 && !files[0]?.name)) {
       return NextResponse.json(
         { error: 'No se proporcionaron archivos' },
         { status: 400 }
       );
     }
 
-    // Validar tipos de archivo
-    const allowedTypes = ['image/jpeg', 'image/png', 'image/webp', 'image/gif'];
+    // Validar tipos de archivo - ser mas permisivo
+    const allowedTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/webp', 'image/gif'];
     for (const file of files) {
-      if (!allowedTypes.includes(file.type)) {
+      if (!file.type || (!allowedTypes.includes(file.type) && !file.type.startsWith('image/'))) {
         return NextResponse.json(
-          { error: `Tipo de archivo no permitido: ${file.type}` },
+          { error: `Tipo de archivo no permitido: ${file.type || 'desconocido'}. Use JPG, PNG, WebP o GIF.` },
           { status: 400 }
         );
       }
@@ -53,6 +58,16 @@ export async function POST(request: NextRequest) {
 
     const results = await Promise.all(uploadPromises);
 
+    // Si es un solo archivo, devolver url directamente para compatibilidad
+    if (results.length === 1) {
+      return NextResponse.json({
+        success: true,
+        url: results[0].url,
+        publicId: results[0].publicId,
+        images: results,
+      });
+    }
+
     return NextResponse.json({
       success: true,
       images: results,
@@ -60,7 +75,7 @@ export async function POST(request: NextRequest) {
   } catch (error) {
     console.error('Error en upload:', error);
     return NextResponse.json(
-      { error: 'Error al subir las imagenes' },
+      { error: 'Error al subir las imagenes', details: error instanceof Error ? error.message : 'Unknown error' },
       { status: 500 }
     );
   }

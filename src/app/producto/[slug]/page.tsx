@@ -1,9 +1,9 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useParams } from 'next/navigation';
 import Link from 'next/link';
-import { motion } from 'framer-motion';
+import Image from 'next/image';
 import {
   Minus,
   Plus,
@@ -15,11 +15,28 @@ import {
   ChevronRight,
   ShoppingBag,
 } from 'lucide-react';
-import { ProductCarousel } from '@/components/home';
-import { getProductBySlug, getRelatedProducts, products } from '@/data/products';
 import { useCartStore } from '@/store';
 import { formatPrice, calculateTransferPrice, cn } from '@/lib/utils';
 import { PAYMENT_CONFIG, SHIPPING_CONFIG } from '@/lib/constants';
+
+interface ProductData {
+  id: string;
+  name: string;
+  slug: string;
+  description: string;
+  price: number;
+  compareAtPrice?: number;
+  sku?: string;
+  images: string[];
+  sizes: { size: string; stock: number }[];
+  colors: { name: string; hexCode: string }[];
+  category: { id: string; name: string; slug: string };
+  tags: string[];
+  isNew: boolean;
+  isFeatured: boolean;
+  isOnSale: boolean;
+  stock: number;
+}
 
 /**
  * Pagina de detalle de producto
@@ -29,7 +46,8 @@ export default function ProductPage() {
   const params = useParams();
   const slug = params.slug as string;
 
-  const product = getProductBySlug(slug);
+  const [product, setProduct] = useState<ProductData | null>(null);
+  const [loading, setLoading] = useState(true);
   const addItem = useCartStore((state) => state.addItem);
 
   const [selectedSize, setSelectedSize] = useState<string>('');
@@ -37,6 +55,36 @@ export default function ProductPage() {
   const [quantity, setQuantity] = useState(1);
   const [activeImage, setActiveImage] = useState(0);
   const [postalCode, setPostalCode] = useState('');
+
+  // Cargar producto desde la API
+  useEffect(() => {
+    const fetchProduct = async () => {
+      try {
+        setLoading(true);
+        const response = await fetch(`/api/products/${slug}`);
+        if (response.ok) {
+          const data = await response.json();
+          setProduct(data.product);
+        }
+      } catch (error) {
+        console.error('Error fetching product:', error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    if (slug) {
+      fetchProduct();
+    }
+  }, [slug]);
+
+  if (loading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-accent"></div>
+      </div>
+    );
+  }
 
   if (!product) {
     return (
@@ -54,26 +102,64 @@ export default function ProductPage() {
     );
   }
 
-  const relatedProducts = getRelatedProducts(product.id, 8);
   const transferPrice = calculateTransferPrice(product.price, PAYMENT_CONFIG.transferDiscount);
   const installmentPrice = Math.round(product.price / 6);
 
+  // Si no hay colores, usar "Default" como color predeterminado
+  const hasColors = product.colors && product.colors.length > 0;
+  const hasSizes = product.sizes && product.sizes.length > 0;
+  
+  // Auto-seleccionar si solo hay una opción
+  const effectiveColor = hasColors ? selectedColor : 'default';
+  const effectiveSize = hasSizes ? selectedSize : 'unico';
+
   const handleAddToCart = () => {
-    if (!selectedSize || !selectedColor) {
-      // Mostrar error - seleccionar opciones
+    // Permitir agregar si no requiere selección o si ya está seleccionado
+    const needsSize = hasSizes && !selectedSize;
+    const needsColor = hasColors && !selectedColor;
+    
+    if (needsSize || needsColor) {
+      alert(needsSize && needsColor ? 'Selecciona talle y color' : needsSize ? 'Selecciona un talle' : 'Selecciona un color');
       return;
     }
-    addItem(product, quantity, selectedSize, selectedColor);
+    
+    // Adaptar el producto al formato esperado por el carrito
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const cartProduct: any = {
+      id: product.id,
+      name: product.name,
+      slug: product.slug,
+      description: product.description,
+      price: product.price,
+      originalPrice: product.compareAtPrice,
+      images: product.images.map((url, i) => ({ id: `img-${i}`, url, alt: product.name })),
+      sizes: hasSizes 
+        ? product.sizes.map((s, i) => ({ id: `size-${i}`, name: s.size, available: s.stock > 0 }))
+        : [{ id: 'size-0', name: 'Único', available: true }],
+      colors: hasColors
+        ? product.colors.map((c) => ({ id: c.name.toLowerCase(), name: c.name, hexCode: c.hexCode }))
+        : [{ id: 'default', name: 'Default', hexCode: '#000000' }],
+      category: product.category,
+      tags: product.tags,
+      isNew: product.isNew,
+      isOnSale: product.isOnSale,
+      featured: product.isFeatured,
+      stock: {},
+      sku: product.sku || '',
+      createdAt: new Date().toISOString(),
+      updatedAt: new Date().toISOString(),
+    };
+    addItem(cartProduct, quantity, effectiveSize, effectiveColor);
   };
 
-  const getStockForSelection = () => {
-    if (!selectedSize || !selectedColor) return null;
-    const key = `${selectedSize.toLowerCase()}-${selectedColor}`;
-    return product.stock[key] || 0;
+  const getStockForSize = (sizeName: string) => {
+    const size = product.sizes.find(s => s.size === sizeName);
+    return size?.stock || 0;
   };
 
-  const stock = getStockForSelection();
-  const isOutOfStock = stock !== null && stock === 0;
+  const currentStock = selectedSize ? getStockForSize(selectedSize) : null;
+  const isOutOfStock = currentStock !== null && currentStock === 0;
+  const currentImage = product.images[activeImage] || product.images[0];
 
   return (
     <div className="min-h-screen">
@@ -90,10 +176,10 @@ export default function ProductPage() {
             </Link>
             <ChevronRight className="w-4 h-4 flex-shrink-0" />
             <Link
-              href={`/categoria/${product.category.slug}`}
+              href={`/categoria/${product.category?.slug || 'general'}`}
               className="hover:text-accent"
             >
-              {product.category.name}
+              {product.category?.name || 'General'}
             </Link>
             <ChevronRight className="w-4 h-4 flex-shrink-0" />
             <span className="text-accent truncate">{product.name}</span>
@@ -108,15 +194,28 @@ export default function ProductPage() {
           <div className="space-y-4">
             {/* Imagen principal */}
             <div className="aspect-product bg-surface rounded-xl overflow-hidden relative">
-              <div className="absolute inset-0 flex items-center justify-center">
-                <ShoppingBag className="w-24 h-24 text-primary-700" />
-              </div>
+              {currentImage ? (
+                <Image
+                  src={currentImage}
+                  alt={product.name}
+                  fill
+                  className="object-cover"
+                  sizes="(max-width: 768px) 100vw, 50vw"
+                  priority
+                />
+              ) : (
+                <div className="absolute inset-0 flex items-center justify-center">
+                  <ShoppingBag className="w-24 h-24 text-primary-700" />
+                </div>
+              )}
 
               {/* Tags */}
               <div className="absolute top-4 left-4 flex flex-col gap-2">
                 {product.isNew && <span className="tag-new">Nuevo</span>}
-                {product.isOnSale && product.discount && (
-                  <span className="tag-sale">{product.discount}% OFF</span>
+                {product.isOnSale && product.compareAtPrice && (
+                  <span className="tag-sale">
+                    {Math.round((1 - product.price / product.compareAtPrice) * 100)}% OFF
+                  </span>
                 )}
               </div>
 
@@ -142,18 +241,22 @@ export default function ProductPage() {
               <div className="flex gap-3 overflow-x-auto pb-2">
                 {product.images.map((image, index) => (
                   <button
-                    key={image.id}
+                    key={index}
                     onClick={() => setActiveImage(index)}
                     className={cn(
-                      'w-20 h-24 flex-shrink-0 bg-surface rounded-lg overflow-hidden border-2 transition-colors',
+                      'w-20 h-24 flex-shrink-0 bg-surface rounded-lg overflow-hidden border-2 transition-colors relative',
                       activeImage === index
                         ? 'border-accent'
                         : 'border-transparent hover:border-border'
                     )}
                   >
-                    <div className="w-full h-full flex items-center justify-center">
-                      <ShoppingBag className="w-8 h-8 text-primary-700" />
-                    </div>
+                    <Image
+                      src={image}
+                      alt={`${product.name} - ${index + 1}`}
+                      fill
+                      className="object-cover"
+                      sizes="80px"
+                    />
                   </button>
                 ))}
               </div>
@@ -165,21 +268,23 @@ export default function ProductPage() {
             {/* Categoria y nombre */}
             <div>
               <p className="text-sm text-accent-muted uppercase tracking-wider mb-2">
-                {product.category.name}
+                {product.category?.name || 'General'}
               </p>
               <h1 className="font-display text-2xl sm:text-3xl lg:text-4xl font-bold">
                 {product.name}
               </h1>
-              <p className="text-accent-muted text-sm mt-2">SKU: {product.sku}</p>
+              {product.sku && (
+                <p className="text-accent-muted text-sm mt-2">SKU: {product.sku}</p>
+              )}
             </div>
 
             {/* Precios */}
             <div className="space-y-2">
               <div className="flex items-baseline gap-3">
                 <span className="price text-3xl">{formatPrice(product.price)}</span>
-                {product.originalPrice && (
+                {product.compareAtPrice && (
                   <span className="price-original text-lg">
-                    {formatPrice(product.originalPrice)}
+                    {formatPrice(product.compareAtPrice)}
                   </span>
                 )}
               </div>
@@ -195,71 +300,78 @@ export default function ProductPage() {
             <div className="divider" />
 
             {/* Selector de color */}
-            <div>
-              <label className="block text-sm font-medium mb-3">
-                Color: <span className="text-accent-muted">{selectedColor || 'Selecciona'}</span>
-              </label>
-              <div className="flex flex-wrap gap-3">
-                {product.colors.map((color) => (
-                  <button
-                    key={color.id}
-                    onClick={() => setSelectedColor(color.id)}
-                    className={cn(
-                      'w-10 h-10 rounded-full border-2 transition-all',
-                      selectedColor === color.id
-                        ? 'border-accent scale-110'
-                        : 'border-border hover:border-accent-muted'
-                    )}
-                    style={{ backgroundColor: color.hexCode }}
-                    title={color.name}
-                  />
-                ))}
+            {product.colors.length > 0 && (
+              <div>
+                <label className="block text-sm font-medium mb-3">
+                  Color: <span className="text-accent-muted">{selectedColor || 'Selecciona'}</span>
+                </label>
+                <div className="flex flex-wrap gap-3">
+                  {product.colors.map((color) => (
+                    <button
+                      key={color.name}
+                      onClick={() => setSelectedColor(color.name)}
+                      className={cn(
+                        'w-10 h-10 rounded-full border-2 transition-all',
+                        selectedColor === color.name
+                          ? 'border-accent scale-110'
+                          : 'border-border hover:border-accent-muted'
+                      )}
+                      style={{ backgroundColor: color.hexCode }}
+                      title={color.name}
+                    />
+                  ))}
+                </div>
               </div>
-            </div>
+            )}
 
             {/* Selector de talle */}
-            <div>
-              <div className="flex items-center justify-between mb-3">
-                <label className="text-sm font-medium">
-                  Talle: <span className="text-accent-muted">{selectedSize || 'Selecciona'}</span>
-                </label>
-                <Link
-                  href="/guia-de-talles"
-                  className="text-sm text-accent-muted hover:text-accent underline"
-                >
-                  Guia de talles
-                </Link>
-              </div>
-              <div className="flex flex-wrap gap-2">
-                {product.sizes.map((size) => (
-                  <button
-                    key={size.id}
-                    onClick={() => setSelectedSize(size.name)}
-                    className={cn(
-                      'px-4 py-2 text-sm font-medium rounded-lg border transition-colors',
-                      selectedSize === size.name
-                        ? 'bg-accent text-background border-accent'
-                        : 'border-border hover:border-accent-muted'
-                    )}
+            {product.sizes.length > 0 && (
+              <div>
+                <div className="flex items-center justify-between mb-3">
+                  <label className="text-sm font-medium">
+                    Talle: <span className="text-accent-muted">{selectedSize || 'Selecciona'}</span>
+                  </label>
+                  <Link
+                    href="/guia-de-talles"
+                    className="text-sm text-accent-muted hover:text-accent underline"
                   >
-                    {size.name}
-                  </button>
-                ))}
+                    Guia de talles
+                  </Link>
+                </div>
+                <div className="flex flex-wrap gap-2">
+                  {product.sizes.map((size) => (
+                    <button
+                      key={size.size}
+                      onClick={() => setSelectedSize(size.size)}
+                      disabled={size.stock === 0}
+                      className={cn(
+                        'px-4 py-2 text-sm font-medium rounded-lg border transition-colors',
+                        selectedSize === size.size
+                          ? 'bg-accent text-background border-accent'
+                          : size.stock === 0
+                          ? 'border-border opacity-50 cursor-not-allowed line-through'
+                          : 'border-border hover:border-accent-muted'
+                      )}
+                    >
+                      {size.size}
+                    </button>
+                  ))}
+                </div>
               </div>
-            </div>
+            )}
 
             {/* Stock */}
-            {stock !== null && (
+            {currentStock !== null && (
               <p
                 className={cn(
                   'text-sm font-medium',
-                  stock > 5 ? 'text-success' : stock > 0 ? 'text-warning' : 'text-error'
+                  currentStock > 5 ? 'text-success' : currentStock > 0 ? 'text-warning' : 'text-error'
                 )}
               >
-                {stock > 5
+                {currentStock > 5
                   ? 'Stock disponible'
-                  : stock > 0
-                  ? `Ultimas ${stock} unidades`
+                  : currentStock > 0
+                  ? `Ultimas ${currentStock} unidades`
                   : 'Sin stock'}
               </p>
             )}
@@ -279,7 +391,7 @@ export default function ProductPage() {
                 <button
                   onClick={() => setQuantity(Math.min(10, quantity + 1))}
                   className="p-3 hover:bg-surface transition-colors"
-                  disabled={quantity >= 10 || (stock !== null && quantity >= stock)}
+                  disabled={quantity >= 10 || (currentStock !== null && quantity >= currentStock)}
                 >
                   <Plus className="w-5 h-5" />
                 </button>
@@ -288,7 +400,7 @@ export default function ProductPage() {
               {/* Boton agregar */}
               <button
                 onClick={handleAddToCart}
-                disabled={!selectedSize || !selectedColor || isOutOfStock}
+                disabled={(hasSizes && !selectedSize) || (hasColors && !selectedColor) || isOutOfStock}
                 className="btn-primary flex-1 justify-center"
               >
                 <ShoppingBag className="w-5 h-5" />
@@ -346,7 +458,7 @@ export default function ProductPage() {
             </div>
 
             {/* Tags */}
-            {product.tags.length > 0 && (
+            {product.tags && product.tags.length > 0 && (
               <div className="flex flex-wrap gap-2">
                 {product.tags.map((tag) => (
                   <span
@@ -361,15 +473,6 @@ export default function ProductPage() {
           </div>
         </div>
       </div>
-
-      {/* Productos relacionados */}
-      {relatedProducts.length > 0 && (
-        <ProductCarousel
-          title="Productos relacionados"
-          subtitle="Tambien te puede interesar"
-          products={relatedProducts}
-        />
-      )}
     </div>
   );
 }

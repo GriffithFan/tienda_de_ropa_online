@@ -23,8 +23,15 @@ export function ProductCard({ product, priority = false }: ProductCardProps) {
   const [imageError, setImageError] = useState(false);
   const addItem = useCartStore((state) => state.addItem);
 
-  const primaryImage = product.images.find((img) => img.isPrimary) || product.images[0];
-  const secondaryImage = product.images.find((img) => !img.isPrimary);
+  // Soportar ambos formatos de images: array de objetos o array de strings
+  const getImageUrl = (img: { url?: string; isPrimary?: boolean } | string): string => {
+    if (typeof img === 'string') return img;
+    return img.url || '';
+  };
+
+  const images = product.images || [];
+  const primaryImage = images.length > 0 ? getImageUrl(images[0]) : null;
+  const secondaryImage = images.length > 1 ? getImageUrl(images[1]) : null;
 
   const discount = product.originalPrice
     ? calculateDiscount(product.originalPrice, product.price)
@@ -35,8 +42,8 @@ export function ProductCard({ product, priority = false }: ProductCardProps) {
     e.stopPropagation();
     
     // Agregar con talle y color por defecto
-    const defaultSize = product.sizes[0]?.name || 'M';
-    const defaultColor = product.colors[0]?.name || 'Negro';
+    const defaultSize = product.sizes?.[0]?.name || 'M';
+    const defaultColor = product.colors?.[0]?.name || 'Negro';
     addItem(product, 1, defaultSize, defaultColor);
   };
 
@@ -61,10 +68,16 @@ export function ProductCard({ product, priority = false }: ProductCardProps) {
               isHovered && secondaryImage ? 'opacity-0' : 'opacity-100'
             )}
           >
-            {!imageError ? (
-              <div className="w-full h-full flex items-center justify-center bg-primary-900">
-                <ShoppingBag className="w-16 h-16 text-primary-700" />
-              </div>
+            {primaryImage && !imageError ? (
+              <Image
+                src={primaryImage}
+                alt={product.name}
+                fill
+                className="object-cover"
+                sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 25vw"
+                priority={priority}
+                onError={() => setImageError(true)}
+              />
             ) : (
               <div className="w-full h-full flex items-center justify-center bg-primary-900">
                 <ShoppingBag className="w-16 h-16 text-primary-700" />
@@ -80,9 +93,13 @@ export function ProductCard({ product, priority = false }: ProductCardProps) {
                 isHovered ? 'opacity-100' : 'opacity-0'
               )}
             >
-              <div className="w-full h-full flex items-center justify-center bg-primary-800">
-                <ShoppingBag className="w-16 h-16 text-primary-600" />
-              </div>
+              <Image
+                src={secondaryImage}
+                alt={`${product.name} - alternativa`}
+                fill
+                className="object-cover"
+                sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 25vw"
+              />
             </div>
           )}
 
@@ -128,7 +145,7 @@ export function ProductCard({ product, priority = false }: ProductCardProps) {
         <div className="p-4">
           {/* Categoria */}
           <p className="text-xs text-accent-muted uppercase tracking-wider mb-1">
-            {product.category.name}
+            {typeof product.category === 'string' ? product.category : product.category?.name || 'General'}
           </p>
 
           {/* Nombre */}
@@ -157,13 +174,13 @@ export function ProductCard({ product, priority = false }: ProductCardProps) {
           </p>
 
           {/* Colores disponibles */}
-          {product.colors.length > 1 && (
+          {product.colors && product.colors.length > 1 && (
             <div className="flex items-center gap-1.5 mt-3">
-              {product.colors.slice(0, 4).map((color) => (
+              {product.colors.slice(0, 4).map((color, idx) => (
                 <span
-                  key={color.id}
+                  key={color.id || idx}
                   className="w-4 h-4 rounded-full border border-border"
-                  style={{ backgroundColor: color.hexCode }}
+                  style={{ backgroundColor: color.hexCode || color.hex }}
                   title={color.name}
                 />
               ))}

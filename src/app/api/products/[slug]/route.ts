@@ -62,24 +62,25 @@ export async function GET(
       description: product.description,
       price: Number(product.price),
       compareAtPrice: product.compareAtPrice ? Number(product.compareAtPrice) : undefined,
-      category: product.category.slug,
-      images: product.images.map((img: { url: string }) => img.url),
-      sizes: product.sizes.map((s: { size: string }) => s.size),
-      colors: product.colors.map((c: { name: string; hex: string }) => ({ name: c.name, hex: c.hex })),
+      sku: product.sku,
+      category: product.category,
+      images: product.images?.map((img: { url: string }) => img.url) || [],
+      sizes: product.sizes?.map((s: { size: string; stock: number }) => ({ size: s.size, stock: s.stock })) || [],
+      colors: product.colors?.map((c: { name: string; hex: string }) => ({ name: c.name, hexCode: c.hex })) || [],
       stock: product.stock,
       isNew: product.isNew,
       isFeatured: product.isFeatured,
       isOnSale: product.isOnSale,
-      tags: product.tags,
+      tags: product.tags || [],
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      reviews: product.reviews.map((r: any) => ({
+      reviews: product.reviews?.map((r: any) => ({
         id: r.id,
         rating: r.rating,
         title: r.title,
         comment: r.comment,
-        userName: `${r.user.firstName} ${r.user.lastName.charAt(0)}.`,
+        userName: `${r.user.firstName} ${r.user.lastName?.charAt(0) || ''}.`,
         createdAt: r.createdAt,
-      })),
+      })) || [],
     };
 
     // eslint-disable-next-line @typescript-eslint/no-explicit-any

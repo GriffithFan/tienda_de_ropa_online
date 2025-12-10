@@ -1,9 +1,8 @@
 'use client';
 
-import { useState, useMemo, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { useSearchParams } from 'next/navigation';
 import { ProductGrid, ProductFilters } from '@/components/products';
-import { products } from '@/data/products';
 import type { FilterState, Product } from '@/types';
 
 /**
@@ -25,103 +24,127 @@ export default function ProductsPage() {
   });
 
   const [sortBy, setSortBy] = useState('newest');
-  const [displayedProducts, setDisplayedProducts] = useState<Product[]>([]);
+  const [products, setProducts] = useState<Product[]>([]);
+  const [totalProducts, setTotalProducts] = useState(0);
   const [page, setPage] = useState(1);
+  const [loading, setLoading] = useState(true);
   const productsPerPage = 12;
 
-  // Filtrar y ordenar productos
-  const filteredProducts = useMemo(() => {
-    let result = [...products];
+  // Función para obtener productos de la API
+  const fetchProducts = useCallback(async (pageNum: number = 1, append: boolean = false) => {
+    try {
+      setLoading(true);
+      
+      // Construir query params
+      const params = new URLSearchParams();
+      params.set('page', pageNum.toString());
+      params.set('limit', productsPerPage.toString());
+      params.set('sort', sortBy);
+      
+      if (searchQuery) {
+        params.set('search', searchQuery);
+      }
+      
+      if (filters.sizes.length > 0) {
+        params.set('size', filters.sizes[0]); // API acepta un talle a la vez
+      }
+      
+      if (filters.colors.length > 0) {
+        params.set('color', filters.colors[0]); // API acepta un color a la vez
+      }
+      
+      if (filters.priceRange[0] > 0) {
+        params.set('minPrice', filters.priceRange[0].toString());
+      }
+      
+      if (filters.priceRange[1] < 200000) {
+        params.set('maxPrice', filters.priceRange[1].toString());
+      }
+      
+      if (filters.onSale) {
+        params.set('onSale', 'true');
+      }
+      
+      if (initialFilter === 'featured') {
+        params.set('featured', 'true');
+      }
 
-    // Filtro por busqueda
-    if (searchQuery) {
-      const query = searchQuery.toLowerCase();
-      result = result.filter(
-        (p) =>
-          p.name.toLowerCase().includes(query) ||
-          p.description.toLowerCase().includes(query) ||
-          p.tags.some((tag) => tag.toLowerCase().includes(query))
-      );
+      const response = await fetch(`/api/products?${params.toString()}`);
+      const data = await response.json();
+      
+      if (response.ok) {
+        // Mapear los datos de la API al formato esperado por el frontend
+        const mappedProducts: Product[] = (data.products || []).map((p: {
+          id: string;
+          name: string;
+          slug: string;
+          description: string;
+          price: number;
+          compareAtPrice?: number | null;
+          images: string[];
+          sizes: { size: string; stock: number }[];
+          colors: { name: string; hexCode: string }[];
+          category?: { id: string; name: string; slug: string } | null;
+          tags: string[];
+          isFeatured: boolean;
+          isOnSale: boolean;
+          isNew: boolean;
+          isActive: boolean;
+          createdAt: string;
+        }) => ({
+          id: p.id,
+          name: p.name,
+          slug: p.slug,
+          description: p.description,
+          price: p.price,
+          originalPrice: p.compareAtPrice || undefined,
+          images: p.images || [],
+          sizes: (p.sizes || []).map((s: { size: string; stock: number }) => ({
+            name: s.size,
+            available: s.stock > 0,
+            stock: s.stock,
+          })),
+          colors: (p.colors || []).map((c: { name: string; hexCode: string }) => ({
+            id: c.name.toLowerCase(),
+            name: c.name,
+            hex: c.hexCode,
+          })),
+          category: p.category?.slug || 'general',
+          tags: p.tags || [],
+          featured: p.isFeatured,
+          isNew: p.isNew,
+          isOnSale: p.isOnSale,
+          createdAt: p.createdAt,
+        }));
+        
+        if (append) {
+          setProducts(prev => [...prev, ...mappedProducts]);
+        } else {
+          setProducts(mappedProducts);
+        }
+        setTotalProducts(data.pagination?.total || mappedProducts.length);
+      }
+    } catch (error) {
+      console.error('Error fetching products:', error);
+    } finally {
+      setLoading(false);
     }
+  }, [sortBy, searchQuery, filters, initialFilter, productsPerPage]);
 
-    // Filtro por talle
-    if (filters.sizes.length > 0) {
-      result = result.filter((p) =>
-        p.sizes.some((size) => filters.sizes.includes(size.name))
-      );
-    }
-
-    // Filtro por color
-    if (filters.colors.length > 0) {
-      result = result.filter((p) =>
-        p.colors.some((color) => filters.colors.includes(color.id))
-      );
-    }
-
-    // Filtro por precio
-    result = result.filter(
-      (p) =>
-        p.price >= filters.priceRange[0] && p.price <= filters.priceRange[1]
-    );
-
-    // Filtro por ofertas
-    if (filters.onSale) {
-      result = result.filter((p) => p.isOnSale);
-    }
-
-    // Filtro especial desde URL
-    if (initialFilter === 'new') {
-      result = result.filter((p) => p.isNew);
-    } else if (initialFilter === 'featured') {
-      result = result.filter((p) => p.featured);
-    }
-
-    // Ordenamiento
-    switch (sortBy) {
-      case 'newest':
-        result.sort(
-          (a, b) =>
-            new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
-        );
-        break;
-      case 'oldest':
-        result.sort(
-          (a, b) =>
-            new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime()
-        );
-        break;
-      case 'price-asc':
-        result.sort((a, b) => a.price - b.price);
-        break;
-      case 'price-desc':
-        result.sort((a, b) => b.price - a.price);
-        break;
-      case 'name-asc':
-        result.sort((a, b) => a.name.localeCompare(b.name));
-        break;
-      case 'name-desc':
-        result.sort((a, b) => b.name.localeCompare(a.name));
-        break;
-    }
-
-    return result;
-  }, [filters, sortBy, searchQuery, initialFilter]);
-
-  // Inicializar productos mostrados
+  // Cargar productos cuando cambian los filtros
   useEffect(() => {
-    setDisplayedProducts(filteredProducts.slice(0, productsPerPage));
     setPage(1);
-  }, [filteredProducts]);
+    fetchProducts(1, false);
+  }, [fetchProducts]);
 
   // Cargar mas productos
   const loadMore = () => {
     const nextPage = page + 1;
-    const nextProducts = filteredProducts.slice(0, nextPage * productsPerPage);
-    setDisplayedProducts(nextProducts);
     setPage(nextPage);
+    fetchProducts(nextPage, true);
   };
 
-  const hasMore = displayedProducts.length < filteredProducts.length;
+  const hasMore = products.length < totalProducts;
 
   // Titulo de la pagina basado en filtros
   const getPageTitle = () => {
@@ -147,9 +170,9 @@ export default function ProductsPage() {
           <h1 className="section-title">{getPageTitle()}</h1>
           {searchQuery && (
             <p className="text-accent-muted mt-2">
-              {filteredProducts.length} resultado
-              {filteredProducts.length !== 1 && 's'} encontrado
-              {filteredProducts.length !== 1 && 's'}
+              {totalProducts} resultado
+              {totalProducts !== 1 && 's'} encontrado
+              {totalProducts !== 1 && 's'}
             </p>
           )}
         </div>
@@ -162,7 +185,7 @@ export default function ProductsPage() {
           <ProductFilters
             filters={filters}
             onFilterChange={setFilters}
-            totalProducts={filteredProducts.length}
+            totalProducts={totalProducts}
           />
 
           {/* Grid de productos */}
@@ -170,7 +193,7 @@ export default function ProductsPage() {
             {/* Barra superior con ordenamiento */}
             <div className="flex items-center justify-between mb-6 pb-4 border-b border-border">
               <p className="text-sm text-accent-muted">
-                {filteredProducts.length} producto{filteredProducts.length !== 1 && 's'}
+                {loading ? 'Cargando...' : `${totalProducts} producto${totalProducts !== 1 ? 's' : ''}`}
               </p>
               <div className="flex items-center gap-3">
                 <label htmlFor="sort" className="text-sm text-accent-muted">
@@ -192,11 +215,22 @@ export default function ProductsPage() {
               </div>
             </div>
             
-            <ProductGrid
-              products={displayedProducts}
-              hasMore={hasMore}
-              onLoadMore={loadMore}
-            />
+            {loading && products.length === 0 ? (
+              <div className="flex items-center justify-center py-20">
+                <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-accent"></div>
+              </div>
+            ) : products.length === 0 ? (
+              <div className="text-center py-20">
+                <p className="text-accent-muted text-lg">No se encontraron productos</p>
+                <p className="text-accent-muted/60 mt-2">Intenta ajustar los filtros</p>
+              </div>
+            ) : (
+              <ProductGrid
+                products={products}
+                hasMore={hasMore}
+                onLoadMore={loadMore}
+              />
+            )}
           </div>
         </div>
       </div>

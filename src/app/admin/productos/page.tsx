@@ -21,10 +21,11 @@ interface Product {
   description: string
   price: number
   originalPrice: number | null
-  category: { id: string; name: string }
-  images: string[]
+  compareAtPrice: number | null
+  category: { id: string; name: string } | null
+  images: Array<{ id?: string; url: string; alt?: string }>
   colors: Array<{ id: string; name: string; hex: string }>
-  sizes: string[]
+  sizes: Array<{ id?: string; size: string; stock: number }> | string[]
   stock: number
   isNew: boolean
   isFeatured: boolean
@@ -101,18 +102,28 @@ export default function AdminProductos() {
   const openModal = (product?: Product) => {
     if (product) {
       setEditingProduct(product)
+      // Normalizar images: extraer URLs si son objetos
+      const imageUrls = (product.images || []).map(img => 
+        typeof img === 'string' ? img : img.url
+      ).filter(url => url && url.trim() !== '')
+      
+      // Normalizar sizes: extraer size strings si son objetos
+      const sizeStrings = (product.sizes || []).map(s => 
+        typeof s === 'string' ? s : s.size
+      )
+      
       setFormData({
         name: product.name,
         slug: product.slug,
         description: product.description,
         price: product.price,
-        originalPrice: product.originalPrice || 0,
-        categoryId: product.category.id,
-        images: product.images.length > 0 ? product.images : [''],
-        sizes: product.sizes,
-        stock: product.stock,
-        isNew: product.isNew,
-        isFeatured: product.isFeatured,
+        originalPrice: product.originalPrice || product.compareAtPrice || 0,
+        categoryId: product.category?.id || '',
+        images: imageUrls.length > 0 ? imageUrls : [''],
+        sizes: sizeStrings,
+        stock: product.stock || 0,
+        isNew: product.isNew || false,
+        isFeatured: product.isFeatured || false,
       })
     } else {
       setEditingProduct(null)
@@ -166,14 +177,19 @@ export default function AdminProductos() {
       
       const method = editingProduct ? 'PUT' : 'POST'
       
+      // Asegurar que price y stock sean numeros
+      const payload = {
+        ...formData,
+        price: Number(formData.price) || 0,
+        originalPrice: formData.originalPrice ? Number(formData.originalPrice) : null,
+        stock: Number(formData.stock) || 0,
+        images: formData.images.filter(img => img.trim() !== ''),
+      }
+      
       const res = await fetch(url, {
         method,
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          ...formData,
-          images: formData.images.filter(img => img.trim() !== ''),
-          originalPrice: formData.originalPrice || null,
-        }),
+        body: JSON.stringify(payload),
       })
 
       if (!res.ok) {
@@ -228,9 +244,10 @@ export default function AdminProductos() {
   }
 
   const toggleSize = (size: string) => {
-    const newSizes = formData.sizes.includes(size)
-      ? formData.sizes.filter(s => s !== size)
-      : [...formData.sizes, size]
+    const currentSizes = formData.sizes || []
+    const newSizes = currentSizes.includes(size)
+      ? currentSizes.filter(s => s !== size)
+      : [...currentSizes, size]
     setFormData({ ...formData, sizes: newSizes })
   }
 
@@ -317,9 +334,9 @@ export default function AdminProductos() {
                     <td className="px-5 py-4">
                       <div className="flex items-center gap-3">
                         <div className="w-12 h-12 bg-zinc-800 rounded-lg overflow-hidden flex-shrink-0">
-                          {product.images[0] ? (
+                          {product.images[0]?.url ? (
                             <Image
-                              src={product.images[0]}
+                              src={product.images[0].url}
                               alt={product.name}
                               width={48}
                               height={48}
@@ -569,7 +586,7 @@ export default function AdminProductos() {
                       type="button"
                       onClick={() => toggleSize(size)}
                       className={`px-3 py-1.5 text-sm rounded-lg border transition-colors ${
-                        formData.sizes.includes(size)
+                        (formData.sizes || []).includes(size)
                           ? 'bg-white text-black border-white'
                           : 'bg-zinc-800 text-zinc-400 border-zinc-700 hover:border-zinc-500'
                       }`}
@@ -583,11 +600,53 @@ export default function AdminProductos() {
               {/* Images */}
               <div>
                 <label className="block text-sm font-medium text-zinc-300 mb-2">
-                  Imagenes (URLs)
+                  Imagenes
                 </label>
-                <div className="space-y-2">
+                <div className="space-y-3">
+                  {/* Input para subir archivo */}
+                  <div className="border-2 border-dashed border-zinc-700 rounded-lg p-4 hover:border-zinc-500 transition-colors">
+                    <input
+                      type="file"
+                      accept="image/*"
+                      onChange={async (e) => {
+                        const file = e.target.files?.[0]
+                        if (!file) return
+                        
+                        const formDataUpload = new FormData()
+                        formDataUpload.append('file', file)
+                        
+                        try {
+                          const res = await fetch('/api/upload', {
+                            method: 'POST',
+                            body: formDataUpload,
+                          })
+                          
+                          if (res.ok) {
+                            const data = await res.json()
+                            const newImages = [...formData.images.filter(img => img.trim() !== ''), data.url]
+                            setFormData({ ...formData, images: newImages })
+                          } else {
+                            alert('Error al subir imagen')
+                          }
+                        } catch (err) {
+                          console.error(err)
+                          alert('Error al subir imagen')
+                        }
+                        e.target.value = ''
+                      }}
+                      className="w-full text-sm text-zinc-400 file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-medium file:bg-zinc-700 file:text-white hover:file:bg-zinc-600 cursor-pointer"
+                    />
+                    <p className="text-xs text-zinc-500 mt-2">O pega una URL directamente abajo</p>
+                  </div>
+                  
+                  {/* URLs de imagenes */}
                   {formData.images.map((img, index) => (
-                    <div key={index} className="flex gap-2">
+                    <div key={index} className="flex gap-2 items-center">
+                      {img && img.startsWith('http') && (
+                        <div className="w-12 h-12 relative rounded overflow-hidden flex-shrink-0">
+                          <img src={img} alt="" className="w-full h-full object-cover" />
+                        </div>
+                      )}
                       <input
                         type="text"
                         value={img}
@@ -612,7 +671,7 @@ export default function AdminProductos() {
                     className="flex items-center gap-2 text-sm text-zinc-400 hover:text-white transition-colors"
                   >
                     <Plus className="w-4 h-4" />
-                    <span>Agregar imagen</span>
+                    <span>Agregar otra URL</span>
                   </button>
                 </div>
               </div>

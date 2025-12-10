@@ -3,28 +3,36 @@ import { getToken } from 'next-auth/jwt';
 import { z } from 'zod';
 import prisma from '@/lib/prisma';
 
+// Schema flexible para aceptar ambos formatos
 const productSchema = z.object({
-  name: z.string().min(2),
-  slug: z.string().min(2),
-  description: z.string().min(10),
-  price: z.number().positive(),
-  compareAtPrice: z.number().positive().optional(),
-  categoryId: z.string(),
+  name: z.string().min(2, 'Nombre debe tener al menos 2 caracteres'),
+  slug: z.string().min(2, 'Slug debe tener al menos 2 caracteres'),
+  description: z.string().min(3, 'Descripcion debe tener al menos 3 caracteres'),
+  price: z.number().positive('El precio debe ser mayor a 0'),
+  originalPrice: z.number().nullable().optional(),
+  compareAtPrice: z.number().positive().optional().nullable(),
+  categoryId: z.string().min(1, 'Categoria es requerida'),
   subcategory: z.string().optional(),
-  stock: z.number().int().min(0),
+  stock: z.number().int().min(0).default(0),
   isActive: z.boolean().default(true),
   isNew: z.boolean().default(false),
   isFeatured: z.boolean().default(false),
   isOnSale: z.boolean().default(false),
   tags: z.array(z.string()).default([]),
-  images: z.array(z.object({
-    url: z.string(),
-    alt: z.string().optional(),
-  })).default([]),
-  sizes: z.array(z.object({
-    size: z.string(),
-    stock: z.number().int().min(0),
-  })).default([]),
+  // Aceptar array de strings O array de objetos para images
+  images: z.array(
+    z.union([
+      z.string(),
+      z.object({ url: z.string(), alt: z.string().optional() })
+    ])
+  ).default([]),
+  // Aceptar array de strings O array de objetos para sizes
+  sizes: z.array(
+    z.union([
+      z.string(),
+      z.object({ size: z.string(), stock: z.number().int().min(0) })
+    ])
+  ).default([]),
   colors: z.array(z.object({
     name: z.string(),
     hex: z.string(),
@@ -97,23 +105,33 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    const { images, sizes, colors, ...productData } = validation.data;
+    const { images, sizes, colors, originalPrice, ...productData } = validation.data;
+
+    // Normalizar images: convertir strings a objetos
+    const normalizedImages = images.map((img, index) => {
+      if (typeof img === 'string') {
+        return { url: img, alt: '', order: index };
+      }
+      return { url: img.url, alt: img.alt || '', order: index };
+    }).filter(img => img.url && img.url.trim() !== '');
+
+    // Normalizar sizes: convertir strings a objetos con stock del producto
+    const normalizedSizes = sizes.map((s) => {
+      if (typeof s === 'string') {
+        return { size: s, stock: productData.stock || 0 };
+      }
+      return { size: s.size, stock: s.stock };
+    });
 
     const product = await prisma.product.create({
       data: {
         ...productData,
+        compareAtPrice: originalPrice || productData.compareAtPrice || null,
         images: {
-          create: images.map((img, index) => ({
-            url: img.url,
-            alt: img.alt,
-            order: index,
-          })),
+          create: normalizedImages,
         },
         sizes: {
-          create: sizes.map((s) => ({
-            size: s.size,
-            stock: s.stock,
-          })),
+          create: normalizedSizes,
         },
         colors: {
           create: colors.map((c) => ({
