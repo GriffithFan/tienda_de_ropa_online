@@ -1,11 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { z } from 'zod';
+import prisma from '@/lib/prisma';
 
-/**
- * Schema de validacion para ordenes de transferencia
- */
 const transferOrderSchema = z.object({
-  // Datos personales
   customer: z.object({
     firstName: z.string().min(2),
     lastName: z.string().min(2),
@@ -13,8 +10,6 @@ const transferOrderSchema = z.object({
     phone: z.string().min(8),
     dni: z.string().min(7),
   }),
-
-  // Direccion de envio
   shipping: z.object({
     method: z.string(),
     address: z
@@ -29,8 +24,6 @@ const transferOrderSchema = z.object({
       })
       .optional(),
   }),
-
-  // Items del carrito
   items: z.array(
     z.object({
       productId: z.string(),
@@ -39,30 +32,18 @@ const transferOrderSchema = z.object({
       quantity: z.number(),
       size: z.string(),
       color: z.string(),
+      image: z.string().optional(),
     })
   ),
-
-  // Totales
   subtotal: z.number(),
   shippingCost: z.number(),
   discount: z.number(),
   total: z.number(),
 });
 
-type TransferOrder = z.infer<typeof transferOrderSchema>;
-
-/**
- * POST /api/orders/transfer
- * Crea una orden para pago por transferencia bancaria
- * 
- * El cliente debera realizar la transferencia y enviar el comprobante
- * por email o WhatsApp para confirmar el pedido
- */
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json();
-
-    // Validar los datos de la orden
     const validation = transferOrderSchema.safeParse(body);
 
     if (!validation.success) {
@@ -72,38 +53,50 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    const orderData: TransferOrder = validation.data;
+    const { customer, shipping, items, subtotal, shippingCost, discount, total } = validation.data;
 
-    // Generar ID de orden unico
-    const orderId = `KIRA-${Date.now().toString(36).toUpperCase()}-TF`;
+    const orderNumber = `KIRA-${Date.now().toString(36).toUpperCase()}-TF`;
 
-    // En produccion, guardar en base de datos
-    const order = {
-      id: orderId,
-      ...orderData,
-      paymentMethod: 'transfer',
-      status: 'pending_payment',
-      createdAt: new Date().toISOString(),
-      expiresAt: new Date(Date.now() + 48 * 60 * 60 * 1000).toISOString(), // 48 horas para pagar
-    };
-
-    console.log('Nueva orden por transferencia:', order);
-
-    // TODO: Guardar en base de datos
-    // await db.orders.create({ data: order });
-
-    // TODO: Enviar email con instrucciones de pago
-    // await sendTransferInstructions(order);
+    const order = await prisma.order.create({
+      data: {
+        orderNumber,
+        customerEmail: customer.email,
+        customerName: `${customer.firstName} ${customer.lastName}`,
+        customerPhone: customer.phone,
+        customerDni: customer.dni,
+        paymentMethod: 'TRANSFER',
+        shippingMethod: shipping.method,
+        shippingAddress: shipping.address,
+        subtotal,
+        shippingCost,
+        discount,
+        total,
+        expiresAt: new Date(Date.now() + 48 * 60 * 60 * 1000),
+        items: {
+          create: items.map((item) => ({
+            productId: item.productId,
+            name: item.name,
+            price: item.price,
+            quantity: item.quantity,
+            size: item.size,
+            color: item.color,
+            image: item.image,
+          })),
+        },
+      },
+      include: {
+        items: true,
+      },
+    });
 
     return NextResponse.json({
       success: true,
-      orderId: order.id,
+      orderId: order.orderNumber,
       expiresAt: order.expiresAt,
-      message: 'Orden creada. Realiza la transferencia y envía el comprobante.',
+      message: 'Orden creada. Realiza la transferencia y envia el comprobante.',
     });
   } catch (error) {
     console.error('Error creando orden por transferencia:', error);
-
     return NextResponse.json(
       { error: 'Error al crear la orden' },
       { status: 500 }
@@ -111,10 +104,6 @@ export async function POST(request: NextRequest) {
   }
 }
 
-/**
- * GET /api/orders/transfer?orderId=XXX
- * Obtiene el estado de una orden por transferencia
- */
 export async function GET(request: NextRequest) {
   try {
     const { searchParams } = new URL(request.url);
@@ -127,21 +116,30 @@ export async function GET(request: NextRequest) {
       );
     }
 
-    // TODO: Buscar en base de datos
-    // const order = await db.orders.findUnique({ where: { id: orderId } });
+    const order = await prisma.order.findUnique({
+      where: { orderNumber: orderId },
+      include: {
+        items: true,
+      },
+    });
 
-    // Respuesta de ejemplo
-    const order = {
-      id: orderId,
-      status: 'pending_payment',
-      total: 45000,
-      expiresAt: new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString(),
-    };
+    if (!order) {
+      return NextResponse.json(
+        { error: 'Orden no encontrada' },
+        { status: 404 }
+      );
+    }
 
-    return NextResponse.json(order);
+    return NextResponse.json({
+      id: order.orderNumber,
+      status: order.status,
+      paymentStatus: order.paymentStatus,
+      total: Number(order.total),
+      expiresAt: order.expiresAt,
+      items: order.items,
+    });
   } catch (error) {
     console.error('Error obteniendo orden:', error);
-
     return NextResponse.json(
       { error: 'Error al obtener la orden' },
       { status: 500 }

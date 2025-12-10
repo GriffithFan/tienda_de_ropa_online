@@ -1,10 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { products } from '@/data/products';
+import prisma from '@/lib/prisma';
 
-/**
- * GET /api/products/[slug]
- * Obtiene un producto por su slug
- */
 export async function GET(
   request: NextRequest,
   { params }: { params: { slug: string } }
@@ -12,8 +8,29 @@ export async function GET(
   try {
     const { slug } = params;
 
-    // Buscar el producto
-    const product = products.find((p) => p.slug === slug);
+    const product = await prisma.product.findUnique({
+      where: { slug, isActive: true },
+      include: {
+        category: {
+          select: { id: true, name: true, slug: true },
+        },
+        images: {
+          orderBy: { order: 'asc' },
+        },
+        sizes: true,
+        colors: true,
+        reviews: {
+          where: { isVisible: true },
+          include: {
+            user: {
+              select: { firstName: true, lastName: true },
+            },
+          },
+          orderBy: { createdAt: 'desc' },
+          take: 10,
+        },
+      },
+    });
 
     if (!product) {
       return NextResponse.json(
@@ -22,18 +39,64 @@ export async function GET(
       );
     }
 
-    // Obtener productos relacionados (misma categoria, excluyendo el actual)
-    const relatedProducts = products
-      .filter((p) => p.category === product.category && p.id !== product.id)
-      .slice(0, 4);
+    const relatedProducts = await prisma.product.findMany({
+      where: {
+        categoryId: product.categoryId,
+        id: { not: product.id },
+        isActive: true,
+      },
+      take: 4,
+      include: {
+        images: {
+          orderBy: { order: 'asc' },
+          take: 1,
+        },
+        colors: true,
+      },
+    });
+
+    const formattedProduct = {
+      id: product.id,
+      name: product.name,
+      slug: product.slug,
+      description: product.description,
+      price: Number(product.price),
+      compareAtPrice: product.compareAtPrice ? Number(product.compareAtPrice) : undefined,
+      category: product.category.slug,
+      images: product.images.map((img) => img.url),
+      sizes: product.sizes.map((s) => s.size),
+      colors: product.colors.map((c) => ({ name: c.name, hex: c.hex })),
+      stock: product.stock,
+      isNew: product.isNew,
+      isFeatured: product.isFeatured,
+      isOnSale: product.isOnSale,
+      tags: product.tags,
+      reviews: product.reviews.map((r) => ({
+        id: r.id,
+        rating: r.rating,
+        title: r.title,
+        comment: r.comment,
+        userName: `${r.user.firstName} ${r.user.lastName.charAt(0)}.`,
+        createdAt: r.createdAt,
+      })),
+    };
+
+    const formattedRelated = relatedProducts.map((p) => ({
+      id: p.id,
+      name: p.name,
+      slug: p.slug,
+      price: Number(p.price),
+      compareAtPrice: p.compareAtPrice ? Number(p.compareAtPrice) : undefined,
+      images: p.images.map((img) => img.url),
+      colors: p.colors.map((c) => ({ name: c.name, hex: c.hex })),
+    }));
 
     return NextResponse.json({
-      product,
-      relatedProducts,
+      product: formattedProduct,
+      relatedProducts: formattedRelated,
     });
   } catch (error) {
     console.error('Error obteniendo producto:', error);
-
     return NextResponse.json(
       { error: 'Error al obtener el producto' },
       { status: 500 }

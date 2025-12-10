@@ -4,21 +4,37 @@
   "private": true,
   "scripts": {
     "dev": "next dev",
-    "build": "next build",
+    "build": "prisma generate && next build",
     "start": "next start",
     "lint": "next lint",
-    "type-check": "tsc --noEmit"
+    "type-check": "tsc --noEmit",
+    "postinstall": "prisma generate",
+    "db:generate": "prisma generate",
+    "db:push": "prisma db push",
+    "db:migrate": "prisma migrate dev",
+    "db:studio": "prisma studio",
+    "db:seed": "npx ts-node --compiler-options {\"module\":\"CommonJS\"} prisma/seed.ts"
+  },
+  "prisma": {
+    "seed": "npx ts-node --compiler-options {\"module\":\"CommonJS\"} prisma/seed.ts"
   },
   "dependencies": {
+    "@auth/prisma-adapter": "^2.11.1",
     "@hookform/resolvers": "^3.3.0",
+    "@prisma/client": "^7.1.0",
+    "bcryptjs": "^3.0.3",
     "clsx": "^2.1.0",
     "framer-motion": "^11.0.0",
+    "jsonwebtoken": "^9.0.3",
     "lucide-react": "^0.344.0",
     "mercadopago": "^2.0.8",
     "next": "^14.2.33",
+    "next-auth": "^4.24.13",
+    "prisma": "^7.1.0",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
     "react-hook-form": "^7.50.0",
+    "resend": "^6.6.0",
     "sharp": "^0.33.0",
     "swiper": "^11.0.0",
     "tailwind-merge": "^2.2.0",
@@ -26,6 +42,8 @@
     "zustand": "^4.5.0"
   },
   "devDependencies": {
+    "@types/bcryptjs": "^2.4.6",
+    "@types/jsonwebtoken": "^9.0.10",
     "@types/node": "^20.11.0",
     "@types/react": "^18.2.0",
     "@types/react-dom": "^18.2.0",
@@ -34,6 +52,7 @@
     "eslint-config-next": "^16.0.8",
     "postcss": "^8.4.0",
     "tailwindcss": "^3.4.0",
+    "ts-node": "^10.9.2",
     "typescript": "^5.3.0"
   }
 }
