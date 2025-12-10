@@ -50,7 +50,7 @@ export interface Size {
 }
 
 export interface SizeMeasurement {
-  width: number;
+  width?: number;
   length: number;
   sleeve?: number;
   waist?: number;

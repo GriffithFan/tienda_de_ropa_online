@@ -233,7 +233,7 @@ export function ProductFilters({
           </span>
           <select
             value={currentSort}
-            onChange={(e) => onSortChange(e.target.value)}
+            onChange={(e) => onSortChange?.(e.target.value)}
             className="text-sm py-2 pl-3 pr-8 min-w-[160px]"
           >
             {SORT_OPTIONS.map((option) => (

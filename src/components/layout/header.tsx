@@ -156,7 +156,7 @@ export function Header() {
             <ul className="flex items-center justify-center gap-1">
               {NAV_LINKS.map((link) => (
                 <li key={link.href} className="relative">
-                  {link.hasDropdown ? (
+                  {'hasDropdown' in link && link.hasDropdown ? (
                     <div
                       className="relative"
                       onMouseEnter={() => setIsCategoriesOpen(true)}
@@ -259,7 +259,7 @@ export function Header() {
                 <ul className="space-y-1">
                   {NAV_LINKS.map((link) => (
                     <li key={link.href}>
-                      {link.hasDropdown ? (
+                      {'hasDropdown' in link && link.hasDropdown ? (
                         <MobileDropdown label={link.label} />
                       ) : (
                         <Link
