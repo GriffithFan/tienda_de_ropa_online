@@ -69,39 +69,44 @@ export async function GET(request: NextRequest) {
       }),
     ]);
 
-    const monthlyRevenue = monthlyOrders.reduce((sum, order) => sum + Number(order.total), 0);
-    const lastMonthRevenue = lastMonthOrders.reduce((sum, order) => sum + Number(order.total), 0);
+    const monthlyRevenue = monthlyOrders.reduce((sum: number, order: { total: number | string }) => sum + Number(order.total), 0);
+    const lastMonthRevenue = lastMonthOrders.reduce((sum: number, order: { total: number | string }) => sum + Number(order.total), 0);
     const revenueGrowth = lastMonthRevenue > 0 
       ? ((monthlyRevenue - lastMonthRevenue) / lastMonthRevenue) * 100 
       : 0;
 
-    const topProductIds = topProducts.map((p) => p.productId);
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const topProductIds = topProducts.map((p: any) => p.productId);
     const topProductDetails = await prisma.product.findMany({
       where: { id: { in: topProductIds } },
       select: { id: true, name: true, slug: true },
     });
 
-    const topProductsWithDetails = topProducts.map((p) => ({
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const topProductsWithDetails = topProducts.map((p: any) => ({
       ...p,
-      product: topProductDetails.find((d) => d.id === p.productId),
+      product: topProductDetails.find((d: { id: string }) => d.id === p.productId),
     }));
 
     return NextResponse.json({
-      stats: {
-        totalProducts,
-        totalOrders,
-        totalUsers,
-        pendingOrders,
-        monthlyRevenue,
-        lastMonthRevenue,
-        revenueGrowth: Math.round(revenueGrowth * 100) / 100,
-      },
-      recentOrders: recentOrders.map((order) => ({
+      totalProducts: totalProducts || 0,
+      totalOrders: totalOrders || 0,
+      totalUsers: totalUsers || 0,
+      totalRevenue: monthlyRevenue || 0,
+      pendingOrders: pendingOrders || 0,
+      monthlyRevenue: monthlyRevenue || 0,
+      lastMonthRevenue: lastMonthRevenue || 0,
+      revenueGrowth: Math.round(revenueGrowth * 100) / 100,
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      recentOrders: recentOrders.map((order: any) => ({
         ...order,
         total: Number(order.total),
       })),
       topProducts: topProductsWithDetails,
       lowStockProducts,
+      ordersByStatus: {
+        PENDING: pendingOrders || 0,
+      },
     });
   } catch (error) {
     console.error('Error obteniendo estadisticas:', error);

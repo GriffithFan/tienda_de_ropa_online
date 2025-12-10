@@ -1,15 +1,15 @@
-# KIRA Store
+﻿# Tienda UNDER - E-commerce Platform
 
-Tienda online de ropa alternativa y estilo japones under
+Plataforma de e-commerce empresarial especializada en ropa alternativa y estilo urbano.
 
 ![Next.js](https://img.shields.io/badge/Next.js-14-black?style=flat-square&logo=next.js)
 ![TypeScript](https://img.shields.io/badge/TypeScript-5-blue?style=flat-square&logo=typescript)
 ![Tailwind CSS](https://img.shields.io/badge/Tailwind-3-38bdf8?style=flat-square&logo=tailwindcss)
-![MercadoPago](https://img.shields.io/badge/MercadoPago-Integrated-00a0e4?style=flat-square)
+![PostgreSQL](https://img.shields.io/badge/PostgreSQL-17-336791?style=flat-square&logo=postgresql)
 
 ## Descripcion
 
-KIRA Store es una plataforma de e-commerce moderna y minimalista, especializada en ropa alternativa con estetica japonesa under. Desarrollada con las tecnologias mas avanzadas para ofrecer una experiencia de compra fluida y responsive.
+Sistema completo de e-commerce desarrollado con Next.js 14 y React 18. Incluye panel de administracion avanzado, gestion de inventario, procesamiento de pagos con MercadoPago, sistema de emails automatizados y gestion de imagenes en la nube.
 
 ### Caracteristicas Principales
 
@@ -39,26 +39,26 @@ KIRA Store es una plataforma de e-commerce moderna y minimalista, especializada 
 
 ```
 kira-store/
-├── src/
-│   ├── app/                 # Rutas y paginas (App Router)
-│   │   ├── api/            # API Routes
-│   │   ├── checkout/       # Flujo de checkout
-│   │   ├── categoria/      # Paginas por categoria
-│   │   ├── producto/       # Paginas de producto
-│   │   └── ...
-│   ├── components/         # Componentes React
-│   │   ├── cart/          # Carrito de compras
-│   │   ├── home/          # Componentes del home
-│   │   ├── layout/        # Header, Footer, etc.
-│   │   ├── products/      # Cards y grids
-│   │   └── search/        # Busqueda
-│   ├── data/              # Datos mock
-│   ├── lib/               # Utilidades
-│   ├── store/             # Estado Zustand
-│   ├── styles/            # Estilos globales
-│   └── types/             # Tipos TypeScript
-├── public/                # Assets estaticos
-└── ...config files
+ src/
+    app/                 # Rutas y paginas (App Router)
+       api/            # API Routes
+       checkout/       # Flujo de checkout
+       categoria/      # Paginas por categoria
+       producto/       # Paginas de producto
+       ...
+    components/         # Componentes React
+       cart/          # Carrito de compras
+       home/          # Componentes del home
+       layout/        # Header, Footer, etc.
+       products/      # Cards y grids
+       search/        # Busqueda
+    data/              # Datos mock
+    lib/               # Utilidades
+    store/             # Estado Zustand
+    styles/            # Estilos globales
+    types/             # Tipos TypeScript
+ public/                # Assets estaticos
+ ...config files
 ```
 
 ## Instalacion

@@ -11,6 +11,11 @@ export const SITE_CONFIG = {
   email: 'contacto@kuro.com.ar',
   phone: '+54 11 1234-5678',
   whatsapp: '5491112345678',
+  contact: {
+    email: 'contacto@kuro.com.ar',
+    phone: '+54 11 1234-5678',
+    whatsapp: '5491112345678',
+  },
   address: {
     street: 'Av. Corrientes 1234',
     city: 'Buenos Aires',

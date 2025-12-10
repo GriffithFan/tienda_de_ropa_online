@@ -13,7 +13,9 @@ import {
   X,
   ChevronDown,
   Heart,
+  Settings,
 } from 'lucide-react';
+import { useSession } from 'next-auth/react';
 import { cn } from '@/lib/utils';
 import { useCartStore } from '@/store';
 import { NAV_LINKS, CATEGORIES, SITE_CONFIG } from '@/lib/constants';
@@ -31,11 +33,14 @@ export function Header() {
   const [isSearchOpen, setIsSearchOpen] = useState(false);
   const [isCategoriesOpen, setIsCategoriesOpen] = useState(false);
   const pathname = usePathname();
+  const { data: session } = useSession();
 
   const cartItemCount = useCartStore((state) => state.getItemCount());
   const openCart = useCartStore((state) => state.openCart);
   const isCartOpen = useCartStore((state) => state.isOpen);
   const closeCart = useCartStore((state) => state.closeCart);
+  
+  const isAdmin = session?.user?.role === 'ADMIN';
 
   // Detectar scroll para cambiar estilos del header
   useEffect(() => {
@@ -109,6 +114,17 @@ export function Header() {
               >
                 <Search className="w-5 h-5" />
               </button>
+
+              {/* Panel Admin (solo para admins) */}
+              {isAdmin && (
+                <Link 
+                  href="/admin" 
+                  className="hidden sm:flex btn-icon bg-zinc-800 hover:bg-zinc-700"
+                  title="Panel de Administración"
+                >
+                  <Settings className="w-5 h-5" />
+                </Link>
+              )}
 
               {/* Favoritos */}
               <Link href="/favoritos" className="hidden sm:flex btn-icon">
@@ -281,6 +297,15 @@ export function Header() {
 
               {/* Links de cuenta */}
               <div className="p-4 border-t border-border">
+                {isAdmin && (
+                  <Link
+                    href="/admin"
+                    className="flex items-center gap-3 px-4 py-3 mb-2 rounded-lg bg-zinc-800 text-white hover:bg-zinc-700 transition-colors"
+                  >
+                    <Settings className="w-5 h-5" />
+                    <span>Panel Admin</span>
+                  </Link>
+                )}
                 <Link
                   href="/cuenta"
                   className="flex items-center gap-3 px-4 py-3 rounded-lg text-accent-muted hover:bg-surface hover:text-accent transition-colors"

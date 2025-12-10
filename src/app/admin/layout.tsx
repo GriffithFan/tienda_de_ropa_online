@@ -13,16 +13,20 @@ import {
   LogOut,
   Menu,
   X,
-  ChevronRight
+  ChevronRight,
+  FolderTree,
+  Boxes,
 } from 'lucide-react'
 import { signOut } from 'next-auth/react'
 
 const navigation = [
   { name: 'Dashboard', href: '/admin', icon: LayoutDashboard },
   { name: 'Productos', href: '/admin/productos', icon: Package },
+  { name: 'Categorías', href: '/admin/categorias', icon: FolderTree },
+  { name: 'Inventario', href: '/admin/inventario', icon: Boxes },
   { name: 'Pedidos', href: '/admin/pedidos', icon: ShoppingCart },
   { name: 'Usuarios', href: '/admin/usuarios', icon: Users },
-  { name: 'Configuracion', href: '/admin/configuracion', icon: Settings },
+  { name: 'Configuración', href: '/admin/configuracion', icon: Settings },
 ]
 
 export default function AdminLayout({

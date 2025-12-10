@@ -89,9 +89,12 @@ export default function AdminProductos() {
       const res = await fetch('/api/categories')
       if (!res.ok) throw new Error('Error al cargar categorias')
       const data = await res.json()
-      setCategories(data)
+      // La API devuelve { categories: [...] }
+      const categoriesArray = data.categories || data
+      setCategories(Array.isArray(categoriesArray) ? categoriesArray : [])
     } catch (err) {
       console.error(err)
+      setCategories([])
     }
   }
 
@@ -278,7 +281,7 @@ export default function AdminProductos() {
           className="px-4 py-2.5 bg-zinc-900 border border-zinc-800 rounded-lg text-white focus:outline-none focus:border-zinc-600"
         >
           <option value="">Todas las categorias</option>
-          {categories.map((cat) => (
+          {Array.isArray(categories) && categories.map((cat) => (
             <option key={cat.id} value={cat.slug}>
               {cat.name}
             </option>

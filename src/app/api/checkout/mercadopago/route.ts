@@ -37,7 +37,7 @@ interface PayerData {
   };
   address: {
     street_name: string;
-    street_number: number;
+    street_number: string;
     zip_code: string;
   };
 }

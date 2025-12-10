@@ -12,52 +12,51 @@ export async function GET(request: NextRequest) {
     const { searchParams } = new URL(request.url);
     const page = parseInt(searchParams.get('page') || '1');
     const limit = parseInt(searchParams.get('limit') || '20');
-    const status = searchParams.get('status');
+    const role = searchParams.get('role');
     const search = searchParams.get('search');
 
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const where: any = {};
 
-    if (status) {
-      where.status = status;
+    if (role) {
+      where.role = role;
     }
 
     if (search) {
       where.OR = [
-        { orderNumber: { contains: search, mode: 'insensitive' } },
-        { customerEmail: { contains: search, mode: 'insensitive' } },
-        { customerName: { contains: search, mode: 'insensitive' } },
+        { email: { contains: search, mode: 'insensitive' } },
+        { firstName: { contains: search, mode: 'insensitive' } },
+        { lastName: { contains: search, mode: 'insensitive' } },
       ];
     }
 
-    const [orders, total] = await Promise.all([
-      prisma.order.findMany({
+    const [users, total] = await Promise.all([
+      prisma.user.findMany({
         where,
         skip: (page - 1) * limit,
         take: limit,
         orderBy: { createdAt: 'desc' },
-        include: {
-          items: true,
-          user: { select: { id: true, email: true, firstName: true, lastName: true } },
+        select: {
+          id: true,
+          email: true,
+          firstName: true,
+          lastName: true,
+          phone: true,
+          role: true,
+          createdAt: true,
+          _count: {
+            select: {
+              orders: true,
+              addresses: true,
+            },
+          },
         },
       }),
-      prisma.order.count({ where }),
+      prisma.user.count({ where }),
     ]);
 
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const formattedOrders = orders.map((order: any) => ({
-      ...order,
-      subtotal: Number(order.subtotal),
-      shippingCost: Number(order.shippingCost),
-      discount: Number(order.discount),
-      total: Number(order.total),
-      items: order.items.map((item: { price: number | string; [key: string]: unknown }) => ({
-        ...item,
-        price: Number(item.price),
-      })),
-    }));
-
     return NextResponse.json({
-      orders: formattedOrders,
+      users,
       pagination: {
         page,
         limit,

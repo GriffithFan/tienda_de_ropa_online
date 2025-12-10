@@ -63,15 +63,16 @@ export async function GET(
       price: Number(product.price),
       compareAtPrice: product.compareAtPrice ? Number(product.compareAtPrice) : undefined,
       category: product.category.slug,
-      images: product.images.map((img) => img.url),
-      sizes: product.sizes.map((s) => s.size),
-      colors: product.colors.map((c) => ({ name: c.name, hex: c.hex })),
+      images: product.images.map((img: { url: string }) => img.url),
+      sizes: product.sizes.map((s: { size: string }) => s.size),
+      colors: product.colors.map((c: { name: string; hex: string }) => ({ name: c.name, hex: c.hex })),
       stock: product.stock,
       isNew: product.isNew,
       isFeatured: product.isFeatured,
       isOnSale: product.isOnSale,
       tags: product.tags,
-      reviews: product.reviews.map((r) => ({
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      reviews: product.reviews.map((r: any) => ({
         id: r.id,
         rating: r.rating,
         title: r.title,
@@ -81,14 +82,15 @@ export async function GET(
       })),
     };
 
-    const formattedRelated = relatedProducts.map((p) => ({
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const formattedRelated = relatedProducts.map((p: any) => ({
       id: p.id,
       name: p.name,
       slug: p.slug,
       price: Number(p.price),
       compareAtPrice: p.compareAtPrice ? Number(p.compareAtPrice) : undefined,
-      images: p.images.map((img) => img.url),
-      colors: p.colors.map((c) => ({ name: c.name, hex: c.hex })),
+      images: p.images.map((img: { url: string }) => img.url),
+      colors: p.colors.map((c: { name: string; hex: string }) => ({ name: c.name, hex: c.hex })),
     }));
 
     return NextResponse.json({

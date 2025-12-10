@@ -8,9 +8,10 @@ export interface Product {
   slug: string;
   name: string;
   description: string;
-  shortDescription: string;
+  shortDescription?: string;
   price: number;
   originalPrice?: number;
+  compareAtPrice?: number;
   discount?: number;
   images: ProductImage[];
   category: Category;

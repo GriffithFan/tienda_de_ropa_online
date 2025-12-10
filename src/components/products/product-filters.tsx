@@ -210,12 +210,11 @@ export function ProductFilters({
 
   return (
     <>
-      {/* Header de ordenamiento - siempre visible */}
-      <div className="flex items-center justify-between gap-4 mb-6">
-        {/* Boton de filtros mobile */}
+      {/* Boton de filtros mobile */}
+      <div className="lg:hidden mb-6">
         <button
           onClick={() => setIsMobileFiltersOpen(true)}
-          className="lg:hidden btn-secondary btn-sm"
+          className="btn-secondary btn-sm"
         >
           <SlidersHorizontal className="w-4 h-4" />
           Filtros
@@ -225,24 +224,6 @@ export function ProductFilters({
             </span>
           )}
         </button>
-
-        {/* Selector de ordenamiento */}
-        <div className="flex items-center gap-2 ml-auto">
-          <span className="text-sm text-accent-muted hidden sm:block">
-            Ordenar por:
-          </span>
-          <select
-            value={currentSort}
-            onChange={(e) => onSortChange?.(e.target.value)}
-            className="text-sm py-2 pl-3 pr-8 min-w-[160px]"
-          >
-            {SORT_OPTIONS.map((option) => (
-              <option key={option.value} value={option.value}>
-                {option.label}
-              </option>
-            ))}
-          </select>
-        </div>
       </div>
 
       {/* Panel de filtros desktop */}

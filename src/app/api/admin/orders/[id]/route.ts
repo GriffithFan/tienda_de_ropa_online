@@ -51,7 +51,7 @@ export async function GET(
         shippingCost: Number(order.shippingCost),
         discount: Number(order.discount),
         total: Number(order.total),
-        items: order.items.map((item) => ({
+        items: order.items.map((item: { price: number | string; [key: string]: unknown }) => ({
           ...item,
           price: Number(item.price),
         })),

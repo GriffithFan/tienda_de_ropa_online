@@ -100,28 +100,28 @@ export default function AdminDashboard() {
   const statCards = [
     {
       title: 'Ingresos totales',
-      value: `$${stats.totalRevenue.toLocaleString()}`,
+      value: `$${(stats.totalRevenue || 0).toLocaleString()}`,
       icon: DollarSign,
       change: '+12.5%',
       positive: true,
     },
     {
       title: 'Pedidos',
-      value: stats.totalOrders.toString(),
+      value: (stats.totalOrders || 0).toString(),
       icon: ShoppingCart,
       change: '+8.2%',
       positive: true,
     },
     {
       title: 'Productos',
-      value: stats.totalProducts.toString(),
+      value: (stats.totalProducts || 0).toString(),
       icon: Package,
       change: '0%',
       positive: true,
     },
     {
       title: 'Usuarios',
-      value: stats.totalUsers.toString(),
+      value: (stats.totalUsers || 0).toString(),
       icon: Users,
       change: '+15.3%',
       positive: true,
