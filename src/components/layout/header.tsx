@@ -17,7 +17,7 @@ import {
 } from 'lucide-react';
 import { useSession } from 'next-auth/react';
 import { cn } from '@/lib/utils';
-import { useCartStore } from '@/store';
+import { useCartStore, useFavoritesStore } from '@/store';
 import { NAV_LINKS, CATEGORIES, SITE_CONFIG } from '@/lib/constants';
 import { AnnouncementBar } from './announcement-bar';
 import { CartDrawer } from '../cart/cart-drawer';
@@ -32,6 +32,7 @@ export function Header() {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [isSearchOpen, setIsSearchOpen] = useState(false);
   const [isCategoriesOpen, setIsCategoriesOpen] = useState(false);
+  const [mounted, setMounted] = useState(false);
   const pathname = usePathname();
   const { data: session } = useSession();
 
@@ -39,8 +40,13 @@ export function Header() {
   const openCart = useCartStore((state) => state.openCart);
   const isCartOpen = useCartStore((state) => state.isOpen);
   const closeCart = useCartStore((state) => state.closeCart);
+  const favoritesCount = useFavoritesStore((state) => state.favorites.length);
   
   const isAdmin = session?.user?.role === 'ADMIN';
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
 
   // Detectar scroll para cambiar estilos del header
   useEffect(() => {
@@ -127,8 +133,13 @@ export function Header() {
               )}
 
               {/* Favoritos */}
-              <Link href="/favoritos" className="hidden sm:flex btn-icon">
+              <Link href="/favoritos" className="hidden sm:flex btn-icon relative">
                 <Heart className="w-5 h-5" />
+                {mounted && favoritesCount > 0 && (
+                  <span className="absolute -top-1 -right-1 w-5 h-5 bg-error text-white text-xs rounded-full flex items-center justify-center">
+                    {favoritesCount > 9 ? '9+' : favoritesCount}
+                  </span>
+                )}
               </Link>
 
               {/* Cuenta */}
@@ -140,10 +151,10 @@ export function Header() {
               <button
                 onClick={openCart}
                 className="btn-icon relative"
-                aria-label={`Carrito (${cartItemCount} productos)`}
+                aria-label={`Carrito (${mounted ? cartItemCount : 0} productos)`}
               >
                 <ShoppingBag className="w-5 h-5" />
-                {cartItemCount > 0 && (
+                {mounted && cartItemCount > 0 && (
                   <span className="absolute -top-1 -right-1 w-5 h-5 flex items-center justify-center bg-accent text-background text-xs font-bold rounded-full">
                     {cartItemCount > 99 ? '99+' : cartItemCount}
                   </span>
@@ -319,6 +330,11 @@ export function Header() {
                 >
                   <Heart className="w-5 h-5" />
                   <span>Favoritos</span>
+                  {mounted && favoritesCount > 0 && (
+                    <span className="ml-auto bg-error text-white text-xs px-2 py-0.5 rounded-full">
+                      {favoritesCount}
+                    </span>
+                  )}
                 </Link>
               </div>
             </motion.div>

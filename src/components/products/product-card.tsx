@@ -1,13 +1,13 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { motion } from 'framer-motion';
 import { Heart, ShoppingBag, Eye } from 'lucide-react';
 import type { Product } from '@/types';
 import { formatPrice, calculateDiscount, cn } from '@/lib/utils';
-import { useCartStore } from '@/store';
+import { useCartStore, useFavoritesStore } from '@/store';
 
 interface ProductCardProps {
   product: Product;
@@ -21,7 +21,15 @@ interface ProductCardProps {
 export function ProductCard({ product, priority = false }: ProductCardProps) {
   const [isHovered, setIsHovered] = useState(false);
   const [imageError, setImageError] = useState(false);
+  const [mounted, setMounted] = useState(false);
   const addItem = useCartStore((state) => state.addItem);
+  const { toggleFavorite, isFavorite } = useFavoritesStore();
+  
+  const isProductFavorite = mounted ? isFavorite(product.slug) : false;
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
 
   // Soportar ambos formatos de images: array de objetos o array de strings
   const getImageUrl = (img: { url?: string; isPrimary?: boolean } | string): string => {
@@ -131,12 +139,15 @@ export function ProductCard({ product, priority = false }: ProductCardProps) {
               onClick={(e) => {
                 e.preventDefault();
                 e.stopPropagation();
-                // Agregar a favoritos
+                toggleFavorite(product.slug);
               }}
-              className="btn-secondary btn-sm px-3"
-              aria-label="Agregar a favoritos"
+              className={cn(
+                "btn-secondary btn-sm px-3",
+                isProductFavorite && "bg-error/20 border-error text-error hover:bg-error hover:text-white"
+              )}
+              aria-label={isProductFavorite ? "Quitar de favoritos" : "Agregar a favoritos"}
             >
-              <Heart className="w-4 h-4" />
+              <Heart className={cn("w-4 h-4", isProductFavorite && "fill-current")} />
             </button>
           </div>
         </div>

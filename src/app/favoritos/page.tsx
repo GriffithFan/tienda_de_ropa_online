@@ -1,37 +1,82 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import Link from 'next/link';
+import Image from 'next/image';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Heart, Trash2, ShoppingBag, ArrowRight } from 'lucide-react';
-import { ProductCard } from '@/components/products';
-import { products } from '@/data/products';
+import { Heart, Trash2, ShoppingBag, ArrowRight, Loader2 } from 'lucide-react';
+import { useFavoritesStore } from '@/store';
+
+interface Product {
+  id: string;
+  name: string;
+  slug: string;
+  price: number;
+  originalPrice?: number | null;
+  compareAtPrice?: number | null;
+  images: (string | { url: string })[];
+  category?: { name: string } | null;
+}
+
+// Helper para obtener URL de imagen
+function getImageUrl(img: string | { url: string } | undefined): string | null {
+  if (!img) return null;
+  if (typeof img === 'string') return img;
+  return img.url || null;
+}
 
 /**
  * Pagina de favoritos (wishlist)
  * Muestra los productos guardados por el usuario
- * 
- * Nota: En produccion, los favoritos deberian persistirse
- * en localStorage o en una base de datos si el usuario esta logueado
+ * Los favoritos se persisten en localStorage
  */
 export default function FavoritosPage() {
-  // Estado de ejemplo - en produccion usar Zustand con persistencia
-  const [favorites, setFavorites] = useState<string[]>([
-    'remera-dragon-spirit',
-    'buzo-neko-mafia',
-    'pantalon-cargo-tactical',
-  ]);
+  const { favorites, removeFavorite, clearFavorites } = useFavoritesStore();
+  const [products, setProducts] = useState<Product[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [mounted, setMounted] = useState(false);
 
-  // Obtener productos favoritos
-  const favoriteProducts = products.filter((p) => favorites.includes(p.slug));
+  // Evitar hydration mismatch
+  useEffect(() => {
+    setMounted(true);
+  }, []);
 
-  const removeFavorite = (slug: string) => {
-    setFavorites((prev) => prev.filter((f) => f !== slug));
-  };
+  // Cargar productos favoritos desde la API
+  useEffect(() => {
+    const fetchFavoriteProducts = async () => {
+      if (favorites.length === 0) {
+        setProducts([]);
+        setLoading(false);
+        return;
+      }
 
-  const clearAllFavorites = () => {
-    setFavorites([]);
-  };
+      try {
+        setLoading(true);
+        // Obtener productos por sus slugs
+        const response = await fetch(`/api/products?slugs=${favorites.join(',')}`);
+        if (response.ok) {
+          const data = await response.json();
+          setProducts(data.products || []);
+        }
+      } catch (error) {
+        console.error('Error fetching favorites:', error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    if (mounted) {
+      fetchFavoriteProducts();
+    }
+  }, [favorites, mounted]);
+
+  if (!mounted) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <Loader2 className="w-8 h-8 animate-spin text-accent-muted" />
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen">
@@ -52,7 +97,7 @@ export default function FavoritosPage() {
             </div>
             {favorites.length > 0 && (
               <button
-                onClick={clearAllFavorites}
+                onClick={clearFavorites}
                 className="text-sm text-accent-muted hover:text-error transition-colors flex items-center gap-2"
               >
                 <Trash2 className="w-4 h-4" />
@@ -65,7 +110,11 @@ export default function FavoritosPage() {
 
       {/* Contenido */}
       <div className="container-custom py-8">
-        {favorites.length === 0 ? (
+        {loading ? (
+          <div className="flex items-center justify-center py-20">
+            <Loader2 className="w-8 h-8 animate-spin text-accent-muted" />
+          </div>
+        ) : favorites.length === 0 ? (
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
@@ -93,7 +142,7 @@ export default function FavoritosPage() {
 
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
               <AnimatePresence mode="popLayout">
-                {favoriteProducts.map((product) => (
+                {products.map((product) => (
                   <motion.div
                     key={product.id}
                     layout
@@ -101,9 +150,61 @@ export default function FavoritosPage() {
                     animate={{ opacity: 1, scale: 1 }}
                     exit={{ opacity: 0, scale: 0.9 }}
                     transition={{ duration: 0.3 }}
-                    className="relative"
+                    className="relative group"
                   >
-                    <ProductCard product={product} />
+                    <Link href={`/producto/${product.slug}`} className="block">
+                      <div className="card overflow-hidden">
+                        {/* Image */}
+                        <div className="relative aspect-[3/4] bg-surface">
+                          {getImageUrl(product.images[0]) ? (
+                            <Image
+                              src={getImageUrl(product.images[0])!}
+                              alt={product.name}
+                              fill
+                              className="object-cover group-hover:scale-105 transition-transform duration-500"
+                              sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 25vw"
+                            />
+                          ) : (
+                            <div className="w-full h-full flex items-center justify-center text-accent-muted">
+                              Sin imagen
+                            </div>
+                          )}
+                          
+                          {/* Discount badge */}
+                          {(product.originalPrice || product.compareAtPrice) && 
+                           (product.originalPrice || product.compareAtPrice)! > product.price && (
+                            <span className="absolute top-3 left-3 bg-error text-white text-xs font-bold px-2 py-1 rounded">
+                              -{Math.round((1 - product.price / (product.originalPrice || product.compareAtPrice)!) * 100)}%
+                            </span>
+                          )}
+                        </div>
+                        
+                        {/* Info */}
+                        <div className="p-4">
+                          {product.category && (
+                            <p className="text-xs text-accent-muted mb-1">
+                              {product.category.name}
+                            </p>
+                          )}
+                          <h3 className="font-medium text-accent group-hover:text-white transition-colors line-clamp-2">
+                            {product.name}
+                          </h3>
+                          <div className="mt-2 flex items-center gap-2">
+                            <span className="font-bold text-accent">
+                              ${product.price.toLocaleString()}
+                            </span>
+                            {(product.originalPrice || product.compareAtPrice) && 
+                             (product.originalPrice || product.compareAtPrice)! > product.price && (
+                              <span className="text-sm text-accent-muted line-through">
+                                ${(product.originalPrice || product.compareAtPrice)!.toLocaleString()}
+                              </span>
+                            )}
+                          </div>
+                        </div>
+                      </div>
+                    </Link>
+                    
+                    {/* Remove button */}
                     <button
                       onClick={() => removeFavorite(product.slug)}
                       className="absolute top-4 right-4 z-10 p-2 bg-background/80 backdrop-blur-sm rounded-full hover:bg-error hover:text-white transition-colors"

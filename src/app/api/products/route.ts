@@ -14,6 +14,7 @@ export async function GET(request: NextRequest) {
     const search = searchParams.get('search');
     const featured = searchParams.get('featured');
     const onSale = searchParams.get('onSale');
+    const slugs = searchParams.get('slugs');
     const page = parseInt(searchParams.get('page') || '1');
     const limit = parseInt(searchParams.get('limit') || '12');
 
@@ -21,6 +22,12 @@ export async function GET(request: NextRequest) {
     const where: any = {
       isActive: true,
     };
+
+    // Filtrar por slugs (para favoritos)
+    if (slugs) {
+      const slugArray = slugs.split(',').filter(Boolean);
+      where.slug = { in: slugArray };
+    }
 
     if (category) {
       where.category = {

@@ -1,17 +1,54 @@
 'use client';
 
+import { Suspense } from 'react';
 import Link from 'next/link';
+import { useSearchParams } from 'next/navigation';
 import { motion } from 'framer-motion';
-import { CheckCircle2, Package, Mail, Phone, ArrowRight, Home } from 'lucide-react';
+import { CheckCircle2, Package, Mail, Phone, ArrowRight, Home, CreditCard, Banknote, Building2 } from 'lucide-react';
 import { SITE_CONFIG } from '@/lib/constants';
 
 /**
- * Pagina de confirmacion de pedido
- * Se muestra despues de completar el checkout exitosamente
+ * Contenido de la pagina de confirmacion
  */
-export default function OrderConfirmationPage() {
-  // En produccion, el numero de orden vendria de la base de datos
-  const orderNumber = `KIRA-${Date.now().toString(36).toUpperCase()}`;
+function ConfirmationContent() {
+  const searchParams = useSearchParams();
+  const orderId = searchParams.get('orderId') || searchParams.get('external_reference');
+  const paymentMethod = searchParams.get('method') || searchParams.get('payment_type');
+  const status = searchParams.get('status') || searchParams.get('collection_status');
+  
+  // Generar número de orden si no viene de los params
+  const orderNumber = orderId || `KIRA-${Date.now().toString(36).toUpperCase()}`;
+
+  // Determinar si el pago fue exitoso (para MercadoPago)
+  const isPaymentApproved = status === 'approved' || !status;
+
+  // Información según método de pago
+  const getPaymentInfo = () => {
+    if (paymentMethod === 'transfer') {
+      return {
+        icon: Building2,
+        title: 'Transferencia Bancaria',
+        description: 'Realiza la transferencia a los siguientes datos y envía el comprobante por WhatsApp:',
+        showBankData: true,
+      };
+    }
+    if (paymentMethod === 'cash') {
+      return {
+        icon: Banknote,
+        title: 'Efectivo al retirar',
+        description: 'Abonarás al momento de retirar tu pedido en nuestro local.',
+        showBankData: false,
+      };
+    }
+    return {
+      icon: CreditCard,
+      title: 'MercadoPago',
+      description: 'Tu pago ha sido procesado exitosamente.',
+      showBankData: false,
+    };
+  };
+
+  const paymentInfo = getPaymentInfo();
 
   return (
     <div className="min-h-screen flex items-center justify-center p-4">
@@ -153,5 +190,21 @@ export default function OrderConfirmationPage() {
         </motion.div>
       </motion.div>
     </div>
+  );
+}
+
+/**
+ * Pagina de confirmacion de pedido
+ * Se muestra despues de completar el checkout exitosamente
+ */
+export default function OrderConfirmationPage() {
+  return (
+    <Suspense fallback={
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="animate-pulse text-accent-muted">Cargando...</div>
+      </div>
+    }>
+      <ConfirmationContent />
+    </Suspense>
   );
 }

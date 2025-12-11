@@ -2,10 +2,12 @@
 
 import { useState } from 'react';
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 import { motion } from 'framer-motion';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
+import { useSession, signOut } from 'next-auth/react';
 import {
   User,
   Package,
@@ -16,9 +18,9 @@ import {
   Edit2,
   Plus,
   Trash2,
+  Loader2,
 } from 'lucide-react';
 import { cn, formatPrice } from '@/lib/utils';
-import { useAuthStore } from '@/store';
 
 /**
  * Schema de validacion para perfil
@@ -38,12 +40,33 @@ type ProfileForm = z.infer<typeof profileSchema>;
  */
 export default function PerfilPage() {
   const [activeTab, setActiveTab] = useState<'profile' | 'orders' | 'addresses'>('profile');
-  const { user, isAuthenticated, logout } = useAuthStore();
+  const { data: session, status } = useSession();
+  const router = useRouter();
 
-  // Si no esta autenticado, mostrar formulario de login/registro
-  if (!isAuthenticated) {
-    return <AuthSection />;
+  // Mientras carga la sesión
+  if (status === 'loading') {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <Loader2 className="w-8 h-8 animate-spin text-accent-muted" />
+      </div>
+    );
   }
+
+  // Si no esta autenticado, redirigir a login
+  if (!session?.user) {
+    router.push('/auth/login');
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <Loader2 className="w-8 h-8 animate-spin text-accent-muted" />
+      </div>
+    );
+  }
+
+  const user = session.user;
+
+  const handleLogout = async () => {
+    await signOut({ callbackUrl: '/' });
+  };
 
   const tabs = [
     { id: 'profile', label: 'Mi Perfil', icon: User },
@@ -76,7 +99,7 @@ export default function PerfilPage() {
               </div>
             </div>
             <button
-              onClick={logout}
+              onClick={handleLogout}
               className="text-sm text-accent-muted hover:text-error transition-colors flex items-center gap-2"
             >
               <LogOut className="w-4 h-4" />
@@ -136,88 +159,6 @@ export default function PerfilPage() {
               {activeTab === 'addresses' && <AddressesSection />}
             </motion.div>
           </main>
-        </div>
-      </div>
-    </div>
-  );
-}
-
-/**
- * Seccion de autenticacion (login/registro)
- */
-function AuthSection() {
-  const [isLogin, setIsLogin] = useState(true);
-  const { login } = useAuthStore();
-
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    // Simular login
-    await login('test@example.com', 'password');
-  };
-
-  return (
-    <div className="min-h-screen flex items-center justify-center p-4">
-      <div className="card p-8 max-w-md w-full">
-        <div className="text-center mb-8">
-          <User className="w-12 h-12 mx-auto mb-4" />
-          <h1 className="font-display text-2xl font-bold">
-            {isLogin ? 'Iniciar Sesion' : 'Crear Cuenta'}
-          </h1>
-          <p className="text-accent-muted mt-2">
-            {isLogin
-              ? 'Ingresa a tu cuenta para ver tus pedidos'
-              : 'Registrate para una mejor experiencia'}
-          </p>
-        </div>
-
-        <form onSubmit={handleSubmit} className="space-y-4">
-          {!isLogin && (
-            <div className="grid grid-cols-2 gap-4">
-              <div className="input-group">
-                <label className="input-label">Nombre</label>
-                <input type="text" placeholder="Tu nombre" />
-              </div>
-              <div className="input-group">
-                <label className="input-label">Apellido</label>
-                <input type="text" placeholder="Tu apellido" />
-              </div>
-            </div>
-          )}
-
-          <div className="input-group">
-            <label className="input-label">Email</label>
-            <input type="email" placeholder="tu@email.com" />
-          </div>
-
-          <div className="input-group">
-            <label className="input-label">Contraseña</label>
-            <input type="password" placeholder="••••••••" />
-          </div>
-
-          {isLogin && (
-            <div className="text-right">
-              <button type="button" className="text-sm text-accent-muted hover:text-accent">
-                ¿Olvidaste tu contraseña?
-              </button>
-            </div>
-          )}
-
-          <button type="submit" className="btn-primary w-full justify-center">
-            {isLogin ? 'Ingresar' : 'Crear cuenta'}
-          </button>
-        </form>
-
-        <div className="mt-6 text-center">
-          <p className="text-sm text-accent-muted">
-            {isLogin ? '¿No tenes cuenta?' : '¿Ya tenes cuenta?'}{' '}
-            <button
-              type="button"
-              onClick={() => setIsLogin(!isLogin)}
-              className="text-accent hover:underline"
-            >
-              {isLogin ? 'Registrate' : 'Ingresa'}
-            </button>
-          </p>
         </div>
       </div>
     </div>

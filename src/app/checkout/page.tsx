@@ -92,21 +92,92 @@ export default function CheckoutPage() {
   };
 
   const handlePaymentSubmit = async () => {
-    if (!selectedPayment) return;
+    if (!selectedPayment || !personalData || !shippingData) return;
 
     setIsProcessing(true);
 
-    // Simulacion de procesamiento
-    await new Promise((resolve) => setTimeout(resolve, 2000));
+    try {
+      // Si es MercadoPago, crear preferencia y redirigir
+      if (selectedPayment === 'mercadopago') {
+        // Generar orderId temporal
+        const orderId = `KIRA-${Date.now().toString(36).toUpperCase()}`;
 
-    // En produccion, aqui se integraria con MercadoPago
-    if (selectedPayment === 'mercadopago') {
-      // Redirigir a MercadoPago
-      console.log('Redirigiendo a MercadoPago...');
+        // Preparar items para MercadoPago
+        const mpItems = items.map((item) => ({
+          id: item.productId,
+          title: `${item.product.name} - ${item.size}`,
+          quantity: item.quantity,
+          unit_price: Math.round(Number(item.product.price)),
+          picture_url: item.product.images?.[0] || '',
+        }));
+
+        // Preparar datos del comprador
+        const phoneParts = personalData.phone.replace(/\D/g, '');
+        const payer = {
+          name: personalData.firstName,
+          surname: personalData.lastName,
+          email: personalData.email,
+          phone: {
+            area_code: phoneParts.slice(0, 2),
+            number: phoneParts.slice(2),
+          },
+          identification: {
+            type: 'DNI',
+            number: personalData.dni,
+          },
+          address: {
+            street_name: shippingData.street,
+            street_number: shippingData.number,
+            zip_code: shippingData.postalCode,
+          },
+        };
+
+        // Llamar a la API de MercadoPago
+        const response = await fetch('/api/checkout/mercadopago', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ items: mpItems, payer, orderId }),
+        });
+
+        const data = await response.json();
+
+        if (!response.ok) {
+          // Mensaje más descriptivo según el error
+          if (data.error?.includes('access token') || data.error?.includes('unauthorized')) {
+            throw new Error('Error de configuración de MercadoPago. Por favor, contacta al administrador.');
+          }
+          throw new Error(data.error || 'Error al crear el pago');
+        }
+
+        // Redirigir al checkout de MercadoPago
+        // En desarrollo usar sandbox_init_point, en producción usar init_point
+        const checkoutUrl = process.env.NODE_ENV === 'production' 
+          ? data.init_point 
+          : data.sandbox_init_point || data.init_point;
+
+        if (checkoutUrl) {
+          window.location.href = checkoutUrl;
+        } else {
+          throw new Error('No se pudo obtener la URL de pago');
+        }
+        return;
+      }
+
+      // Para otros métodos de pago (transferencia, efectivo)
+      // Crear orden en la base de datos
+      const orderId = `KIRA-${Date.now().toString(36).toUpperCase()}`;
+      
+      // Aquí podrías guardar la orden en la base de datos
+      // await fetch('/api/orders', { ... });
+
+      clearCart();
+      router.push(`/checkout/confirmacion?orderId=${orderId}&method=${selectedPayment}`);
+    } catch (error) {
+      console.error('Error en el pago:', error);
+      alert(error instanceof Error ? error.message : 'Error al procesar el pago');
+    } finally {
+      setIsProcessing(false);
     }
-
-    clearCart();
-    router.push('/checkout/confirmacion');
   };
 
   if (items.length === 0) {

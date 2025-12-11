@@ -33,7 +33,7 @@ function LoginContent() {
       })
 
       if (result?.error) {
-        setError('Email o contrasena incorrectos')
+        setError('Email o contraseña incorrectos')
       } else {
         router.push(callbackUrl)
         router.refresh()
@@ -125,7 +125,7 @@ function LoginContent() {
             {/* Password */}
             <div>
               <label className="block text-sm font-medium text-zinc-300 mb-2">
-                Contrasena
+                Contraseña
               </label>
               <div className="relative">
                 <Lock className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-zinc-500" />
@@ -134,7 +134,7 @@ function LoginContent() {
                   value={formData.password}
                   onChange={(e) => setFormData({ ...formData, password: e.target.value })}
                   required
-                  placeholder="Tu contrasena"
+                  placeholder="Tu contraseña"
                   className="w-full pl-10 pr-12 py-3 bg-zinc-800 border border-zinc-700 rounded-lg text-white placeholder-zinc-500 focus:outline-none focus:border-zinc-500 transition-colors"
                 />
                 <button
@@ -157,7 +157,7 @@ function LoginContent() {
                 href="/auth/recuperar"
                 className="text-sm text-zinc-400 hover:text-white transition-colors"
               >
-                Olvidaste tu contrasena?
+                ¿Olvidaste tu contraseña?
               </Link>
             </div>
 

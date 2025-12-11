@@ -10,7 +10,8 @@ export default function RegistroPage() {
   const router = useRouter()
   
   const [formData, setFormData] = useState({
-    name: '',
+    firstName: '',
+    lastName: '',
     email: '',
     password: '',
     confirmPassword: '',
@@ -36,14 +37,14 @@ export default function RegistroPage() {
     // Validate password requirements
     const allRequirementsMet = passwordRequirements.every(req => req.test(formData.password))
     if (!allRequirementsMet) {
-      setError('La contrasena no cumple todos los requisitos')
+      setError('La contraseña no cumple todos los requisitos')
       setLoading(false)
       return
     }
 
     // Validate passwords match
     if (formData.password !== formData.confirmPassword) {
-      setError('Las contrasenas no coinciden')
+      setError('Las contraseñas no coinciden')
       setLoading(false)
       return
     }
@@ -53,7 +54,8 @@ export default function RegistroPage() {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          name: formData.name,
+          firstName: formData.firstName,
+          lastName: formData.lastName,
           email: formData.email,
           password: formData.password,
         }),
@@ -130,21 +132,39 @@ export default function RegistroPage() {
           )}
 
           <form onSubmit={handleSubmit} className="space-y-5">
-            {/* Name */}
-            <div>
-              <label className="block text-sm font-medium text-zinc-300 mb-2">
-                Nombre completo
-              </label>
-              <div className="relative">
-                <User className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-zinc-500" />
-                <input
-                  type="text"
-                  value={formData.name}
-                  onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                  required
-                  placeholder="Tu nombre"
-                  className="w-full pl-10 pr-4 py-3 bg-zinc-800 border border-zinc-700 rounded-lg text-white placeholder-zinc-500 focus:outline-none focus:border-zinc-500 transition-colors"
-                />
+            {/* Name fields */}
+            <div className="grid grid-cols-2 gap-4">
+              <div>
+                <label className="block text-sm font-medium text-zinc-300 mb-2">
+                  Nombre
+                </label>
+                <div className="relative">
+                  <User className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-zinc-500" />
+                  <input
+                    type="text"
+                    value={formData.firstName}
+                    onChange={(e) => setFormData({ ...formData, firstName: e.target.value })}
+                    required
+                    placeholder="Nombre"
+                    className="w-full pl-10 pr-4 py-3 bg-zinc-800 border border-zinc-700 rounded-lg text-white placeholder-zinc-500 focus:outline-none focus:border-zinc-500 transition-colors"
+                  />
+                </div>
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-zinc-300 mb-2">
+                  Apellido
+                </label>
+                <div className="relative">
+                  <User className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-zinc-500" />
+                  <input
+                    type="text"
+                    value={formData.lastName}
+                    onChange={(e) => setFormData({ ...formData, lastName: e.target.value })}
+                    required
+                    placeholder="Apellido"
+                    className="w-full pl-10 pr-4 py-3 bg-zinc-800 border border-zinc-700 rounded-lg text-white placeholder-zinc-500 focus:outline-none focus:border-zinc-500 transition-colors"
+                  />
+                </div>
               </div>
             </div>
 
@@ -169,7 +189,7 @@ export default function RegistroPage() {
             {/* Password */}
             <div>
               <label className="block text-sm font-medium text-zinc-300 mb-2">
-                Contrasena
+                Contraseña
               </label>
               <div className="relative">
                 <Lock className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-zinc-500" />
@@ -178,7 +198,7 @@ export default function RegistroPage() {
                   value={formData.password}
                   onChange={(e) => setFormData({ ...formData, password: e.target.value })}
                   required
-                  placeholder="Crea una contrasena"
+                  placeholder="Crea una contraseña"
                   className="w-full pl-10 pr-12 py-3 bg-zinc-800 border border-zinc-700 rounded-lg text-white placeholder-zinc-500 focus:outline-none focus:border-zinc-500 transition-colors"
                 />
                 <button
@@ -218,7 +238,7 @@ export default function RegistroPage() {
             {/* Confirm Password */}
             <div>
               <label className="block text-sm font-medium text-zinc-300 mb-2">
-                Confirmar contrasena
+                Confirmar contraseña
               </label>
               <div className="relative">
                 <Lock className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-zinc-500" />
@@ -227,7 +247,7 @@ export default function RegistroPage() {
                   value={formData.confirmPassword}
                   onChange={(e) => setFormData({ ...formData, confirmPassword: e.target.value })}
                   required
-                  placeholder="Repite tu contrasena"
+                  placeholder="Repite tu contraseña"
                   className="w-full pl-10 pr-12 py-3 bg-zinc-800 border border-zinc-700 rounded-lg text-white placeholder-zinc-500 focus:outline-none focus:border-zinc-500 transition-colors"
                 />
                 <button
@@ -243,7 +263,7 @@ export default function RegistroPage() {
                 </button>
               </div>
               {formData.confirmPassword && formData.password !== formData.confirmPassword && (
-                <p className="mt-2 text-xs text-red-400">Las contrasenas no coinciden</p>
+                <p className="mt-2 text-xs text-red-400">Las contraseñas no coinciden</p>
               )}
             </div>
 
