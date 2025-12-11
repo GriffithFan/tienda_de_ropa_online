@@ -13,37 +13,21 @@ export default function manifest(): MetadataRoute.Manifest {
     categories: ['shopping', 'fashion', 'lifestyle'],
     icons: [
       {
-        src: '/icons/icon-192x192.png',
+        src: '/icons/icon-192x192.svg',
         sizes: '192x192',
-        type: 'image/png',
+        type: 'image/svg+xml',
         purpose: 'maskable',
       },
       {
-        src: '/icons/icon-512x512.png',
+        src: '/icons/icon-512x512.svg',
         sizes: '512x512',
-        type: 'image/png',
+        type: 'image/svg+xml',
         purpose: 'any',
       },
       {
         src: '/favicon.svg',
         sizes: 'any',
         type: 'image/svg+xml',
-      },
-    ],
-    screenshots: [
-      {
-        src: '/images/screenshot-wide.png',
-        sizes: '1280x720',
-        type: 'image/png',
-        // @ts-expect-error - form_factor is valid but not in types yet
-        form_factor: 'wide',
-      },
-      {
-        src: '/images/screenshot-mobile.png',
-        sizes: '390x844',
-        type: 'image/png',
-        // @ts-expect-error - form_factor is valid but not in types yet
-        form_factor: 'narrow',
       },
     ],
   }

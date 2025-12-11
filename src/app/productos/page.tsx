@@ -1,15 +1,14 @@
 'use client';
 
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, Suspense } from 'react';
 import { useSearchParams } from 'next/navigation';
 import { ProductGrid, ProductFilters } from '@/components/products';
 import type { FilterState, Product } from '@/types';
 
 /**
- * Pagina del catalogo de productos
- * Incluye filtros, ordenamiento y carga infinita
+ * Componente interno que usa useSearchParams
  */
-export default function ProductsPage() {
+function ProductsContent() {
   const searchParams = useSearchParams();
   const initialFilter = searchParams.get('filter');
   const searchQuery = searchParams.get('search');
@@ -235,5 +234,21 @@ export default function ProductsPage() {
         </div>
       </div>
     </div>
+  );
+}
+
+/**
+ * Pagina del catalogo de productos
+ * Incluye filtros, ordenamiento y carga infinita
+ */
+export default function ProductsPage() {
+  return (
+    <Suspense fallback={
+      <div className="min-h-screen bg-primary flex items-center justify-center">
+        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-accent"></div>
+      </div>
+    }>
+      <ProductsContent />
+    </Suspense>
   );
 }

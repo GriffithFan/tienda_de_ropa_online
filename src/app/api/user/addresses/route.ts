@@ -44,7 +44,7 @@ export async function POST(request: NextRequest) {
     }
 
     const body = await request.json()
-    const { firstName, lastName, address, city, province, postalCode, phone, isDefault } = body
+    const { label, street, number, floor, apartment, city, province, postalCode, isDefault } = body
 
     // If setting as default, unset other defaults
     if (isDefault) {
@@ -57,13 +57,14 @@ export async function POST(request: NextRequest) {
     const newAddress = await prisma.address.create({
       data: {
         userId: session.user.id,
-        firstName,
-        lastName,
-        address,
+        label,
+        street,
+        number,
+        floor,
+        apartment,
         city,
         province,
         postalCode,
-        phone,
         isDefault: isDefault || false,
       },
     })

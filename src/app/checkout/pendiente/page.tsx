@@ -4,15 +4,13 @@ import Link from 'next/link';
 import { useSearchParams } from 'next/navigation';
 import { motion } from 'framer-motion';
 import { Clock, Mail, Phone, ArrowRight, Home, Copy, Check } from 'lucide-react';
-import { useState } from 'react';
+import { useState, Suspense } from 'react';
 import { SITE_CONFIG, PAYMENT_CONFIG } from '@/lib/constants';
 
 /**
- * Pagina de pago pendiente
- * Se muestra cuando el cliente elige pagar por transferencia
- * o cuando MercadoPago devuelve un estado pendiente
+ * Componente interno que usa useSearchParams
  */
-export default function PendingPaymentPage() {
+function PendingPaymentContent() {
   const searchParams = useSearchParams();
   const orderId = searchParams.get('order') || `KIRA-${Date.now().toString(36).toUpperCase()}`;
   const [copiedField, setCopiedField] = useState<string | null>(null);
@@ -206,5 +204,22 @@ export default function PendingPaymentPage() {
         </motion.div>
       </motion.div>
     </div>
+  );
+}
+
+/**
+ * Pagina de pago pendiente
+ * Se muestra cuando el cliente elige pagar por transferencia
+ * o cuando MercadoPago devuelve un estado pendiente
+ */
+export default function PendingPaymentPage() {
+  return (
+    <Suspense fallback={
+      <div className="min-h-screen bg-primary flex items-center justify-center">
+        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-accent"></div>
+      </div>
+    }>
+      <PendingPaymentContent />
+    </Suspense>
   );
 }

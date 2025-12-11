@@ -89,13 +89,14 @@ export async function PUT(
     const updatedAddress = await prisma.address.update({
       where: { id },
       data: {
-        firstName: body.firstName ?? existingAddress.firstName,
-        lastName: body.lastName ?? existingAddress.lastName,
-        address: body.address ?? existingAddress.address,
+        label: body.label ?? existingAddress.label,
+        street: body.street ?? existingAddress.street,
+        number: body.number ?? existingAddress.number,
+        floor: body.floor ?? existingAddress.floor,
+        apartment: body.apartment ?? existingAddress.apartment,
         city: body.city ?? existingAddress.city,
         province: body.province ?? existingAddress.province,
         postalCode: body.postalCode ?? existingAddress.postalCode,
-        phone: body.phone ?? existingAddress.phone,
         isDefault: body.isDefault ?? existingAddress.isDefault,
       },
     })

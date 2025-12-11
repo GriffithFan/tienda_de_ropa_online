@@ -360,7 +360,7 @@ export default function AdminProductos() {
                     </td>
                     <td className="px-5 py-4">
                       <span className="text-sm text-zinc-400">
-                        {product.category.name}
+                        {product.category?.name || 'Sin categoría'}
                       </span>
                     </td>
                     <td className="px-5 py-4">

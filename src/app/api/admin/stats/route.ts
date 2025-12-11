@@ -69,8 +69,8 @@ export async function GET(request: NextRequest) {
       }),
     ]);
 
-    const monthlyRevenue = monthlyOrders.reduce((sum: number, order: { total: number | string }) => sum + Number(order.total), 0);
-    const lastMonthRevenue = lastMonthOrders.reduce((sum: number, order: { total: number | string }) => sum + Number(order.total), 0);
+    const monthlyRevenue = monthlyOrders.reduce((sum, order) => sum + Number(order.total), 0);
+    const lastMonthRevenue = lastMonthOrders.reduce((sum, order) => sum + Number(order.total), 0);
     const revenueGrowth = lastMonthRevenue > 0 
       ? ((monthlyRevenue - lastMonthRevenue) / lastMonthRevenue) * 100 
       : 0;

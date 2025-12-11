@@ -2,12 +2,13 @@ import { NextRequest, NextResponse } from 'next/server';
 import { getToken } from 'next-auth/jwt';
 import prisma from '@/lib/prisma';
 import { z } from 'zod';
+import { Role } from '@prisma/client';
 
 const updateUserSchema = z.object({
   firstName: z.string().optional(),
   lastName: z.string().optional(),
   phone: z.string().optional(),
-  role: z.enum(['USER', 'ADMIN']).optional(),
+  role: z.nativeEnum(Role).optional(),
 });
 
 interface RouteParams {
@@ -56,7 +57,6 @@ export async function GET(request: NextRequest, { params }: RouteParams) {
         _count: {
           select: {
             orders: true,
-            wishlist: true,
             reviews: true,
           },
         },
