@@ -48,7 +48,7 @@ export function HeroBanner({
 
   return (
     <section
-      className="relative w-full aspect-banner min-h-[400px] max-h-[600px] overflow-hidden bg-surface"
+      className="relative w-full aspect-[4/3] sm:aspect-[16/9] lg:aspect-banner min-h-[300px] sm:min-h-[400px] max-h-[600px] overflow-hidden bg-surface"
       onMouseEnter={() => setIsPaused(true)}
       onMouseLeave={() => setIsPaused(false)}
     >
@@ -73,7 +73,7 @@ export function HeroBanner({
           />
 
           {/* Overlay gradient */}
-          <div className="absolute inset-0 bg-gradient-to-r from-background/90 via-background/50 to-transparent" />
+          <div className="absolute inset-0 bg-gradient-to-r from-background/95 via-background/60 to-transparent sm:from-background/90 sm:via-background/50" />
 
           {/* Content */}
           <div className="container-custom h-full flex items-center">
@@ -81,20 +81,20 @@ export function HeroBanner({
               initial={{ opacity: 0, y: 30 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.2, duration: 0.5 }}
-              className="max-w-xl"
+              className="max-w-xl px-2 sm:px-0"
             >
               {currentSlide.subtitle && (
-                <p className="text-accent-muted text-sm sm:text-base uppercase tracking-widest mb-2">
+                <p className="text-accent-muted text-xs sm:text-sm lg:text-base uppercase tracking-widest mb-1 sm:mb-2">
                   {currentSlide.subtitle}
                 </p>
               )}
-              <h1 className="font-display text-4xl sm:text-5xl lg:text-6xl font-bold tracking-tight mb-4">
+              <h1 className="font-display text-2xl sm:text-4xl lg:text-5xl xl:text-6xl font-bold tracking-tight mb-3 sm:mb-4">
                 {currentSlide.title}
               </h1>
               {currentSlide.buttonText && (
                 <Link
                   href={currentSlide.link}
-                  className="btn-primary btn-lg inline-flex"
+                  className="btn-primary text-sm sm:text-base px-4 sm:px-6 lg:px-8 py-2.5 sm:py-3 lg:py-4 inline-flex"
                 >
                   {currentSlide.buttonText}
                 </Link>
@@ -104,38 +104,38 @@ export function HeroBanner({
         </motion.div>
       </AnimatePresence>
 
-      {/* Navigation arrows */}
+      {/* Navigation arrows - ocultos en mobile pequeño */}
       {slides.length > 1 && (
         <>
           <button
             onClick={goToPrevious}
-            className="absolute left-4 top-1/2 -translate-y-1/2 w-12 h-12 flex items-center justify-center rounded-full bg-background/50 backdrop-blur-sm border border-border hover:bg-background/80 transition-colors"
+            className="absolute left-2 sm:left-4 top-1/2 -translate-y-1/2 w-10 h-10 sm:w-12 sm:h-12 hidden sm:flex items-center justify-center rounded-full bg-background/50 backdrop-blur-sm border border-border hover:bg-background/80 transition-colors"
             aria-label="Slide anterior"
           >
-            <ChevronLeft className="w-6 h-6" />
+            <ChevronLeft className="w-5 h-5 sm:w-6 sm:h-6" />
           </button>
           <button
             onClick={goToNext}
-            className="absolute right-4 top-1/2 -translate-y-1/2 w-12 h-12 flex items-center justify-center rounded-full bg-background/50 backdrop-blur-sm border border-border hover:bg-background/80 transition-colors"
+            className="absolute right-2 sm:right-4 top-1/2 -translate-y-1/2 w-10 h-10 sm:w-12 sm:h-12 hidden sm:flex items-center justify-center rounded-full bg-background/50 backdrop-blur-sm border border-border hover:bg-background/80 transition-colors"
             aria-label="Siguiente slide"
           >
-            <ChevronRight className="w-6 h-6" />
+            <ChevronRight className="w-5 h-5 sm:w-6 sm:h-6" />
           </button>
         </>
       )}
 
       {/* Indicators */}
       {slides.length > 1 && (
-        <div className="absolute bottom-6 left-1/2 -translate-x-1/2 flex items-center gap-2">
+        <div className="absolute bottom-4 sm:bottom-6 left-1/2 -translate-x-1/2 flex items-center gap-1.5 sm:gap-2">
           {slides.map((_, index) => (
             <button
               key={index}
               onClick={() => goToSlide(index)}
               className={cn(
-                'h-2 rounded-full transition-all duration-300',
+                'h-1.5 sm:h-2 rounded-full transition-all duration-300',
                 index === currentIndex
-                  ? 'w-8 bg-accent'
-                  : 'w-2 bg-accent/40 hover:bg-accent/60'
+                  ? 'w-6 sm:w-8 bg-accent'
+                  : 'w-1.5 sm:w-2 bg-accent/40 hover:bg-accent/60'
               )}
               aria-label={`Ir al slide ${index + 1}`}
             />

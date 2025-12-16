@@ -186,7 +186,7 @@ function ProfileSection({ user }: { user: any }) {
   });
 
   const onSubmit = (data: ProfileForm) => {
-    console.log('Actualizar perfil:', data);
+    // TODO: Implementar llamada a API para actualizar perfil
     setIsEditing(false);
   };
 

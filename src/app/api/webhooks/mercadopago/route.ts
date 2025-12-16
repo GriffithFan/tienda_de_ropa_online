@@ -23,7 +23,7 @@ export async function POST(request: NextRequest) {
       const status = paymentData.status;
 
       if (!orderId) {
-        console.log('Pago sin referencia de orden');
+        // Pago sin referencia de orden - ignorar
         return NextResponse.json({ received: true });
       }
 
@@ -32,7 +32,7 @@ export async function POST(request: NextRequest) {
       });
 
       if (!order) {
-        console.log(`Orden ${orderId} no encontrada`);
+        // Orden no encontrada - ignorar
         return NextResponse.json({ received: true });
       }
 

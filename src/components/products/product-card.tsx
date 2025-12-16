@@ -4,7 +4,7 @@ import { useState, useEffect } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { motion } from 'framer-motion';
-import { Heart, ShoppingBag, Eye } from 'lucide-react';
+import { Heart, ShoppingBag } from 'lucide-react';
 import type { Product } from '@/types';
 import { formatPrice, calculateDiscount, cn } from '@/lib/utils';
 import { useCartStore, useFavoritesStore } from '@/store';
@@ -186,13 +186,15 @@ export function ProductCard({ product, priority = false }: ProductCardProps) {
 
           {/* Colores disponibles */}
           {product.colors && product.colors.length > 1 && (
-            <div className="flex items-center gap-1.5 mt-3">
+            <div className="flex items-center gap-1.5 mt-3" role="list" aria-label="Colores disponibles">
               {product.colors.slice(0, 4).map((color, idx) => (
                 <span
                   key={color.id || idx}
                   className="w-4 h-4 rounded-full border border-border"
                   style={{ backgroundColor: color.hexCode || color.hex }}
                   title={color.name}
+                  role="listitem"
+                  aria-label={color.name}
                 />
               ))}
               {product.colors.length > 4 && (

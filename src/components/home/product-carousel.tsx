@@ -65,18 +65,18 @@ export function ProductCarousel({
   if (products.length === 0) return null;
 
   return (
-    <section className="py-12 lg:py-16">
+    <section className="py-8 sm:py-12 lg:py-16">
       <div className="container-custom">
         {/* Header */}
-        <div className="flex items-end justify-between mb-8">
+        <div className="flex items-end justify-between mb-6 sm:mb-8">
           <div>
-            <h2 className="section-title">{title}</h2>
+            <h2 className="section-title text-xl sm:text-2xl lg:text-3xl">{title}</h2>
             {subtitle && (
-              <p className="section-subtitle mt-2">{subtitle}</p>
+              <p className="section-subtitle mt-1 sm:mt-2 text-sm sm:text-base">{subtitle}</p>
             )}
           </div>
 
-          <div className="flex items-center gap-2">
+          <div className="hidden sm:flex items-center gap-2">
             {/* Navigation buttons */}
             <button
               onClick={() => scroll('left')}
@@ -134,10 +134,10 @@ export function ProductCarousel({
 
         {/* View all link */}
         {viewAllLink && (
-          <div className="text-center mt-8">
+          <div className="text-center mt-6 sm:mt-8">
             <a
               href={viewAllLink}
-              className="btn-outline"
+              className="btn-outline text-sm sm:text-base px-4 sm:px-6 py-2 sm:py-3"
             >
               Ver todos
             </a>

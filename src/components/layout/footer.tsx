@@ -201,16 +201,16 @@ function BenefitsBar() {
 
   return (
     <div className="border-b border-border">
-      <div className="container-custom py-8">
-        <div className="grid grid-cols-2 lg:grid-cols-4 gap-6">
+      <div className="container-custom py-6 sm:py-8">
+        <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
           {benefits.map((benefit, index) => (
-            <div key={index} className="flex items-start gap-3">
-              <div className="w-10 h-10 flex items-center justify-center rounded-full bg-background border border-border flex-shrink-0">
-                <benefit.icon className="w-5 h-5" />
+            <div key={index} className="flex items-start gap-2 sm:gap-3">
+              <div className="w-8 h-8 sm:w-10 sm:h-10 flex items-center justify-center rounded-full bg-background border border-border flex-shrink-0">
+                <benefit.icon className="w-4 h-4 sm:w-5 sm:h-5" />
               </div>
               <div>
-                <h4 className="font-medium text-sm">{benefit.title}</h4>
-                <p className="text-xs text-accent-muted mt-0.5">
+                <h4 className="font-medium text-xs sm:text-sm">{benefit.title}</h4>
+                <p className="text-[10px] sm:text-xs text-accent-muted mt-0.5 hidden sm:block">
                   {benefit.description}
                 </p>
               </div>

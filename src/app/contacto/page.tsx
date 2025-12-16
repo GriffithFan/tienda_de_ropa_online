@@ -54,10 +54,9 @@ export default function ContactPage() {
   const onSubmit = async (data: ContactFormData) => {
     setIsSubmitting(true);
 
-    // Simulacion de envio
+    // TODO: Implementar envio real via API
     await new Promise((resolve) => setTimeout(resolve, 1500));
 
-    console.log('Form data:', data);
     setIsSubmitting(false);
     setIsSubmitted(true);
     reset();
