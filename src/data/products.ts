@@ -1,6 +1,49 @@
 import type { Product, Category, BannerSlide, Announcement } from '@/types';
 
 /**
+ * URLs de imagenes de Unsplash para productos
+ */
+const UNSPLASH = {
+  remeras: [
+    'https://images.unsplash.com/photo-1521572163474-6864f9cf17ab?w=800&q=80',
+    'https://images.unsplash.com/photo-1503341504253-dff4815485f1?w=800&q=80',
+    'https://images.unsplash.com/photo-1583743814966-8936f5b7be1a?w=800&q=80',
+    'https://images.unsplash.com/photo-1576566588028-4147f3842f27?w=800&q=80',
+    'https://images.unsplash.com/photo-1562157873-818bc0726f68?w=800&q=80',
+    'https://images.unsplash.com/photo-1618354691373-d851c5c3a990?w=800&q=80',
+  ],
+  hoodies: [
+    'https://images.unsplash.com/photo-1556821840-3a63f95609a7?w=800&q=80',
+    'https://images.unsplash.com/photo-1578768079052-aa76e52ff62e?w=800&q=80',
+    'https://images.unsplash.com/photo-1620799140408-edc6dcb6d633?w=800&q=80',
+    'https://images.unsplash.com/photo-1509942774463-acf339cf87d5?w=800&q=80',
+  ],
+  pants: [
+    'https://images.unsplash.com/photo-1624378439575-d8705ad7ae80?w=800&q=80',
+    'https://images.unsplash.com/photo-1542272604-787c3835535d?w=800&q=80',
+    'https://images.unsplash.com/photo-1473966968600-fa801b869a1a?w=800&q=80',
+  ],
+  accesorios: [
+    'https://images.unsplash.com/photo-1588850561407-ed78c282e89b?w=800&q=80',
+    'https://images.unsplash.com/photo-1521369909029-2afed882baee?w=800&q=80',
+    'https://images.unsplash.com/photo-1553062407-98eeb64c6a62?w=800&q=80',
+  ],
+  categories: [
+    'https://images.unsplash.com/photo-1489987707025-afc232f7ea0f?w=600&q=80',
+    'https://images.unsplash.com/photo-1434389677669-e08b4cac3105?w=600&q=80',
+    'https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=600&q=80',
+    'https://images.unsplash.com/photo-1553062407-98eeb64c6a62?w=600&q=80',
+    'https://images.unsplash.com/photo-1489987707025-afc232f7ea0f?w=600&q=80',
+    'https://images.unsplash.com/photo-1607082348824-0a96f2a4b9da?w=600&q=80',
+  ],
+  banners: [
+    'https://images.unsplash.com/photo-1441984904996-e0b6ba687e04?w=1920&q=80',
+    'https://images.unsplash.com/photo-1490481651871-ab68de25d43d?w=1920&q=80',
+    'https://images.unsplash.com/photo-1445205170230-053b83016050?w=1920&q=80',
+  ],
+};
+
+/**
  * Categorias de la tienda
  */
 export const categories: Category[] = [
@@ -9,7 +52,7 @@ export const categories: Category[] = [
     slug: 'remeras',
     name: 'Remeras',
     description: 'Remeras oversize y regular con disenos unicos inspirados en la estetica japonesa y el streetwear alternativo.',
-    image: '/images/categories/remeras.jpg',
+    image: UNSPLASH.categories[0],
     productCount: 45,
   },
   {
@@ -17,7 +60,7 @@ export const categories: Category[] = [
     slug: 'hoodies',
     name: 'Hoodies',
     description: 'Buzos y hoodies de alta calidad con estampados exclusivos y corte oversize.',
-    image: '/images/categories/hoodies.jpg',
+    image: UNSPLASH.categories[1],
     productCount: 28,
   },
   {
@@ -25,7 +68,7 @@ export const categories: Category[] = [
     slug: 'pants-shorts',
     name: 'Pants & Shorts',
     description: 'Pantalones cargo, joggers y shorts con el estilo urbano japones que nos caracteriza.',
-    image: '/images/categories/pants.jpg',
+    image: UNSPLASH.categories[2],
     productCount: 32,
   },
   {
@@ -33,7 +76,7 @@ export const categories: Category[] = [
     slug: 'accesorios',
     name: 'Accesorios',
     description: 'Gorras, bolsos, cadenas y accesorios para completar tu look.',
-    image: '/images/categories/accesorios.jpg',
+    image: UNSPLASH.categories[3],
     productCount: 18,
   },
   {
@@ -41,7 +84,7 @@ export const categories: Category[] = [
     slug: 'basicos',
     name: 'Basicos',
     description: 'Prendas esenciales en colores neutros, perfectas para combinar.',
-    image: '/images/categories/basicos.jpg',
+    image: UNSPLASH.categories[4],
     productCount: 15,
   },
   {
@@ -49,7 +92,7 @@ export const categories: Category[] = [
     slug: 'liquidacion',
     name: 'Liquidacion',
     description: 'Ultimas unidades con descuentos especiales. Stock limitado.',
-    image: '/images/categories/liquidacion.jpg',
+    image: UNSPLASH.categories[5],
     productCount: 22,
   },
 ];
@@ -68,9 +111,9 @@ export const products: Product[] = [
     originalPrice: 52900,
     discount: 15,
     images: [
-      { id: 'img-001-1', url: '/images/products/remera-dragon-1.jpg', alt: 'Remera Dragon Spirit - Frente', isPrimary: true },
-      { id: 'img-001-2', url: '/images/products/remera-dragon-2.jpg', alt: 'Remera Dragon Spirit - Espalda', isPrimary: false },
-      { id: 'img-001-3', url: '/images/products/remera-dragon-3.jpg', alt: 'Remera Dragon Spirit - Detalle', isPrimary: false },
+      { id: 'img-001-1', url: UNSPLASH.remeras[0], alt: 'Remera Dragon Spirit - Frente', isPrimary: true },
+      { id: 'img-001-2', url: UNSPLASH.remeras[1], alt: 'Remera Dragon Spirit - Espalda', isPrimary: false },
+      { id: 'img-001-3', url: UNSPLASH.remeras[2], alt: 'Remera Dragon Spirit - Detalle', isPrimary: false },
     ],
     category: categories[0],
     subcategory: 'oversize',
@@ -115,8 +158,8 @@ export const products: Product[] = [
     originalPrice: undefined,
     discount: undefined,
     images: [
-      { id: 'img-002-1', url: '/images/products/hoodie-kitsune-1.jpg', alt: 'Hoodie Kitsune - Frente', isPrimary: true },
-      { id: 'img-002-2', url: '/images/products/hoodie-kitsune-2.jpg', alt: 'Hoodie Kitsune - Espalda', isPrimary: false },
+      { id: 'img-002-1', url: UNSPLASH.hoodies[0], alt: 'Hoodie Kitsune - Frente', isPrimary: true },
+      { id: 'img-002-2', url: UNSPLASH.hoodies[1], alt: 'Hoodie Kitsune - Espalda', isPrimary: false },
     ],
     category: categories[1],
     subcategory: 'oversize',
@@ -153,8 +196,8 @@ export const products: Product[] = [
     originalPrice: undefined,
     discount: undefined,
     images: [
-      { id: 'img-003-1', url: '/images/products/short-cargo-1.jpg', alt: 'Short Cargo Shogun - Frente', isPrimary: true },
-      { id: 'img-003-2', url: '/images/products/short-cargo-2.jpg', alt: 'Short Cargo Shogun - Lateral', isPrimary: false },
+      { id: 'img-003-1', url: UNSPLASH.pants[0], alt: 'Short Cargo Shogun - Frente', isPrimary: true },
+      { id: 'img-003-2', url: UNSPLASH.pants[1], alt: 'Short Cargo Shogun - Lateral', isPrimary: false },
     ],
     category: categories[2],
     subcategory: 'shorts',
@@ -196,7 +239,7 @@ export const products: Product[] = [
     originalPrice: undefined,
     discount: undefined,
     images: [
-      { id: 'img-004-1', url: '/images/products/remera-neko-1.jpg', alt: 'Remera Neko Mafia Boss - Frente', isPrimary: true },
+      { id: 'img-004-1', url: UNSPLASH.remeras[3], alt: 'Remera Neko Mafia Boss - Frente', isPrimary: true },
     ],
     category: categories[0],
     subcategory: 'oversize',
@@ -235,7 +278,7 @@ export const products: Product[] = [
     originalPrice: 44900,
     discount: 15,
     images: [
-      { id: 'img-005-1', url: '/images/products/remera-washed-1.jpg', alt: 'Remera Washed Alternative', isPrimary: true },
+      { id: 'img-005-1', url: UNSPLASH.remeras[4], alt: 'Remera Washed Alternative', isPrimary: true },
     ],
     category: categories[4],
     subcategory: 'basicos',
@@ -277,7 +320,7 @@ export const products: Product[] = [
     originalPrice: 44900,
     discount: 10,
     images: [
-      { id: 'img-006-1', url: '/images/products/remera-disconnect-1.jpg', alt: 'Remera Disconnection', isPrimary: true },
+      { id: 'img-006-1', url: UNSPLASH.remeras[5], alt: 'Remera Disconnection', isPrimary: true },
     ],
     category: categories[0],
     subcategory: 'oversize',
@@ -316,7 +359,7 @@ export const products: Product[] = [
     originalPrice: undefined,
     discount: undefined,
     images: [
-      { id: 'img-007-1', url: '/images/products/buzo-neko-1.jpg', alt: 'Buzo Neko Mafia Boss', isPrimary: true },
+      { id: 'img-007-1', url: UNSPLASH.hoodies[2], alt: 'Buzo Neko Mafia Boss', isPrimary: true },
     ],
     category: categories[1],
     subcategory: 'hoodies',
@@ -353,7 +396,7 @@ export const products: Product[] = [
     originalPrice: undefined,
     discount: undefined,
     images: [
-      { id: 'img-008-1', url: '/images/products/remera-meiyo-1.jpg', alt: 'Remera Meiyo Beige', isPrimary: true },
+      { id: 'img-008-1', url: UNSPLASH.remeras[0], alt: 'Remera Meiyo Beige', isPrimary: true },
     ],
     category: categories[0],
     subcategory: 'oversize',
@@ -390,8 +433,8 @@ export const bannerSlides: BannerSlide[] = [
     id: 'slide-1',
     title: 'Nueva Coleccion',
     subtitle: 'Descubri lo ultimo en streetwear japones',
-    image: '/images/banners/banner-1.jpg',
-    mobileImage: '/images/banners/banner-1-mobile.jpg',
+    image: UNSPLASH.banners[0],
+    mobileImage: UNSPLASH.banners[0],
     link: '/productos?filter=new',
     buttonText: 'Ver Novedades',
   },
@@ -399,8 +442,8 @@ export const bannerSlides: BannerSlide[] = [
     id: 'slide-2',
     title: 'Hoodies Premium',
     subtitle: 'French Terry 320gsm - Maxima calidad',
-    image: '/images/banners/banner-2.jpg',
-    mobileImage: '/images/banners/banner-2-mobile.jpg',
+    image: UNSPLASH.banners[1],
+    mobileImage: UNSPLASH.banners[1],
     link: '/categoria/hoodies',
     buttonText: 'Explorar',
   },
@@ -408,8 +451,8 @@ export const bannerSlides: BannerSlide[] = [
     id: 'slide-3',
     title: 'Hasta 50% OFF',
     subtitle: 'Liquidacion de temporada',
-    image: '/images/banners/banner-3.jpg',
-    mobileImage: '/images/banners/banner-3-mobile.jpg',
+    image: UNSPLASH.banners[2],
+    mobileImage: UNSPLASH.banners[2],
     link: '/categoria/liquidacion',
     buttonText: 'Ver Ofertas',
   },
