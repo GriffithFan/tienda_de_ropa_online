@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect, useCallback } from 'react';
+import Image from 'next/image';
 import Link from 'next/link';
 import { motion, AnimatePresence } from 'framer-motion';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
@@ -61,11 +62,18 @@ export function HeroBanner({
           transition={{ duration: 0.5 }}
           className="absolute inset-0"
         >
-          {/* Background image placeholder */}
-          <div className="absolute inset-0 bg-gradient-to-r from-primary-950 via-primary-900 to-primary-950" />
+          {/* Background image */}
+          <Image
+            src={currentSlide.image}
+            alt={currentSlide.title}
+            fill
+            className="object-cover"
+            priority
+            unoptimized
+          />
 
           {/* Overlay gradient */}
-          <div className="absolute inset-0 bg-gradient-to-r from-background/80 via-background/40 to-transparent" />
+          <div className="absolute inset-0 bg-gradient-to-r from-background/90 via-background/50 to-transparent" />
 
           {/* Content */}
           <div className="container-custom h-full flex items-center">

@@ -1,5 +1,6 @@
 'use client';
 
+import Image from 'next/image';
 import Link from 'next/link';
 import { motion } from 'framer-motion';
 import { ArrowRight } from 'lucide-react';
@@ -46,11 +47,17 @@ function CategoryCard({ category, index }: CategoryCardProps) {
         href={`/categoria/${category.slug}`}
         className="group block relative aspect-category overflow-hidden rounded-xl"
       >
-        {/* Background placeholder */}
-        <div className="absolute inset-0 bg-gradient-to-br from-primary-800 to-primary-950 transition-transform duration-500 group-hover:scale-105" />
+        {/* Background image */}
+        <Image
+          src={category.image}
+          alt={category.name}
+          fill
+          className="object-cover transition-transform duration-500 group-hover:scale-105"
+          unoptimized
+        />
 
         {/* Overlay gradient */}
-        <div className="absolute inset-0 bg-gradient-to-t from-background via-background/20 to-transparent" />
+        <div className="absolute inset-0 bg-gradient-to-t from-background via-background/40 to-transparent" />
 
         {/* Content */}
         <div className="absolute inset-0 flex flex-col items-center justify-center p-6 text-center">
