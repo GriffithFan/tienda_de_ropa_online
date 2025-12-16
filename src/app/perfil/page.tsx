@@ -262,14 +262,14 @@ function OrdersSection() {
   // Ejemplo de pedidos - en produccion vendrian de la API
   const orders = [
     {
-      id: 'KIRA-ABC123',
+      id: 'KURO-ABC123',
       date: '2024-12-08',
       status: 'delivered',
       total: 89900,
       items: 2,
     },
     {
-      id: 'KIRA-DEF456',
+      id: 'KURO-DEF456',
       date: '2024-12-05',
       status: 'shipped',
       total: 44900,

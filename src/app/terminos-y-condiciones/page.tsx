@@ -40,7 +40,7 @@ export default function TerminosPage() {
               1. Aceptación de los Términos
             </h2>
             <p className="text-accent-muted leading-relaxed">
-              Al acceder y utilizar el sitio web de KIRA Store, aceptas estos
+              Al acceder y utilizar el sitio web de KURO, aceptas estos
               términos y condiciones en su totalidad. Si no estás de acuerdo con
               alguna parte de estos términos, te pedimos que no utilices nuestro
               sitio web.
@@ -68,7 +68,7 @@ export default function TerminosPage() {
               3. Proceso de Compra
             </h2>
             <p className="text-accent-muted leading-relaxed mb-4">
-              Al realizar una compra en KIRA Store:
+              Al realizar una compra en KURO:
             </p>
             <ul className="list-disc list-inside text-accent-muted space-y-2">
               <li>Debes ser mayor de 18 años o contar con autorización</li>
@@ -136,7 +136,7 @@ export default function TerminosPage() {
             </h2>
             <p className="text-accent-muted leading-relaxed">
               Todo el contenido del sitio (imágenes, textos, logos, diseños) es
-              propiedad de KIRA Store y está protegido por las leyes de
+              propiedad de KURO y está protegido por las leyes de
               propiedad intelectual. Queda prohibida su reproducción sin
               autorización expresa.
             </p>
@@ -152,7 +152,7 @@ export default function TerminosPage() {
               <Link href="/contacto" className="text-accent hover:underline">
                 página de contacto
               </Link>{' '}
-              o enviarnos un email a hola@kirastore.com.ar
+              o enviarnos un email a contacto@kuro.com.ar
             </p>
           </section>
         </div>

@@ -43,7 +43,7 @@ export default function PrivacidadPage() {
               1. Información que Recopilamos
             </h2>
             <p className="text-accent-muted leading-relaxed mb-4">
-              En KIRA Store recopilamos información que nos proporcionas
+              En KURO recopilamos información que nos proporcionas
               directamente cuando:
             </p>
             <ul className="list-disc list-inside text-accent-muted space-y-2">
@@ -156,17 +156,17 @@ export default function PrivacidadPage() {
               Para ejercer tus derechos o consultas sobre privacidad, contactanos
               en:{' '}
               <a
-                href="mailto:privacidad@kirastore.com.ar"
+                href="mailto:privacidad@kuro.com.ar"
                 className="text-accent hover:underline"
               >
-                privacidad@kirastore.com.ar
+                privacidad@kuro.com.ar
               </a>
             </p>
           </section>
 
           <div className="p-4 bg-surface rounded-lg">
             <p className="text-sm text-accent-muted">
-              <strong>Responsable:</strong> KIRA Store
+              <strong>Responsable:</strong> KURO
               <br />
               <strong>Dirección:</strong> Morón, Buenos Aires, Argentina
               <br />

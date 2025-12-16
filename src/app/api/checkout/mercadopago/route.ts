@@ -58,15 +58,8 @@ export async function POST(request: NextRequest) {
       orderId: string;
     };
 
-    // Determinar la URL base
     const baseUrl = process.env.NEXT_PUBLIC_APP_URL || process.env.APP_URL || 'http://localhost:3000';
-    
-    console.log('=== MercadoPago Debug ===');
-    console.log('Base URL:', baseUrl);
-    console.log('Items recibidos:', JSON.stringify(items, null, 2));
-    console.log('Payer:', JSON.stringify(payer, null, 2));
 
-    // Validacion basica de datos
     if (!items || items.length === 0) {
       return NextResponse.json(
         { error: 'No hay items en el carrito' },
@@ -81,7 +74,6 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Validar y preparar items
     const validatedItems = items.map((item) => ({
       id: String(item.id),
       title: String(item.title || 'Producto'),
@@ -90,12 +82,8 @@ export async function POST(request: NextRequest) {
       currency_id: 'ARS' as const,
     }));
 
-    console.log('Items validados:', JSON.stringify(validatedItems, null, 2));
-
-    // Verificar que unit_price sea un número válido
     for (const item of validatedItems) {
       if (isNaN(item.unit_price) || item.unit_price <= 0) {
-        console.error('Precio inválido para item:', item);
         return NextResponse.json(
           { error: `Precio inválido para: ${item.title}` },
           { status: 400 }
@@ -103,10 +91,7 @@ export async function POST(request: NextRequest) {
       }
     }
 
-    // Crear la preferencia de pago
     const preference = new Preference(client);
-
-    // En desarrollo (localhost), no usar auto_return ya que MercadoPago no lo soporta
     const isLocalhost = baseUrl.includes('localhost') || baseUrl.includes('127.0.0.1');
     
     const preferenceBody: Record<string, unknown> = {
@@ -120,7 +105,6 @@ export async function POST(request: NextRequest) {
       statement_descriptor: 'KURO STORE',
     };
 
-    // Solo agregar back_urls y auto_return si NO es localhost
     if (!isLocalhost) {
       preferenceBody.back_urls = {
         success: `${baseUrl}/checkout/confirmacion`,
@@ -130,9 +114,6 @@ export async function POST(request: NextRequest) {
       preferenceBody.auto_return = 'approved';
     }
 
-    console.log('Is localhost:', isLocalhost);
-    console.log('Preference body:', JSON.stringify(preferenceBody, null, 2));
-
     const preferenceData = await preference.create({ body: preferenceBody as Parameters<typeof preference.create>[0]['body'] });
 
     return NextResponse.json({
@@ -141,9 +122,8 @@ export async function POST(request: NextRequest) {
       sandbox_init_point: preferenceData.sandbox_init_point,
     });
   } catch (error: unknown) {
-    console.error('Error creando preferencia de MercadoPago:', error);
+    console.error('MercadoPago preference creation failed:', error);
 
-    // Detectar errores específicos de MercadoPago
     const mpError = error as { code?: string; message?: string };
     
     if (mpError?.code === 'unauthorized' || mpError?.message?.includes('invalid access token')) {

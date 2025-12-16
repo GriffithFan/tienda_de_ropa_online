@@ -55,7 +55,7 @@ export async function POST(request: NextRequest) {
 
     const { customer, shipping, items, subtotal, shippingCost, discount, total } = validation.data;
 
-    const orderNumber = `KIRA-${Date.now().toString(36).toUpperCase()}-TF`;
+    const orderNumber = `KURO-${Date.now().toString(36).toUpperCase()}-TF`;
 
     const order = await prisma.order.create({
       data: {

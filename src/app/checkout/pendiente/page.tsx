@@ -12,7 +12,7 @@ import { SITE_CONFIG, PAYMENT_CONFIG } from '@/lib/constants';
  */
 function PendingPaymentContent() {
   const searchParams = useSearchParams();
-  const orderId = searchParams.get('order') || `KIRA-${Date.now().toString(36).toUpperCase()}`;
+  const orderId = searchParams.get('order') || `KURO-${Date.now().toString(36).toUpperCase()}`;
   const [copiedField, setCopiedField] = useState<string | null>(null);
 
   const copyToClipboard = async (text: string, field: string) => {

@@ -33,7 +33,7 @@ export default function SobreNosotrosPage() {
       icon: Truck,
       title: 'Compromiso',
       description:
-        'Nos comprometemos con la calidad de nuestros productos y la satisfacción de quienes eligen KIRA.',
+        'Nos comprometemos con la calidad de nuestros productos y la satisfacción de quienes eligen KURO.',
     },
   ];
 
@@ -70,7 +70,7 @@ export default function SobreNosotrosPage() {
             </h2>
             <div className="space-y-4 text-accent-muted">
               <p>
-                KIRA nació de una pasión compartida por la moda alternativa y la
+                KURO nació de una pasión compartida por la moda alternativa y la
                 cultura japonesa. Lo que empezó como un proyecto personal se
                 convirtió en una marca que representa a quienes buscan expresarse
                 a través de su vestimenta.
@@ -97,7 +97,7 @@ export default function SobreNosotrosPage() {
             {/* Placeholder - Reemplazar con imagen real */}
             <div className="absolute inset-0 flex items-center justify-center">
               <span className="font-display text-6xl font-bold text-accent/10">
-                KIRA
+                KURO
               </span>
             </div>
           </motion.div>
@@ -208,7 +208,7 @@ export default function SobreNosotrosPage() {
           className="bg-gradient-to-r from-zinc-900 to-zinc-800 rounded-2xl p-8 md:p-12 text-center"
         >
           <h2 className="font-display text-2xl md:text-3xl font-bold mb-4">
-            Unite a la comunidad KIRA
+            Unite a la comunidad KURO
           </h2>
           <p className="text-accent-muted mb-6 max-w-xl mx-auto">
             Seguinos en redes sociales para ver las últimas novedades, detrás de
@@ -216,7 +216,7 @@ export default function SobreNosotrosPage() {
           </p>
           <div className="flex justify-center gap-4">
             <a
-              href="https://instagram.com/kirastore"
+              href="https://instagram.com/kuro.streetwear"
               target="_blank"
               rel="noopener noreferrer"
               className="btn-primary"

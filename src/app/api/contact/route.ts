@@ -39,7 +39,7 @@ export async function POST(request: NextRequest) {
 
     if (process.env.RESEND_API_KEY && process.env.CONTACT_EMAIL) {
       await resend.emails.send({
-        from: 'KIRA Store <noreply@kirastore.com>',
+        from: 'KURO <noreply@kuro.com.ar>',
         to: process.env.CONTACT_EMAIL,
         subject: `Contacto: ${subject}`,
         html: `

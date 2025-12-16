@@ -1,94 +1,74 @@
-﻿# 🛒 KURO E-commerce Platform
+﻿# KURO E-commerce Platform
 
-<div align="center">
+Plataforma de e-commerce completa para tienda de ropa alternativa y streetwear japonés. Desarrollada con Next.js 14, TypeScript y PostgreSQL.
 
-![KURO Store](https://img.shields.io/badge/KURO-E--commerce-black?style=for-the-badge)
-![Next.js](https://img.shields.io/badge/Next.js-14-black?style=for-the-badge&logo=next.js)
-![TypeScript](https://img.shields.io/badge/TypeScript-5-blue?style=for-the-badge&logo=typescript)
-![Tailwind CSS](https://img.shields.io/badge/Tailwind-3-38bdf8?style=for-the-badge&logo=tailwindcss)
-![PostgreSQL](https://img.shields.io/badge/PostgreSQL-17-336791?style=for-the-badge&logo=postgresql)
-![Prisma](https://img.shields.io/badge/Prisma-6-2D3748?style=for-the-badge&logo=prisma)
-
-**Plataforma de e-commerce moderna, completa y lista para producción.**
-
-[Demo en Vivo](#) • [Documentación](./DOCUMENTATION.md) • [Características](#-características) • [Instalación](#-instalación)
-
-</div>
+**Demo:** [tienda-de-ropa-online.vercel.app](https://tienda-de-ropa-online.vercel.app)
 
 ---
 
-## ✨ Características
-
-### 🎨 Frontend
-- **Diseño Dark & Minimalista** - Paleta oscura moderna con acentos elegantes
-- **100% Responsive** - Adaptado para móvil, tablet y desktop
-- **Animaciones Fluidas** - Framer Motion para transiciones suaves
-- **SSR + SSG** - Renderizado híbrido para SEO y performance
-
-### 🛒 E-commerce Core
-- **Catálogo Completo** - Productos, categorías, variantes (talle/color)
-- **Carrito Persistente** - Almacenamiento en localStorage
-- **Checkout Multi-paso** - Datos → Envío → Pago → Confirmación
-- **Lista de Favoritos** - Wishlist para usuarios
-
-### 💳 Pagos Integrados
-- **MercadoPago** - Tarjetas, Pago Fácil, Rapipago
-- **Transferencia Bancaria** - Con descuento del 10%
-- **Webhooks** - Notificaciones automáticas de pago
-
-### 👤 Usuarios & Auth
-- **NextAuth.js** - Autenticación segura
-- **Login Social** - Google OAuth integrado
-- **Perfil de Usuario** - Datos, direcciones, historial
-- **Roles** - Usuarios y administradores
-
-### 🔧 Panel de Administración
-- **Dashboard** - Métricas y estadísticas
-- **Gestión de Productos** - CRUD completo con imágenes
-- **Gestión de Pedidos** - Estados, seguimiento
-- **Gestión de Usuarios** - Roles y permisos
-- **Inventario** - Control de stock
-
-### 📧 Comunicaciones
-- **Emails Transaccionales** - Resend integrado
-- **Confirmación de Pedido**
-- **Notificaciones de Envío**
-- **Formulario de Contacto**
-
-### 🖼️ Gestión de Medios
-- **Cloudinary** - Upload y optimización de imágenes
-- **Múltiples Imágenes** - Por producto
-- **Lazy Loading** - Carga optimizada
-
-### 🔍 SEO Optimizado
-- **Meta Tags Dinámicos** - Por producto y categoría
-- **Sitemap.xml** - Generación automática
-- **Robots.txt** - Configurado
-- **Open Graph** - Compartir en redes sociales
-
----
-
-## 🛠️ Stack Tecnológico
+## Stack Tecnológico
 
 | Categoría | Tecnología |
 |-----------|------------|
-| **Framework** | Next.js 14 (App Router) |
-| **Lenguaje** | TypeScript 5 |
-| **Estilos** | Tailwind CSS 3 |
-| **Base de Datos** | PostgreSQL 17 (Neon) |
-| **ORM** | Prisma 6 |
-| **Auth** | NextAuth.js 4 |
-| **Pagos** | MercadoPago SDK |
-| **Emails** | Resend |
-| **Imágenes** | Cloudinary |
-| **Estado** | Zustand |
-| **Animaciones** | Framer Motion |
-| **Formularios** | React Hook Form + Zod |
-| **UI Components** | Lucide Icons, Swiper |
+| Framework | Next.js 14 (App Router) |
+| Lenguaje | TypeScript 5 |
+| Estilos | Tailwind CSS 3 |
+| Base de Datos | PostgreSQL 17 (Neon) |
+| ORM | Prisma 6 |
+| Autenticación | NextAuth.js 4 |
+| Pagos | MercadoPago SDK |
+| Emails | Resend |
+| Imágenes | Cloudinary |
+| Estado | Zustand |
+| Animaciones | Framer Motion |
 
 ---
 
-## 📁 Estructura del Proyecto
+## Características
+
+### Frontend
+- Diseño dark minimalista con paleta de colores zinc/negro
+- Diseño responsive para móvil, tablet y desktop
+- Renderizado híbrido SSR/SSG para SEO y performance
+- Animaciones fluidas con Framer Motion
+
+### E-commerce
+- Catálogo de productos con categorías, variantes de talle y color
+- Carrito persistente en localStorage
+- Checkout multi-paso: Datos, Envío, Pago, Confirmación
+- Sistema de favoritos
+- Filtros avanzados por categoría, precio, talle, color
+
+### Pagos
+- Integración completa con MercadoPago
+- Soporte para tarjetas de crédito/débito
+- Transferencia bancaria con descuento del 25%
+- Webhooks para notificaciones automáticas de pago
+
+### Usuarios
+- Autenticación con NextAuth.js
+- Login con email/contraseña
+- OAuth con Google
+- Perfiles de usuario con historial de pedidos
+- Sistema de roles (Usuario/Admin)
+
+### Panel de Administración
+- Dashboard con métricas y estadísticas
+- CRUD completo de productos con imágenes
+- Gestión de categorías
+- Control de inventario por variante
+- Gestión de pedidos con estados
+- Gestión de usuarios y roles
+
+### Comunicaciones
+- Emails transaccionales con Resend
+- Confirmación de pedido
+- Notificaciones de envío
+- Formulario de contacto
+
+---
+
+## Estructura del Proyecto
 
 ```
 src/
@@ -99,7 +79,7 @@ src/
 │   │   ├── usuarios/       # Gestión de usuarios
 │   │   └── categorias/     # Gestión de categorías
 │   ├── api/                # API Routes
-│   │   ├── admin/          # Endpoints admin
+│   │   ├── admin/          # Endpoints protegidos
 │   │   ├── auth/           # NextAuth endpoints
 │   │   ├── products/       # Productos públicos
 │   │   ├── checkout/       # Proceso de pago
@@ -108,14 +88,13 @@ src/
 │   ├── checkout/           # Flujo de compra
 │   ├── cuenta/             # Área de usuario
 │   ├── categoria/[slug]/   # Páginas de categoría
-│   ├── producto/[slug]/    # Páginas de producto
-│   └── ...                 # Otras páginas
+│   └── producto/[slug]/    # Páginas de producto
 ├── components/             # Componentes React
 │   ├── cart/               # Carrito de compras
 │   ├── home/               # Componentes del home
 │   ├── layout/             # Header, Footer
 │   ├── products/           # Cards, grids, filtros
-│   └── ui/                 # Componentes base
+│   └── admin/              # Componentes del admin
 ├── lib/                    # Utilidades
 │   ├── prisma.ts           # Cliente Prisma
 │   ├── auth.ts             # Configuración NextAuth
@@ -129,7 +108,7 @@ src/
 
 ---
 
-## 🚀 Instalación
+## Instalación
 
 ### Prerrequisitos
 
@@ -156,17 +135,17 @@ npm install
 cp .env.example .env
 ```
 
-Editar `.env` con tus credenciales:
+Editar `.env` con las credenciales correspondientes:
 
 ```env
 # Base de Datos
 DATABASE_URL="postgresql://user:pass@host:5432/db"
 
 # NextAuth
-NEXTAUTH_SECRET="tu-secret-key"
+NEXTAUTH_SECRET="secret-key-generada"
 NEXTAUTH_URL="http://localhost:3000"
 
-# Google OAuth
+# Google OAuth (opcional)
 GOOGLE_CLIENT_ID="..."
 GOOGLE_CLIENT_SECRET="..."
 
@@ -190,54 +169,50 @@ npx prisma db push
 npx prisma db seed
 ```
 
-### 5. Iniciar desarrollo
+### 5. Iniciar servidor de desarrollo
 
 ```bash
 npm run dev
 ```
 
-Abrir [http://localhost:3000](http://localhost:3000)
+Acceder a [http://localhost:3000](http://localhost:3000)
 
 ---
 
-## 👤 Credenciales de Demo
+## Credenciales de Demo
 
 | Rol | Email | Contraseña |
 |-----|-------|------------|
-| Admin | admin@kurostore.com | admin123 |
-| Usuario | user@test.com | user123 |
+| Administrador | admin@kurostore.com | admin123 |
 
 ---
 
-## 📱 Páginas Disponibles
+## Páginas Disponibles
 
 ### Públicas
 | Ruta | Descripción |
 |------|-------------|
-| `/` | Home con hero, productos destacados, categorías |
-| `/productos` | Catálogo completo con filtros |
+| `/` | Página principal |
+| `/productos` | Catálogo con filtros |
 | `/categoria/[slug]` | Productos por categoría |
 | `/producto/[slug]` | Detalle de producto |
 | `/ofertas` | Productos en descuento |
 | `/contacto` | Formulario de contacto |
 | `/guia-de-talles` | Tabla de medidas |
-| `/sobre-nosotros` | Historia de la marca |
-| `/preguntas-frecuentes` | FAQ |
 
 ### Usuario
 | Ruta | Descripción |
 |------|-------------|
 | `/auth/login` | Iniciar sesión |
 | `/auth/registro` | Crear cuenta |
-| `/cuenta` | Dashboard de usuario |
-| `/cuenta/pedidos` | Historial de pedidos |
-| `/favoritos` | Lista de deseos |
+| `/perfil` | Perfil de usuario |
+| `/favoritos` | Lista de favoritos |
 | `/checkout` | Proceso de compra |
 
 ### Administración
 | Ruta | Descripción |
 |------|-------------|
-| `/admin` | Dashboard con métricas |
+| `/admin` | Dashboard |
 | `/admin/productos` | Gestión de productos |
 | `/admin/pedidos` | Gestión de pedidos |
 | `/admin/usuarios` | Gestión de usuarios |
@@ -245,17 +220,12 @@ Abrir [http://localhost:3000](http://localhost:3000)
 
 ---
 
-## 🔌 API Endpoints
+## API Endpoints
 
 ### Productos
 ```
 GET  /api/products          # Lista con filtros y paginación
 GET  /api/products/[slug]   # Detalle de producto
-```
-
-### Categorías
-```
-GET  /api/categories        # Lista de categorías
 ```
 
 ### Checkout
@@ -264,7 +234,7 @@ POST /api/checkout/mercadopago  # Crear preferencia de pago
 POST /api/orders/transfer       # Orden por transferencia
 ```
 
-### Admin (Autenticado)
+### Admin (requiere autenticación)
 ```
 GET/POST   /api/admin/products      # CRUD productos
 PUT/DELETE /api/admin/products/[id] # Actualizar/eliminar
@@ -278,77 +248,53 @@ POST /api/webhooks/mercadopago  # Notificaciones de pago
 
 ---
 
-## 🎨 Personalización
+## Build y Deploy
 
-### Colores (tailwind.config.ts)
-
-```typescript
-theme: {
-  extend: {
-    colors: {
-      background: '#0a0a0a',  // Fondo principal
-      surface: '#141414',     // Superficies
-      accent: '#fafafa',      // Acentos
-    }
-  }
-}
-```
-
-### Tipografías
-
-- **Inter** - Texto general
-- **Space Grotesk** - Títulos
-
-### Logo
-
-Reemplazar en `public/logos/` y actualizar referencias en componentes.
-
----
-
-## 📦 Build & Deploy
-
-### Producción
+### Producción local
 
 ```bash
 npm run build
 npm run start
 ```
 
-### Vercel (Recomendado)
+### Vercel
 
-1. Conectar repositorio en [vercel.com](https://vercel.com)
-2. Configurar variables de entorno
-3. Deploy automático en cada push
+1. Conectar repositorio en vercel.com
+2. Configurar variables de entorno en el dashboard
+3. Deploy automático en cada push a main
 
-### Variables de Producción
-
-Asegurarse de configurar:
+Variables requeridas en producción:
 - `NEXTAUTH_URL` con el dominio de producción
 - `DATABASE_URL` con la base de datos de producción
 - Credenciales de producción de MercadoPago
 
 ---
 
-## 📄 Licencia
+## Personalización
 
-Este proyecto está disponible para uso comercial bajo licencia MIT.
+### Colores (tailwind.config.ts)
+
+```typescript
+colors: {
+  background: { DEFAULT: '#0a0a0a', secondary: '#141414' },
+  surface: { DEFAULT: '#1a1a1a', hover: '#252525' },
+  accent: { DEFAULT: '#ffffff', muted: '#a0a0a0' },
+}
+```
+
+### Tipografías
+
+- **Inter** - Texto general
+- **Space Grotesk** - Títulos y logo
 
 ---
 
-## 🤝 Soporte & Contacto
+## Licencia
 
-¿Interesado en adquirir o personalizar esta plataforma?
-
-- 📧 Email: contacto@ejemplo.com
-- 💼 Portfolio: tu-portfolio.com
-- 🐙 GitHub: [@GriffithFan](https://github.com/GriffithFan)
+MIT License - Disponible para uso comercial.
 
 ---
 
-<div align="center">
+## Contacto
 
-**Desarrollado con ❤️ usando Next.js 14**
-
-⭐ Si te gusta este proyecto, no olvides darle una estrella!
-
-</div>
+- GitHub: [@GriffithFan](https://github.com/GriffithFan)

@@ -16,8 +16,8 @@ function ConfirmationContent() {
   const paymentMethod = searchParams.get('method') || searchParams.get('payment_type');
   const status = searchParams.get('status') || searchParams.get('collection_status');
   
-  // Generar número de orden si no viene de los params
-  const orderNumber = orderId || `KIRA-${Date.now().toString(36).toUpperCase()}`;
+  // Generar numero de orden si no viene de los params
+  const orderNumber = orderId || `KURO-${Date.now().toString(36).toUpperCase()}`;
 
   // Determinar si el pago fue exitoso (para MercadoPago)
   const isPaymentApproved = status === 'approved' || !status;

@@ -99,8 +99,7 @@ export default function CheckoutPage() {
     try {
       // Si es MercadoPago, crear preferencia y redirigir
       if (selectedPayment === 'mercadopago') {
-        // Generar orderId temporal
-        const orderId = `KIRA-${Date.now().toString(36).toUpperCase()}`;
+        const orderId = `KURO-${Date.now().toString(36).toUpperCase()}`;
 
         // Preparar items para MercadoPago
         const mpItems = items.map((item) => ({
@@ -164,8 +163,7 @@ export default function CheckoutPage() {
       }
 
       // Para otros métodos de pago (transferencia, efectivo)
-      // Crear orden en la base de datos
-      const orderId = `KIRA-${Date.now().toString(36).toUpperCase()}`;
+      const orderId = `KURO-${Date.now().toString(36).toUpperCase()}`;
       
       // Aquí podrías guardar la orden en la base de datos
       // await fetch('/api/orders', { ... });

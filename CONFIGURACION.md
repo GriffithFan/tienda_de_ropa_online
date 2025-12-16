@@ -1,147 +1,141 @@
-﻿# CONFIGURACION COMPLETA - TIENDA UNDER
+﻿# Configuración del Proyecto
 
-## Estado Actual del Proyecto
+Estado actual y configuración de todos los servicios integrados.
+
+---
+
+## Estado de Servicios
 
 ### Base de Datos
 - Proveedor: Neon PostgreSQL 17
-- Region: AWS Sao Paulo (sa-east-1)
+- Región: AWS São Paulo (sa-east-1)
 - Estado: Conectada y migrada
-- Datos: Seed ejecutado (productos, categorias, usuarios)
+- Datos: Seed ejecutado con productos, categorías y usuarios de demo
 
-### Autenticacion
-- Sistema: NextAuth.js v4
-- NEXTAUTH_SECRET: Generado y configurado
-- URL: http://localhost:3000
+### Autenticación (NextAuth.js)
+- Provider: Credentials + Google OAuth
+- NEXTAUTH_SECRET: Configurado
+- URL base: http://localhost:3000 (desarrollo)
 
-Credenciales de Admin:
-- Email: admin@kirastore.com
+Credenciales de administrador:
+- Email: admin@kurostore.com
 - Password: admin123
 
-### Sistema de Emails (Resend)
+### Emails (Resend)
 - API Key: Configurada
 - Remitente: onboarding@resend.dev
-- Plantillas disponibles:
-  - Confirmacion de pedido
-  - Pedido enviado (con tracking)
+- Templates disponibles:
+  - Confirmación de pedido
+  - Pedido enviado
   - Pedido entregado
-  - Email de bienvenida
-  - Recuperacion de contrasena
+  - Bienvenida
+  - Recuperación de contraseña
 
-### Subida de Imagenes (Cloudinary)
+### Imágenes (Cloudinary)
 - Cloud Name: dk0cas6co
 - API Key: Configurada
 - API Secret: Configurada
-- Estado: Listo para usar
+- Estado: Operativo
 
 ### Pagos (MercadoPago)
-- Modo: TEST
-- Public Key: TEST-5fb1d798-b6f1-42aa-bfec-012326706ee3
+- Modo: Sandbox (TEST)
+- Public Key: Configurada
 - Access Token: Configurado
 
 ---
 
 ## Panel de Administración
 
-### Páginas Creadas
+### Páginas Disponibles
 
 | Página | Ruta | Funcionalidades |
 |--------|------|-----------------|
-| **Dashboard** | `/admin` | Estadísticas, ventas, productos más vendidos, gráficos |
-| **Productos** | `/admin/productos` | CRUD completo de productos, gestión de stock, imágenes |
-| **Categorías** | `/admin/categorias` | CRUD, drag-and-drop para ordenar, subida de imágenes |
-| **Inventario** | `/admin/inventario` | Control de stock por variante, alertas, exportar CSV |
-| **Pedidos** | `/admin/pedidos` | Gestión de órdenes, cambio de estado, detalles |
-| **Usuarios** | `/admin/usuarios` | Gestión de usuarios, roles, historial de compras |
-| **Configuración** | `/admin/configuracion` | 8 secciones: General, Apariencia, E-commerce, Envío, Pagos, Email, Redes, SEO |
+| Dashboard | `/admin` | Estadísticas, ventas, gráficos |
+| Productos | `/admin/productos` | CRUD completo, gestión de stock, imágenes |
+| Categorías | `/admin/categorias` | CRUD, ordenamiento, imágenes |
+| Inventario | `/admin/inventario` | Control de stock por variante, alertas |
+| Pedidos | `/admin/pedidos` | Gestión de órdenes, cambio de estado |
+| Usuarios | `/admin/usuarios` | Gestión de roles, historial |
+| Configuración | `/admin/configuracion` | General, Apariencia, E-commerce, Envío, Pagos, Email, SEO |
 
-### Características del Admin
-
- **ImageUploader Component:** Drag-and-drop para múltiples imágenes
- **Autenticación protegida:** Solo usuarios con rol ADMIN
- **Responsive:** Funciona en móvil, tablet y desktop
- **Dark theme:** Diseño minimalista con colores zinc/negro
- **Toast notifications:** Feedback visual con react-hot-toast
- **Animaciones:** Framer Motion para transiciones fluidas
+### Características
+- Componente ImageUploader con drag-and-drop
+- Protección por rol ADMIN
+- Diseño responsive
+- Tema dark con colores zinc/negro
+- Notificaciones toast
+- Animaciones con Framer Motion
 
 ---
 
-## Comandos Utiles
+## Comandos de Desarrollo
 
-### Desarrollo
+### Servidor
 ```bash
-npm run dev          # Iniciar servidor de desarrollo
-npm run build        # Compilar para producción
-npm run start        # Ejecutar en producción
+npm run dev          # Iniciar desarrollo
+npm run build        # Compilar producción
+npm run start        # Ejecutar producción
+npm run lint         # Ejecutar linter
 ```
 
 ### Base de Datos
 ```bash
-npx prisma studio           # Abrir interfaz visual de la DB
-npx prisma db push          # Sincronizar schema sin migración
-npx prisma migrate dev      # Crear nueva migración
-npx prisma db seed          # Volver a ejecutar seed
-npx prisma generate         # Regenerar Prisma Client
+npx prisma studio           # Interfaz visual
+npx prisma db push          # Sincronizar schema
+npx prisma migrate dev      # Nueva migración
+npx prisma db seed          # Ejecutar seed
+npx prisma generate         # Regenerar cliente
 ```
 
 ### Git
 ```bash
 git add .
-git commit -m "mensaje"
+git commit -m "descripcion del cambio"
 git push origin main
 ```
 
 ---
 
-## Estructura de Archivos Importantes
+## Estructura de Archivos Clave
 
 ```
 src/
- app/
-    admin/              # Panel de administración
-       page.tsx        # Dashboard
-       productos/      # Gestión de productos
-       categorias/     # Gestión de categorías
-       inventario/     # Control de inventario
-       pedidos/        # Gestión de pedidos
-       usuarios/       # Gestión de usuarios
-       configuracion/  # Configuración del sitio
-    api/                # API Routes
-       admin/          # APIs protegidas para admin
-       products/       # API de productos
-       categories/     # API de categorías
-       upload/         # API de subida de imágenes
-       webhooks/       # Webhooks (MercadoPago)
-    auth/               # Páginas de autenticación
- components/
-    admin/              # Componentes del admin
-       ImageUploader.tsx
-    layout/             # Header, Footer, etc.
-    product/            # Componentes de productos
- lib/
-    cloudinary.ts       # Utilidades de Cloudinary
-    email.ts            # Sistema de emails
-    prisma.ts           # Cliente de Prisma
-    constants.ts        # Constantes del sitio
- types/
-     index.ts            # TypeScript interfaces
+├── app/
+│   ├── admin/              # Panel de administración
+│   ├── api/                # API Routes
+│   │   ├── admin/          # Endpoints protegidos
+│   │   ├── products/       # API de productos
+│   │   ├── checkout/       # API de pagos
+│   │   └── webhooks/       # Webhooks
+│   └── auth/               # Páginas de autenticación
+├── components/
+│   ├── admin/              # Componentes del admin
+│   └── layout/             # Header, Footer
+├── lib/
+│   ├── cloudinary.ts       # Utilidades de Cloudinary
+│   ├── email.ts            # Sistema de emails
+│   ├── prisma.ts           # Cliente Prisma
+│   └── constants.ts        # Constantes del sitio
+└── types/
+    └── index.ts            # Interfaces TypeScript
 ```
 
 ---
 
-## URLs de Acceso
+## URLs de Desarrollo
 
 | Página | URL |
 |--------|-----|
-| **Tienda Principal** | http://localhost:3000 |
-| **Login** | http://localhost:3000/auth/login |
-| **Registro** | http://localhost:3000/auth/registro |
-| **Panel Admin** | http://localhost:3000/admin |
-| **Productos** | http://localhost:3000/productos |
-| **Categorías** | http://localhost:3000/categorias/[slug] |
+| Tienda | http://localhost:3000 |
+| Login | http://localhost:3000/auth/login |
+| Registro | http://localhost:3000/auth/registro |
+| Admin | http://localhost:3000/admin |
+| Productos | http://localhost:3000/productos |
+| Prisma Studio | http://localhost:5555 |
 
 ---
 
-## Dependencias Instaladas
+## Dependencias Principales
 
 ### Core
 - next@14.2.33
@@ -166,68 +160,66 @@ src/
 
 ---
 
-## Variables de Entorno Configuradas
+## Variables de Entorno
 
 ```env
- DATABASE_URL          # Neon PostgreSQL
- NEXTAUTH_SECRET       # Autenticación
- NEXTAUTH_URL          # URL base
- RESEND_API_KEY        # Emails
- CLOUDINARY_CLOUD_NAME # Imágenes
- CLOUDINARY_API_KEY    # Imágenes
- CLOUDINARY_API_SECRET # Imágenes
- MERCADOPAGO_*         # Pendiente
- GOOGLE_CLIENT_*       # Opcional
+# Base de Datos
+DATABASE_URL="postgresql://..."
+
+# Autenticación
+NEXTAUTH_SECRET="..."
+NEXTAUTH_URL="http://localhost:3000"
+
+# Google OAuth (opcional)
+GOOGLE_CLIENT_ID="..."
+GOOGLE_CLIENT_SECRET="..."
+
+# Pagos
+MERCADOPAGO_ACCESS_TOKEN="..."
+NEXT_PUBLIC_MERCADOPAGO_PUBLIC_KEY="..."
+
+# Imágenes
+CLOUDINARY_CLOUD_NAME="..."
+CLOUDINARY_API_KEY="..."
+CLOUDINARY_API_SECRET="..."
+
+# Emails
+RESEND_API_KEY="..."
+
+# App
+NEXT_PUBLIC_APP_URL="http://localhost:3000"
 ```
 
 ---
 
-## Proximos Pasos (Opcional)
+## Configuración de MercadoPago
 
-### 1. Configurar MercadoPago
-1. Ve a https://www.mercadopago.com.ar/developers
-2. Crea una aplicación
-3. Copia las credenciales (Access Token y Public Key)
-4. Agrégalas al `.env`
+1. Acceder a https://www.mercadopago.com.ar/developers
+2. Crear una aplicación
+3. Copiar credenciales (Access Token y Public Key)
+4. Agregar al archivo `.env`
 
-### 2. Configurar Google OAuth (Opcional)
-1. Ve a https://console.cloud.google.com/apis/credentials
-2. Crea credenciales OAuth 2.0
-3. Configura:
-   - Origen autorizado: http://localhost:3000
-   - URI de redirección: http://localhost:3000/api/auth/callback/google
-4. Agrega Client ID y Secret al `.env`
-
-### 3. Subir Productos Reales
-1. Ingresa al admin: http://localhost:3000/admin
-2. Ve a "Productos"  "Nuevo producto"
-3. Usa el ImageUploader para subir fotos
-4. Las imágenes se guardan automáticamente en Cloudinary
-
-### 4. Personalizar el Sitio
-1. Ve a "Configuración" en el admin
-2. Modifica:
-   - Nombre del sitio
-   - Colores
-   - Textos del anuncio
-   - Redes sociales
-   - SEO
-
-### 5. Probar el Flujo Completo
-1.  Navega por la tienda como usuario
-2.  Agrega productos al carrito
-3.  Realiza una compra (modo test)
-4.  Revisa el pedido en el admin
-5.  Cambia el estado del pedido
-6.  Verifica el email de confirmación
+Para modo producción:
+- Usar credenciales de producción (sin prefijo TEST-)
+- Actualizar `NEXT_PUBLIC_APP_URL` con el dominio real
 
 ---
 
-## Solucion de Problemas
+## Configuración de Google OAuth (Opcional)
+
+1. Acceder a https://console.cloud.google.com/apis/credentials
+2. Crear credenciales OAuth 2.0
+3. Configurar:
+   - Origen autorizado: http://localhost:3000
+   - URI de redirección: http://localhost:3000/api/auth/callback/google
+4. Agregar Client ID y Secret al `.env`
+
+---
+
+## Solución de Problemas
 
 ### El servidor no inicia
 ```bash
-# Limpiar caché y reiniciar
 Remove-Item -Recurse -Force .next
 npm run dev
 ```
@@ -238,74 +230,24 @@ npx prisma generate
 ```
 
 ### Imágenes no se suben
-- Verifica que las credenciales de Cloudinary estén correctas
-- Asegúrate de estar logueado como ADMIN
-- Revisa la consola del navegador para errores
+- Verificar credenciales de Cloudinary
+- Confirmar que el usuario tiene rol ADMIN
 
 ### Error de autenticación
-- Verifica que `NEXTAUTH_SECRET` esté configurado
-- Asegúrate de que `NEXTAUTH_URL` sea correcta
-- Cierra sesión y vuelve a iniciar
+- Verificar NEXTAUTH_SECRET
+- Verificar NEXTAUTH_URL
+- Limpiar cookies del navegador
 
 ---
 
-## Soporte
+## Métricas del Proyecto
 
-Si encuentras algún problema:
-
-1. **Revisa los logs del servidor** en la terminal
-2. **Abre la consola del navegador** (F12) para ver errores de frontend
-3. **Verifica las variables de entorno** en el archivo `.env`
-4. **Asegúrate de que la base de datos esté conectada**
+- Archivos: ~150+
+- Componentes: ~40+
+- API Routes: ~20+
+- Páginas: ~25+
 
 ---
 
-## Personalizacion de Diseno
-
-### Colores (Tailwind)
-Archivo: `tailwind.config.ts`
-
-Los colores principales son:
-- Negro: `#000000`
-- Zinc: `#18181b`, `#27272a`, `#3f3f46`
-- Blanco: `#ffffff`
-
-### Tipografía
-Fuente principal: **Inter** (Google Fonts)
-
-### Componentes Reutilizables
-- `ImageUploader`: Drag-and-drop de imágenes
-- `ProductCard`: Tarjeta de producto
-- `Button`: Botón con animaciones
-- `Modal`: Modal genérico
-
----
-
-## Metricas del Proyecto
-
-- **Archivos creados:** ~150+
-- **Componentes:** ~40+
-- **API Routes:** ~20+
-- **Páginas:** ~25+
-- **Líneas de código:** ~15,000+
-
----
-
-## Caracteristicas Destacadas
-
-1. **100% TypeScript** - Tipado completo
-2. **Responsive Design** - Móvil, tablet, desktop
-3. **Dark Theme** - Diseño moderno y minimalista
-4. **Animaciones Fluidas** - Framer Motion
-5. **SEO Optimizado** - Meta tags, sitemap, robots.txt
-6. **Autenticación Completa** - NextAuth con múltiples proveedores
-7. **Panel Admin Profesional** - CRUD completo con estadísticas
-8. **Sistema de Emails** - Plantillas HTML profesionales
-9. **Subida de Imágenes** - Cloudinary con optimización
-10. **Carrito Persistente** - Zustand con localStorage
-
----
-
-**Última actualización:** 10 de diciembre de 2025
-**Versión:** 1.0.0
-**Estado:**  Producción Ready
+Última actualización: 16 de diciembre de 2025
+Versión: 1.0.0

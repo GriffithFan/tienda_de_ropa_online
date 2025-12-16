@@ -1,16 +1,18 @@
-# KIRA Store - Documentacion Tecnica
+# Documentación Técnica
 
-## Indice
+Referencia técnica del proyecto KURO E-commerce.
+
+---
+
+## Índice
 
 1. [Estructura del Proyecto](#estructura-del-proyecto)
-2. [Archivos de Configuracion](#archivos-de-configuracion)
+2. [Configuración](#configuración)
 3. [Sistema de Tipos](#sistema-de-tipos)
 4. [Componentes](#componentes)
-5. [Paginas](#paginas)
-6. [API Routes](#api-routes)
-7. [Estado Global](#estado-global)
-8. [Estilos](#estilos)
-9. [Utilidades](#utilidades)
+5. [API Routes](#api-routes)
+6. [Estado Global](#estado-global)
+7. [Base de Datos](#base-de-datos)
 
 ---
 
@@ -20,22 +22,21 @@
 src/
 ├── app/                    # App Router de Next.js 14
 │   ├── api/               # API Routes
+│   ├── admin/             # Panel de administración
+│   ├── auth/              # Autenticación
 │   ├── checkout/          # Flujo de checkout
-│   ├── contacto/          # Pagina de contacto
-│   ├── categoria/         # Paginas de categoria
-│   ├── guia-de-talles/    # Guia de talles
-│   ├── producto/          # Paginas de producto
-│   ├── productos/         # Catalogo de productos
+│   ├── categoria/         # Páginas de categoría
+│   ├── producto/          # Páginas de producto
 │   ├── layout.tsx         # Layout principal
 │   └── page.tsx           # Homepage
 ├── components/            # Componentes React
-│   ├── cart/             # Componentes del carrito
+│   ├── admin/            # Componentes del admin
+│   ├── cart/             # Carrito de compras
 │   ├── home/             # Componentes del home
-│   ├── layout/           # Header, Footer, etc.
-│   ├── products/         # Tarjetas y grids de productos
-│   └── search/           # Modal de busqueda
-├── data/                  # Datos mock
-├── lib/                   # Utilidades y constantes
+│   ├── layout/           # Header, Footer
+│   ├── products/         # Tarjetas y grids
+│   └── search/           # Modal de búsqueda
+├── lib/                   # Utilidades y configuración
 ├── store/                 # Estado global (Zustand)
 ├── styles/               # Estilos globales
 └── types/                # Definiciones TypeScript
@@ -43,58 +44,63 @@ src/
 
 ---
 
-## Archivos de Configuracion
+## Configuración
 
 ### package.json
-Define las dependencias del proyecto:
+Dependencias principales:
 - Next.js 14: Framework React con SSR/SSG
-- TypeScript: Tipado estatico
+- TypeScript: Tipado estático
 - Tailwind CSS: Framework de utilidades CSS
-- Zustand: Manejo de estado global
+- Prisma: ORM para PostgreSQL
+- NextAuth.js: Autenticación
+- Zustand: Estado global
 - Framer Motion: Animaciones
-- React Hook Form + Zod: Validacion de formularios
-- MercadoPago SDK: Integracion de pagos
-- Swiper: Carruseles
-- Lucide React: Iconos
+- MercadoPago SDK: Pagos
+- Resend: Emails transaccionales
+- Cloudinary: Gestión de imágenes
 
 ### tsconfig.json
-Configuracion de TypeScript con:
-- Path aliases (`@/` para `src/`)
+- Path aliases: `@/` mapea a `src/`
 - Strict mode habilitado
-- Target ES2022
-- JSX preserve para Next.js
-
-### next.config.js
-Configuracion de Next.js:
-- Optimizacion de imagenes (AVIF, WebP)
-- Dominios permitidos para imagenes
-- Configuracion experimental
+- Target: ES2022
 
 ### tailwind.config.ts
 Tema personalizado:
-- Paleta de colores oscura (zinc/neutral)
-- Tipografias: Inter (texto), Space Grotesk (titulos)
+- Paleta de colores dark (zinc/neutral)
+- Tipografías: Inter (texto), Space Grotesk (títulos)
 - Animaciones personalizadas
 - Breakpoints responsive
 
-### postcss.config.js
-Plugins de PostCSS:
-- Tailwind CSS
-- Autoprefixer
+### Variables de Entorno
 
-### .env.example
-Variables de entorno requeridas:
-- `NEXT_PUBLIC_APP_URL`: URL de la aplicacion
-- `MERCADOPAGO_ACCESS_TOKEN`: Token privado de MP
-- `NEXT_PUBLIC_MERCADOPAGO_PUBLIC_KEY`: Clave publica de MP
+```env
+# Base de Datos
+DATABASE_URL
+
+# Autenticación
+NEXTAUTH_SECRET
+NEXTAUTH_URL
+GOOGLE_CLIENT_ID
+GOOGLE_CLIENT_SECRET
+
+# Pagos
+MERCADOPAGO_ACCESS_TOKEN
+NEXT_PUBLIC_MERCADOPAGO_PUBLIC_KEY
+
+# Imágenes
+CLOUDINARY_CLOUD_NAME
+CLOUDINARY_API_KEY
+CLOUDINARY_API_SECRET
+
+# Emails
+RESEND_API_KEY
+```
 
 ---
 
 ## Sistema de Tipos
 
-### src/types/index.ts
-
-#### Product
+### Product
 ```typescript
 interface Product {
   id: string;
@@ -102,22 +108,23 @@ interface Product {
   slug: string;
   description: string;
   price: number;
-  compareAtPrice?: number;
-  category: string;
-  subcategory?: string;
+  originalPrice?: number;
   images: string[];
-  sizes: string[];
-  colors: ProductColor[];
+  category: Category;
+  categoryId: string;
+  variants: ProductVariant[];
+  isNew: boolean;
+  isFeatured: boolean;
   stock: number;
-  isNew?: boolean;
-  isFeatured?: boolean;
-  tags?: string[];
+  createdAt: Date;
+  updatedAt: Date;
 }
 ```
 
-#### CartItem
+### CartItem
 ```typescript
 interface CartItem {
+  id: string;
   productId: string;
   product: Product;
   quantity: number;
@@ -126,28 +133,19 @@ interface CartItem {
 }
 ```
 
-#### Category
+### Order
 ```typescript
-interface Category {
+interface Order {
   id: string;
-  name: string;
-  slug: string;
-  description?: string;
-  image?: string;
-  productCount: number;
-}
-```
-
-#### User
-```typescript
-interface User {
-  id: string;
-  email: string;
-  firstName: string;
-  lastName: string;
-  phone?: string;
-  addresses: Address[];
-  orders?: Order[];
+  userId: string;
+  items: OrderItem[];
+  status: OrderStatus;
+  total: number;
+  shippingAddress: Address;
+  paymentMethod: string;
+  paymentId?: string;
+  createdAt: Date;
+  updatedAt: Date;
 }
 ```
 
@@ -155,428 +153,168 @@ interface User {
 
 ## Componentes
 
-### Layout Components
+### Layout
+| Componente | Descripción |
+|------------|-------------|
+| Header | Navegación principal con menú responsive |
+| Footer | Footer con enlaces y newsletter |
+| AnnouncementBar | Cinta animada con promociones |
 
-#### AnnouncementBar
-Ubicacion: `src/components/layout/announcement-bar.tsx`
+### Productos
+| Componente | Descripción |
+|------------|-------------|
+| ProductCard | Tarjeta de producto con badges |
+| ProductGrid | Grid con paginación |
+| ProductFilters | Filtros laterales colapsables |
+| ProductGallery | Galería de imágenes con zoom |
 
-Cinta superior animada con anuncios desplazandose.
-- Animacion CSS infinita
-- Pausa en hover
-- Contenido duplicado para loop seamless
+### Carrito
+| Componente | Descripción |
+|------------|-------------|
+| CartDrawer | Panel lateral del carrito |
+| CartItem | Item individual del carrito |
 
-#### Header
-Ubicacion: `src/components/layout/header.tsx`
-
-Navegacion principal de la tienda:
-- Logo a la izquierda
-- Menu de navegacion central
-- Barra de busqueda
-- Iconos de usuario y carrito
-- Menu hamburguesa para mobile
-- Cambio de estilo al hacer scroll
-
-#### Footer
-Ubicacion: `src/components/layout/footer.tsx`
-
-Footer completo con:
-- Logo y descripcion
-- Links de navegacion
-- Informacion de contacto
-- Newsletter con formulario
-- Iconos de metodos de pago
-- Redes sociales
-- Copyright
-
-### Cart Components
-
-#### CartDrawer
-Ubicacion: `src/components/cart/cart-drawer.tsx`
-
-Panel lateral de carrito:
-- Slide desde la derecha
-- Lista de productos con imagen, nombre, talle, color
-- Controles de cantidad (+/-)
-- Boton eliminar
-- Subtotal calculado
-- Link a checkout
-- Estado vacio con CTA
-
-### Product Components
-
-#### ProductCard
-Ubicacion: `src/components/products/product-card.tsx`
-
-Tarjeta individual de producto:
-- Imagen con aspect ratio 3:4
-- Overlay con acciones en hover
-- Badge de descuento/nuevo
-- Nombre y precio
-- Precio anterior tachado si hay descuento
-- Boton wishlist
-- Quick add to cart
-
-#### ProductGrid
-Ubicacion: `src/components/products/product-grid.tsx`
-
-Grid responsive de productos:
-- 4 columnas en desktop
-- 2 columnas en tablet
-- 1 columna en mobile
-- Infinite scroll con Intersection Observer
-- Estado de carga con skeletons
-- Estado vacio con mensaje
-
-#### ProductFilters
-Ubicacion: `src/components/products/product-filters.tsx`
-
-Panel de filtros lateral:
-- Filtro por categoria
-- Filtro por talle
-- Filtro por color (con muestras visuales)
-- Filtro por precio (rango)
-- Secciones colapsables
-- Animaciones Framer Motion
-
-### Home Components
-
-#### HeroBanner
-Ubicacion: `src/components/home/hero-banner.tsx`
-
-Carousel principal:
-- Swiper con autoplay
-- Navegacion con flechas
-- Paginacion con bullets
-- Efecto fade entre slides
-- CTAs personalizables
-
-#### ProductCarousel
-Ubicacion: `src/components/home/product-carousel.tsx`
-
-Carrusel horizontal de productos:
-- Titulo de seccion
-- Link "Ver todos"
-- Navegacion con flechas
-- Responsive breakpoints
-- Reutiliza ProductCard
-
-#### CategoryGrid
-Ubicacion: `src/components/home/category-grid.tsx`
-
-Grid de categorias:
-- Layout asimetrico (2 grandes, 4 pequenas)
-- Imagenes con overlay
-- Nombre y contador de productos
-- Links a paginas de categoria
-
-#### FeaturesSection
-Ubicacion: `src/components/home/features-section.tsx`
-
-Seccion de caracteristicas:
-- Envio gratis a partir de cierto monto
-- Pago seguro
-- Cambios y devoluciones
-- Atencion personalizada
-- Iconos animados
-
-### Search Component
-
-#### SearchModal
-Ubicacion: `src/components/search/search-modal.tsx`
-
-Modal de busqueda:
-- Overlay fullscreen
-- Input con autofocus
-- Busqueda en tiempo real
-- Resultados con thumbnails
-- Navegacion con teclado
-- Cierre con Escape
-
----
-
-## Paginas
-
-### Home (/)
-Archivo: `src/app/page.tsx`
-
-Pagina principal compuesta por:
-1. HeroBanner - Carousel promocional
-2. CategoryGrid - Navegacion por categorias
-3. ProductCarousel (Destacados) - Productos featured
-4. ProductCarousel (Novedades) - Productos nuevos
-5. FeaturesSection - Beneficios de comprar
-
-### Productos (/productos)
-Archivo: `src/app/productos/page.tsx`
-
-Catalogo completo con:
-- Breadcrumbs
-- Filtros laterales
-- Ordenamiento (precio, novedades)
-- Grid de productos
-- Paginacion/infinite scroll
-
-### Categoria (/categoria/[slug])
-Archivo: `src/app/categoria/[slug]/page.tsx`
-
-Pagina de categoria dinamica:
-- Titulo y descripcion de categoria
-- Contador de productos
-- Misma estructura que catalogo
-- Filtros contextuales
-
-### Producto (/producto/[slug])
-Archivo: `src/app/producto/[slug]/page.tsx`
-
-Detalle de producto:
-- Galeria de imagenes con thumbnails
-- Selector de talle
-- Selector de color
-- Cantidad
-- Agregar al carrito
-- Calculadora de envio
-- Acordeones (descripcion, talles, cuidados)
-- Productos relacionados
-
-### Contacto (/contacto)
-Archivo: `src/app/contacto/page.tsx`
-
-Formulario de contacto:
-- Campos: nombre, email, telefono, asunto, mensaje
-- Validacion con Zod
-- Informacion de contacto
-- Links a WhatsApp
-- Horarios de atencion
-
-### Guia de Talles (/guia-de-talles)
-Archivo: `src/app/guia-de-talles/page.tsx`
-
-Tablas de medidas:
-- Remeras y tops
-- Pantalones y shorts
-- Calzado
-- Accesorios
-- Instrucciones de medicion
-
-### Checkout (/checkout)
-Archivo: `src/app/checkout/page.tsx`
-
-Proceso de compra multi-paso:
-1. Datos personales
-2. Direccion de envio
-3. Metodo de pago
-- Progress bar visual
-- Resumen del pedido
-- Calculos de totales
-
-### Confirmacion (/checkout/confirmacion)
-Archivo: `src/app/checkout/confirmacion/page.tsx`
-
-Confirmacion de pedido:
-- Animacion de exito
-- Numero de orden
-- Proximos pasos
-- Datos de contacto
-- Links de navegacion
+### Admin
+| Componente | Descripción |
+|------------|-------------|
+| ImageUploader | Drag-and-drop para imágenes |
+| DataTable | Tabla con ordenamiento y búsqueda |
+| StatsCard | Tarjeta de estadísticas |
 
 ---
 
 ## API Routes
 
-### Productos
+### Públicas
 
-#### GET /api/products
-Lista productos con filtros:
-- `category`: Filtrar por categoria
-- `size`: Filtrar por talle
-- `color`: Filtrar por color
-- `minPrice/maxPrice`: Rango de precio
-- `sort`: Ordenamiento
-- `page/limit`: Paginacion
+```
+GET  /api/products              # Lista de productos
+     Query params: category, minPrice, maxPrice, size, color, sort, page, limit
 
-#### GET /api/products/[slug]
-Detalle de producto:
-- Datos completos del producto
-- Productos relacionados
+GET  /api/products/[slug]       # Detalle de producto
 
-### Categorias
-
-#### GET /api/categories
-Lista todas las categorias.
+GET  /api/categories            # Lista de categorías
+```
 
 ### Checkout
 
-#### POST /api/checkout/mercadopago
-Crea preferencia de MercadoPago:
-- Items del carrito
-- Datos del comprador
-- URLs de retorno
-- Configuracion de pagos
+```
+POST /api/checkout/mercadopago  # Crear preferencia de pago
+     Body: { items, shippingAddress, shippingCost }
 
-### Ordenes
-
-#### POST /api/orders/transfer
-Crea orden para pago por transferencia:
-- Valida datos con Zod
-- Genera ID unico
-- Establece expiracion (48hs)
-
-#### GET /api/orders/transfer
-Consulta estado de orden.
+POST /api/orders/transfer       # Crear orden por transferencia
+     Body: { items, shippingAddress, total }
+```
 
 ### Webhooks
 
-#### POST /api/webhooks/mercadopago
-Recibe notificaciones de MercadoPago:
-- Verifica estado del pago
-- Actualiza orden en BD
-- Dispara emails
+```
+POST /api/webhooks/mercadopago  # Notificación de pago
+     Body: { type, data }
+```
 
-### Contacto
+### Admin (requiere rol ADMIN)
 
-#### POST /api/contact
-Procesa formulario de contacto:
-- Valida datos
-- Envia email
+```
+GET    /api/admin/products          # Listar productos
+POST   /api/admin/products          # Crear producto
+PUT    /api/admin/products/[id]     # Actualizar producto
+DELETE /api/admin/products/[id]     # Eliminar producto
+
+GET    /api/admin/orders            # Listar pedidos
+GET    /api/admin/orders/[id]       # Detalle de pedido
+PUT    /api/admin/orders/[id]       # Actualizar estado
+
+GET    /api/admin/users             # Listar usuarios
+PUT    /api/admin/users/[id]        # Actualizar usuario
+
+POST   /api/admin/upload            # Subir imagen a Cloudinary
+```
 
 ---
 
 ## Estado Global
 
-### Cart Store
-Archivo: `src/store/cart-store.ts`
-
-Estado del carrito con Zustand:
+### Cart Store (Zustand)
 
 ```typescript
-interface CartState {
+interface CartStore {
   items: CartItem[];
   isOpen: boolean;
   addItem: (item: CartItem) => void;
-  removeItem: (productId: string, size: string, color: string) => void;
-  updateQuantity: (productId: string, size: string, color: string, quantity: number) => void;
+  removeItem: (id: string) => void;
+  updateQuantity: (id: string, quantity: number) => void;
   clearCart: () => void;
-  toggleCart: () => void;
   openCart: () => void;
   closeCart: () => void;
-  getItemCount: () => number;
   getSubtotal: () => number;
+  getItemCount: () => number;
 }
 ```
 
-Persistencia con `zustand/middleware`:
-- Guarda en localStorage
-- Key: `kira-cart-storage`
-
-### Auth Store
-Archivo: `src/store/auth-store.ts`
-
-Estado de autenticacion:
+### Favorites Store (Zustand)
 
 ```typescript
-interface AuthState {
-  user: User | null;
-  isAuthenticated: boolean;
-  isLoading: boolean;
-  login: (email: string, password: string) => Promise<void>;
-  logout: () => void;
-  register: (data: RegisterData) => Promise<void>;
-  updateProfile: (data: Partial<User>) => Promise<void>;
-  addAddress: (address: Address) => void;
-  removeAddress: (addressId: string) => void;
+interface FavoritesStore {
+  favorites: string[];
+  addFavorite: (productId: string) => void;
+  removeFavorite: (productId: string) => void;
+  isFavorite: (productId: string) => boolean;
 }
 ```
 
+Ambos stores persisten en localStorage.
+
 ---
 
-## Estilos
+## Base de Datos
 
-### Variables CSS
-Archivo: `src/styles/globals.css`
+### Modelos Prisma
 
-```css
-:root {
-  --background: #0a0a0a;
-  --surface: #141414;
-  --border: #262626;
-  --accent: #fafafa;
-  --accent-muted: #a1a1aa;
-  --primary: #dc2626;
-  --success: #22c55e;
-  --warning: #f59e0b;
-  --error: #ef4444;
+```prisma
+model User {
+  id        String   @id @default(cuid())
+  email     String   @unique
+  name      String?
+  password  String?
+  role      Role     @default(USER)
+  orders    Order[]
+  createdAt DateTime @default(now())
+}
+
+model Product {
+  id            String    @id @default(cuid())
+  name          String
+  slug          String    @unique
+  description   String
+  price         Float
+  originalPrice Float?
+  images        String[]
+  category      Category  @relation(...)
+  variants      ProductVariant[]
+  isNew         Boolean   @default(false)
+  isFeatured    Boolean   @default(false)
+  stock         Int       @default(0)
+}
+
+model Order {
+  id              String      @id @default(cuid())
+  user            User        @relation(...)
+  items           OrderItem[]
+  status          OrderStatus @default(PENDING)
+  total           Float
+  shippingAddress Json
+  paymentMethod   String
+  paymentId       String?
 }
 ```
 
-### Clases Utilitarias
+### Comandos Útiles
 
-```css
-.btn-primary - Boton principal oscuro
-.btn-secondary - Boton con borde
-.card - Contenedor con fondo y borde
-.badge-discount - Badge rojo para descuentos
-.badge-new - Badge para productos nuevos
-.input-group - Contenedor de input con label
-.container-custom - Contenedor responsivo
-.section-title - Titulo de seccion
-.divider - Linea divisoria
+```bash
+npx prisma studio           # Interfaz visual de la DB
+npx prisma db push          # Sincronizar schema
+npx prisma migrate dev      # Crear migración
+npx prisma db seed          # Ejecutar seed
+npx prisma generate         # Regenerar cliente
 ```
-
----
-
-## Utilidades
-
-### src/lib/utils.ts
-
-#### cn(...classes)
-Combina clases con clsx y tailwind-merge.
-
-#### formatPrice(price)
-Formatea numero a precio argentino.
-```typescript
-formatPrice(15000) // "$15.000"
-```
-
-#### calculateDiscount(price, compareAtPrice)
-Calcula porcentaje de descuento.
-
-#### generateSlug(text)
-Genera slug URL-friendly.
-
-#### calculateTransferPrice(price)
-Aplica descuento por transferencia.
-
-### src/lib/constants.ts
-
-#### SITE_CONFIG
-Configuracion general del sitio:
-- Nombre, descripcion, URL
-- Datos de contacto
-- Redes sociales
-
-#### NAVIGATION_ITEMS
-Items del menu de navegacion.
-
-#### SHIPPING_CONFIG
-Configuracion de envios:
-- Umbral para envio gratis
-- Metodos disponibles
-
-#### PAYMENT_CONFIG
-Configuracion de pagos:
-- Descuento por transferencia
-- Datos bancarios
-- Metodos aceptados
-
----
-
-## Proximos Pasos
-
-1. Base de Datos: Implementar Prisma con PostgreSQL
-2. Autenticacion: Agregar NextAuth.js
-3. Email: Configurar Resend para notificaciones
-4. MercadoPago: Completar integracion con credenciales reales
-5. Testing: Agregar tests con Vitest
-6. SEO: Implementar metadata dinamica
-7. Analytics: Configurar Google Analytics
-8. Deploy: Configurar Vercel

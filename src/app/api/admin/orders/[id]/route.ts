@@ -98,7 +98,7 @@ export async function PATCH(
 
     if (validation.data.status === 'SHIPPED' && process.env.RESEND_API_KEY) {
       await resend.emails.send({
-        from: 'KIRA Store <pedidos@kirastore.com>',
+        from: 'KURO <pedidos@kuro.com.ar>',
         to: order.customerEmail,
         subject: `Tu pedido ${order.orderNumber} ha sido enviado`,
         html: `
@@ -106,7 +106,7 @@ export async function PATCH(
           <p>Hola ${order.customerName},</p>
           <p>Tu pedido <strong>${order.orderNumber}</strong> ha sido despachado.</p>
           ${order.trackingNumber ? `<p>Numero de seguimiento: <strong>${order.trackingNumber}</strong></p>` : ''}
-          <p>Saludos,<br />KIRA Store</p>
+          <p>Saludos,<br />KURO</p>
         `,
       });
     }

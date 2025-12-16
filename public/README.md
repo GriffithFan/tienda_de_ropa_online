@@ -1,58 +1,55 @@
-# Estructura de Assets - KIRA Store
+# Assets Estáticos
 
-Este directorio contiene todos los assets estaticos de la tienda.
+Este directorio contiene los recursos estáticos del sitio.
 
-## Carpetas
+---
+
+## Estructura
 
 ### /images
-Imagenes generales del sitio.
+Imágenes generales del sitio.
 
 ### /products
-Fotos de productos. Nombrar como: `{slug}-{numero}.jpg`
-Ejemplo: `remera-dragon-spirit-1.jpg`, `remera-dragon-spirit-2.jpg`
+Fotos de productos.
+- Nomenclatura: `{slug}-{numero}.jpg`
+- Ejemplo: `remera-dragon-spirit-1.jpg`
 
 ### /categories
-Imagenes para las categorias. Nombrar como: `{slug}.jpg`
-Ejemplo: `remeras.jpg`, `hoodies.jpg`
+Imágenes de categorías.
+- Nomenclatura: `{slug}.jpg`
+- Ejemplo: `remeras.jpg`
 
 ### /banners
-Imagenes para el carousel principal del home.
-Resolucion recomendada: 1920x800px
+Imágenes del carousel principal.
+- Resolución recomendada: 1920x800px
 
 ### /icons
-Iconos personalizados, logos de metodos de pago, etc.
+Iconos personalizados y logos de métodos de pago.
 
 ### /logos
-Logo de la marca en diferentes versiones y formatos.
+Logo de la marca en diferentes formatos.
+
+---
 
 ## Especificaciones
 
 ### Productos
-- Formato: JPG o WebP (preferido)
-- Tamano: 800x1067px (ratio 3:4)
-- Peso: Maximo 200KB por imagen
+- Formato: JPG o WebP
+- Tamaño: 800x1067px (ratio 3:4)
+- Peso máximo: 200KB
 
 ### Banners
 - Formato: JPG o WebP
 - Desktop: 1920x800px
 - Mobile: 768x600px
-- Peso: Maximo 300KB
+- Peso máximo: 300KB
 
-### Categorias
+### Categorías
 - Formato: JPG o WebP
-- Tamano: 600x800px
-- Peso: Maximo 150KB
+- Tamaño: 600x800px
+- Peso máximo: 150KB
 
 ### Iconos
 - Formato: SVG (preferido) o PNG
-- Tamano: 64x64px para iconos pequenos
+- Tamaño: 64x64px
 - Fondo: Transparente
-
-## Optimizacion
-
-Las imagenes seran optimizadas automaticamente por Next.js.
-Para mejor rendimiento, subir imagenes ya comprimidas.
-
-Herramientas recomendadas:
-- TinyPNG (https://tinypng.com)
-- Squoosh (https://squoosh.app)

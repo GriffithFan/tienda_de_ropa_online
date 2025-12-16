@@ -98,14 +98,14 @@ async function sendConfirmationEmail(email: string, orderId: string) {
 
   try {
     await resend.emails.send({
-      from: 'KIRA Store <pedidos@kirastore.com>',
+      from: 'KURO <pedidos@kuro.com.ar>',
       to: email,
       subject: `Pedido confirmado - ${orderId}`,
       html: `
         <h1>Gracias por tu compra!</h1>
         <p>Tu pedido <strong>${orderId}</strong> ha sido confirmado.</p>
         <p>Te enviaremos otro email cuando tu pedido sea despachado.</p>
-        <p>Saludos,<br />KIRA Store</p>
+        <p>Saludos,<br />KURO</p>
       `,
     });
   } catch (error) {
