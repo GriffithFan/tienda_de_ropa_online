@@ -104,6 +104,13 @@ async function main() {
   const calzadoCategory = await prisma.category.findUnique({ where: { slug: 'calzado' } });
 
   if (remerasCategory && hoodiesCategory && pantsCategory && shortsCategory && accesoriosCategory && calzadoCategory) {
+    // Limpiar productos existentes para recrear con imagenes nuevas
+    await prisma.productImage.deleteMany({});
+    await prisma.productSize.deleteMany({});
+    await prisma.productColor.deleteMany({});
+    await prisma.product.deleteMany({});
+    console.log('Existing products cleared');
+
     // Productos de Remeras
     const remerasProducts = [
       {
