@@ -281,10 +281,16 @@ function NewsletterForm() {
  */
 function PaymentMethods() {
   const paymentIcons = [
-    { name: 'Visa', icon: 'visa', color: '1A1F71' },
-    { name: 'Mastercard', icon: 'mastercard', color: 'EB001B' },
-    { name: 'American Express', icon: 'americanexpress', color: '006FCF' },
-    { name: 'MercadoPago', icon: 'mercadopago', color: '00B1EA' },
+    { name: 'Visa', src: '/icons/payment/visa.svg' },
+    { name: 'Mastercard', src: '/icons/payment/mastercard.svg' },
+    { name: 'American Express', src: '/icons/payment/amex.svg' },
+    { name: 'MercadoPago', src: '/icons/payment/mercadopago.svg' },
+  ];
+
+  const shippingIcons = [
+    { name: 'Andreani', src: '/icons/shipping/andreani.svg' },
+    { name: 'Correo Argentino', src: '/icons/shipping/correo-argentino-seeklogo.svg' },
+    { name: 'OCA', src: '/icons/shipping/correo-oca-seeklogo.svg' },
   ];
 
   return (
@@ -298,12 +304,12 @@ function PaymentMethods() {
               {paymentIcons.map((item) => (
                 <div
                   key={item.name}
-                  className="w-14 h-9 flex items-center justify-center bg-white rounded border p-2"
+                  className="w-14 h-9 flex items-center justify-center bg-white rounded p-1.5"
                   title={item.name}
                 >
                   {/* eslint-disable-next-line @next/next/no-img-element */}
                   <img
-                    src={`https://cdn.simpleicons.org/${item.icon}/${item.color}`}
+                    src={item.src}
                     alt={item.name}
                     className="w-full h-full object-contain"
                   />
@@ -316,25 +322,20 @@ function PaymentMethods() {
           <div>
             <h4 className="text-sm font-medium mb-4">Medios de envio</h4>
             <div className="flex flex-wrap items-center gap-2">
-              <div className="h-9 px-3 flex items-center justify-center bg-white rounded">
-                <span className="text-[9px] font-bold text-[#E31937] tracking-tight">ANDREANI</span>
-              </div>
-              <div className="h-9 w-auto flex items-center justify-center bg-white rounded overflow-hidden">
-                {/* eslint-disable-next-line @next/next/no-img-element */}
-                <img
-                  src="/icons/shipping/correo-argentino-seeklogo.svg"
-                  alt="Correo Argentino"
-                  className="h-6 w-auto object-contain"
-                />
-              </div>
-              <div className="h-9 w-auto flex items-center justify-center bg-white rounded overflow-hidden">
-                {/* eslint-disable-next-line @next/next/no-img-element */}
-                <img
-                  src="/icons/shipping/correo-oca-seeklogo.svg"
-                  alt="OCA"
-                  className="h-6 w-auto object-contain"
-                />
-              </div>
+              {shippingIcons.map((item) => (
+                <div
+                  key={item.name}
+                  className="h-9 px-2 flex items-center justify-center bg-white rounded"
+                  title={item.name}
+                >
+                  {/* eslint-disable-next-line @next/next/no-img-element */}
+                  <img
+                    src={item.src}
+                    alt={item.name}
+                    className="h-5 w-auto object-contain"
+                  />
+                </div>
+              ))}
             </div>
           </div>
         </div>
