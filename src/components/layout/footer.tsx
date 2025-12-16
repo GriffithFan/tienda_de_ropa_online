@@ -281,10 +281,10 @@ function NewsletterForm() {
  */
 function PaymentMethods() {
   const paymentIcons = [
-    { name: 'Visa', src: '/icons/payment/visa.svg' },
-    { name: 'Mastercard', src: '/icons/payment/mastercard.svg' },
-    { name: 'American Express', src: '/icons/payment/amex.svg' },
-    { name: 'MercadoPago', src: '/icons/payment/mercadopago.svg' },
+    { name: 'Visa', icon: 'visa', color: '1A1F71' },
+    { name: 'Mastercard', icon: 'mastercard', color: 'EB001B' },
+    { name: 'American Express', icon: 'americanexpress', color: '006FCF' },
+    { name: 'MercadoPago', icon: 'mercadopago', color: '00B1EA' },
   ];
 
   const shippingIcons = [
@@ -309,7 +309,7 @@ function PaymentMethods() {
                 >
                   {/* eslint-disable-next-line @next/next/no-img-element */}
                   <img
-                    src={item.src}
+                    src={`https://cdn.simpleicons.org/${item.icon}/${item.color}`}
                     alt={item.name}
                     className="w-full h-full object-contain"
                   />
