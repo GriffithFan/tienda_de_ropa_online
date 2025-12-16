@@ -280,17 +280,12 @@ function NewsletterForm() {
  * Seccion de medios de pago y envio
  */
 function PaymentMethods() {
-  const paymentLogos = [
-    'visa',
-    'mastercard',
-    'amex',
-    'mercadopago',
-    'maestro',
-    'cabal',
-    'naranja',
+  const paymentIcons = [
+    { name: 'Visa', icon: 'visa', color: '1A1F71' },
+    { name: 'Mastercard', icon: 'mastercard', color: 'EB001B' },
+    { name: 'American Express', icon: 'americanexpress', color: '006FCF' },
+    { name: 'MercadoPago', icon: 'mercadopago', color: '00B1EA' },
   ];
-
-  const shippingLogos = ['andreani', 'correo-argentino', 'oca'];
 
   return (
     <div className="border-t border-border">
@@ -299,15 +294,19 @@ function PaymentMethods() {
           {/* Medios de pago */}
           <div>
             <h4 className="text-sm font-medium mb-4">Medios de pago</h4>
-            <div className="flex flex-wrap items-center gap-3">
-              {paymentLogos.map((logo) => (
+            <div className="flex flex-wrap items-center gap-2">
+              {paymentIcons.map((item) => (
                 <div
-                  key={logo}
-                  className="w-12 h-8 flex items-center justify-center bg-white rounded border"
+                  key={item.name}
+                  className="w-14 h-9 flex items-center justify-center bg-white rounded border p-2"
+                  title={item.name}
                 >
-                  <span className="text-2xs font-bold text-gray-600 uppercase">
-                    {logo}
-                  </span>
+                  {/* eslint-disable-next-line @next/next/no-img-element */}
+                  <img
+                    src={`https://cdn.simpleicons.org/${item.icon}/${item.color}`}
+                    alt={item.name}
+                    className="w-full h-full object-contain"
+                  />
                 </div>
               ))}
             </div>
@@ -316,17 +315,26 @@ function PaymentMethods() {
           {/* Medios de envio */}
           <div>
             <h4 className="text-sm font-medium mb-4">Medios de envio</h4>
-            <div className="flex flex-wrap items-center gap-3">
-              {shippingLogos.map((logo) => (
-                <div
-                  key={logo}
-                  className="h-8 px-3 flex items-center justify-center bg-white rounded border"
-                >
-                  <span className="text-2xs font-bold text-gray-600 uppercase">
-                    {logo}
-                  </span>
-                </div>
-              ))}
+            <div className="flex flex-wrap items-center gap-2">
+              <div className="h-9 px-3 flex items-center justify-center bg-white rounded">
+                <span className="text-[9px] font-bold text-[#E31937] tracking-tight">ANDREANI</span>
+              </div>
+              <div className="h-9 w-auto flex items-center justify-center bg-white rounded overflow-hidden">
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img
+                  src="/icons/shipping/correo-argentino-seeklogo.svg"
+                  alt="Correo Argentino"
+                  className="h-6 w-auto object-contain"
+                />
+              </div>
+              <div className="h-9 w-auto flex items-center justify-center bg-white rounded overflow-hidden">
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img
+                  src="/icons/shipping/correo-oca-seeklogo.svg"
+                  alt="OCA"
+                  className="h-6 w-auto object-contain"
+                />
+              </div>
             </div>
           </div>
         </div>
