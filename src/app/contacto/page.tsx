@@ -5,6 +5,7 @@ import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { motion } from 'framer-motion';
+import Link from 'next/link';
 import {
   Mail,
   Phone,
@@ -54,12 +55,24 @@ export default function ContactPage() {
   const onSubmit = async (data: ContactFormData) => {
     setIsSubmitting(true);
 
-    // TODO: Implementar envio real via API
-    await new Promise((resolve) => setTimeout(resolve, 1500));
+    try {
+      const response = await fetch('/api/contact', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(data),
+      });
 
-    setIsSubmitting(false);
-    setIsSubmitted(true);
-    reset();
+      if (!response.ok) {
+        throw new Error('Error al enviar mensaje');
+      }
+
+      setIsSubmitted(true);
+      reset();
+    } catch {
+      alert('No se pudo enviar el mensaje. Intenta nuevamente.');
+    } finally {
+      setIsSubmitting(false);
+    }
 
     // Reset estado despues de 5 segundos
     setTimeout(() => setIsSubmitted(false), 5000);
@@ -71,9 +84,9 @@ export default function ContactPage() {
       <div className="bg-surface border-b border-border">
         <div className="container-custom py-8">
           <nav className="text-sm text-accent-muted mb-4">
-            <a href="/" className="hover:text-accent">
+            <Link href="/" className="hover:text-accent">
               Inicio
-            </a>
+            </Link>
             <span className="mx-2">/</span>
             <span className="text-accent">Contacto</span>
           </nav>

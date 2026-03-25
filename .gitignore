@@ -46,5 +46,9 @@ next-env.d.ts
 # OS
 Thumbs.db
 
+# Sensitive docs
+CONFIGURACION.md
+GUIA-PRUEBAS.md
+
 /src/generated/prisma
 .env*.local

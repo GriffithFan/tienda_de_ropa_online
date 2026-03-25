@@ -886,36 +886,3 @@ export function getSaleProducts(): Product[] {
 export function getNewProducts(): Product[] {
   return products.filter((p) => p.isNew);
 }
-
-/**
- * Obtiene un producto por slug
- */
-export function getProductBySlug(slug: string): Product | undefined {
-  return products.find((p) => p.slug === slug);
-}
-
-/**
- * Obtiene productos por categoria
- */
-export function getProductsByCategory(categorySlug: string): Product[] {
-  return products.filter((p) => p.category.slug === categorySlug);
-}
-
-/**
- * Obtiene una categoria por slug
- */
-export function getCategoryBySlug(slug: string): Category | undefined {
-  return categories.find((c) => c.slug === slug);
-}
-
-/**
- * Obtiene productos relacionados
- */
-export function getRelatedProducts(productId: string, limit: number = 4): Product[] {
-  const product = products.find((p) => p.id === productId);
-  if (!product) return [];
-
-  return products
-    .filter((p) => p.id !== productId && p.category.id === product.category.id)
-    .slice(0, limit);
-}

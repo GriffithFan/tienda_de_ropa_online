@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
+import NextImage from 'next/image';
 import { 
   Plus, 
   Edit2, 
@@ -193,12 +194,14 @@ export default function CategoriasPage() {
                 </button>
 
                 {/* Imagen */}
-                <div className="w-16 h-16 rounded-lg bg-surface overflow-hidden flex-shrink-0">
+                <div className="w-16 h-16 rounded-lg bg-surface overflow-hidden flex-shrink-0 relative">
                   {category.image ? (
-                    <img
+                    <NextImage
                       src={category.image}
                       alt={category.name}
-                      className="w-full h-full object-cover"
+                      fill
+                      className="object-cover"
+                      sizes="64px"
                     />
                   ) : (
                     <div className="w-full h-full flex items-center justify-center">

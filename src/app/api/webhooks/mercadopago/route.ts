@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { MercadoPagoConfig, Payment } from 'mercadopago';
 import prisma from '@/lib/prisma';
 import { Resend } from 'resend';
+import crypto from 'crypto';
 
 const client = new MercadoPagoConfig({
   accessToken: process.env.MERCADOPAGO_ACCESS_TOKEN || '',
@@ -9,9 +10,49 @@ const client = new MercadoPagoConfig({
 
 const resend = new Resend(process.env.RESEND_API_KEY);
 
+function verifyWebhookSignature(request: NextRequest, body: string): boolean {
+  const secret = process.env.MERCADOPAGO_WEBHOOK_SECRET;
+  if (!secret) return true; // Skip verification if secret not configured
+
+  const xSignature = request.headers.get('x-signature');
+  const xRequestId = request.headers.get('x-request-id');
+
+  if (!xSignature || !xRequestId) return false;
+
+  const parts = xSignature.split(',');
+  let ts = '';
+  let hash = '';
+
+  for (const part of parts) {
+    const [key, value] = part.split('=');
+    if (key.trim() === 'ts') ts = value.trim();
+    if (key.trim() === 'v1') hash = value.trim();
+  }
+
+  if (!ts || !hash) return false;
+
+  const dataId = JSON.parse(body).data?.id;
+  const manifest = `id:${dataId};request-id:${xRequestId};ts:${ts};`;
+  const expectedHash = crypto
+    .createHmac('sha256', secret)
+    .update(manifest)
+    .digest('hex');
+
+  return crypto.timingSafeEqual(
+    Buffer.from(hash),
+    Buffer.from(expectedHash)
+  );
+}
+
 export async function POST(request: NextRequest) {
   try {
-    const body = await request.json();
+    const rawBody = await request.text();
+
+    if (!verifyWebhookSignature(request, rawBody)) {
+      return NextResponse.json({ error: 'Invalid signature' }, { status: 401 });
+    }
+
+    const body = JSON.parse(rawBody);
     const { type, data } = body;
 
     if (type === 'payment') {

@@ -2,6 +2,19 @@ import { NextRequest, NextResponse } from 'next/server'
 import { getServerSession } from 'next-auth'
 import { authOptions } from '@/lib/auth'
 import { prisma } from '@/lib/prisma'
+import { z } from 'zod'
+
+const addressUpdateSchema = z.object({
+  label: z.string().min(1).max(100).optional(),
+  street: z.string().min(1).max(200).optional(),
+  number: z.string().min(1).max(20).optional(),
+  floor: z.string().max(10).optional().nullable(),
+  apartment: z.string().max(10).optional().nullable(),
+  city: z.string().min(1).max(100).optional(),
+  province: z.string().min(1).max(100).optional(),
+  postalCode: z.string().min(1).max(10).optional(),
+  isDefault: z.boolean().optional(),
+})
 
 export async function GET(
   request: NextRequest,
@@ -59,6 +72,16 @@ export async function PUT(
 
     const { id } = await params
     const body = await request.json()
+    const validation = addressUpdateSchema.safeParse(body)
+
+    if (!validation.success) {
+      return NextResponse.json(
+        { error: 'Datos invalidos', details: validation.error.errors },
+        { status: 400 }
+      )
+    }
+
+    const validatedData = validation.data
 
     // Verify ownership
     const existingAddress = await prisma.address.findFirst({
@@ -76,7 +99,7 @@ export async function PUT(
     }
 
     // If setting as default, unset other defaults
-    if (body.isDefault) {
+    if (validatedData.isDefault) {
       await prisma.address.updateMany({
         where: { 
           userId: session.user.id,
@@ -89,15 +112,15 @@ export async function PUT(
     const updatedAddress = await prisma.address.update({
       where: { id },
       data: {
-        label: body.label ?? existingAddress.label,
-        street: body.street ?? existingAddress.street,
-        number: body.number ?? existingAddress.number,
-        floor: body.floor ?? existingAddress.floor,
-        apartment: body.apartment ?? existingAddress.apartment,
-        city: body.city ?? existingAddress.city,
-        province: body.province ?? existingAddress.province,
-        postalCode: body.postalCode ?? existingAddress.postalCode,
-        isDefault: body.isDefault ?? existingAddress.isDefault,
+        label: validatedData.label ?? existingAddress.label,
+        street: validatedData.street ?? existingAddress.street,
+        number: validatedData.number ?? existingAddress.number,
+        floor: validatedData.floor ?? existingAddress.floor,
+        apartment: validatedData.apartment ?? existingAddress.apartment,
+        city: validatedData.city ?? existingAddress.city,
+        province: validatedData.province ?? existingAddress.province,
+        postalCode: validatedData.postalCode ?? existingAddress.postalCode,
+        isDefault: validatedData.isDefault ?? existingAddress.isDefault,
       },
     })
 

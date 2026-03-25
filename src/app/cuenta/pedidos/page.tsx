@@ -3,6 +3,7 @@
 import { useEffect, useState } from 'react'
 import { motion } from 'framer-motion'
 import Link from 'next/link'
+import Image from 'next/image'
 import { 
   Package, 
   Clock, 
@@ -187,10 +188,12 @@ export default function MisPedidosPage() {
                         className="w-16 h-16 bg-zinc-800 rounded-lg overflow-hidden flex-shrink-0"
                       >
                         {item.product.images[0] ? (
-                          <img
+                          <Image
                             src={item.product.images[0]}
                             alt={item.product.name}
-                            className="w-full h-full object-cover"
+                            fill
+                            className="object-cover"
+                            sizes="64px"
                           />
                         ) : (
                           <div className="w-full h-full flex items-center justify-center">
@@ -259,12 +262,14 @@ export default function MisPedidosPage() {
                 <div className="bg-zinc-800/50 rounded-lg divide-y divide-zinc-700">
                   {selectedOrder.items.map((item) => (
                     <div key={item.id} className="flex items-center gap-4 p-4">
-                      <div className="w-16 h-16 bg-zinc-700 rounded-lg overflow-hidden flex-shrink-0">
+                      <div className="w-16 h-16 bg-zinc-700 rounded-lg overflow-hidden flex-shrink-0 relative">
                         {item.product.images[0] ? (
-                          <img
+                          <Image
                             src={item.product.images[0]}
                             alt={item.product.name}
-                            className="w-full h-full object-cover"
+                            fill
+                            className="object-cover"
+                            sizes="64px"
                           />
                         ) : (
                           <div className="w-full h-full flex items-center justify-center">

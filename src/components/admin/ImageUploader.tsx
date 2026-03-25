@@ -2,6 +2,7 @@
 
 import { useState, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
+import NextImage from 'next/image';
 import { Upload, X, Image as ImageIcon, Loader2 } from 'lucide-react';
 
 interface UploadedImage {
@@ -165,10 +166,12 @@ export default function ImageUploader({
                 exit={{ opacity: 0, scale: 0.8 }}
                 className="relative aspect-[3/4] rounded-lg overflow-hidden group bg-surface"
               >
-                <img
+                <NextImage
                   src={url}
                   alt={`Imagen ${index + 1}`}
-                  className="w-full h-full object-cover"
+                  fill
+                  className="object-cover"
+                  sizes="(max-width: 640px) 50vw, 20vw"
                 />
                 
                 {/* Overlay */}

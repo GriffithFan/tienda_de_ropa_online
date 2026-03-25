@@ -10,47 +10,6 @@ cloudinary.config({
 export { cloudinary };
 
 /**
- * Opciones de transformacion para imagenes de productos
- */
-export const productImageTransform = {
-  thumbnail: {
-    width: 300,
-    height: 400,
-    crop: 'fill',
-    gravity: 'auto',
-    quality: 'auto',
-    format: 'webp',
-  },
-  card: {
-    width: 600,
-    height: 800,
-    crop: 'fill',
-    gravity: 'auto',
-    quality: 'auto',
-    format: 'webp',
-  },
-  full: {
-    width: 1200,
-    height: 1600,
-    crop: 'fill',
-    gravity: 'auto',
-    quality: 'auto',
-    format: 'webp',
-  },
-};
-
-/**
- * Genera URL optimizada de Cloudinary
- */
-export function getOptimizedImageUrl(
-  publicId: string,
-  transform: keyof typeof productImageTransform = 'card'
-): string {
-  const options = productImageTransform[transform];
-  return cloudinary.url(publicId, options);
-}
-
-/**
  * Sube una imagen a Cloudinary
  */
 export async function uploadImage(

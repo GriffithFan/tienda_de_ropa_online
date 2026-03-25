@@ -644,7 +644,7 @@ export default function AdminProductos() {
                     <div key={index} className="flex gap-2 items-center">
                       {img && img.startsWith('http') && (
                         <div className="w-12 h-12 relative rounded overflow-hidden flex-shrink-0">
-                          <img src={img} alt="" className="w-full h-full object-cover" />
+                          <Image src={img} alt={`Imagen ${index + 1}`} fill className="object-cover" sizes="48px" />
                         </div>
                       )}
                       <input

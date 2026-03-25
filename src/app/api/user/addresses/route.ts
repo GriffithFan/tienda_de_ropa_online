@@ -2,6 +2,19 @@ import { NextRequest, NextResponse } from 'next/server'
 import { getServerSession } from 'next-auth'
 import { authOptions } from '@/lib/auth'
 import { prisma } from '@/lib/prisma'
+import { z } from 'zod'
+
+const addressSchema = z.object({
+  label: z.string().min(1).max(100),
+  street: z.string().min(1).max(200),
+  number: z.string().min(1).max(20),
+  floor: z.string().max(10).optional().nullable(),
+  apartment: z.string().max(10).optional().nullable(),
+  city: z.string().min(1).max(100),
+  province: z.string().min(1).max(100),
+  postalCode: z.string().min(1).max(10),
+  isDefault: z.boolean().optional(),
+})
 
 export async function GET() {
   try {
@@ -44,7 +57,16 @@ export async function POST(request: NextRequest) {
     }
 
     const body = await request.json()
-    const { label, street, number, floor, apartment, city, province, postalCode, isDefault } = body
+    const validation = addressSchema.safeParse(body)
+
+    if (!validation.success) {
+      return NextResponse.json(
+        { error: 'Datos invalidos', details: validation.error.errors },
+        { status: 400 }
+      )
+    }
+
+    const { label, street, number, floor, apartment, city, province, postalCode, isDefault } = validation.data
 
     // If setting as default, unset other defaults
     if (isDefault) {

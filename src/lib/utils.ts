@@ -62,44 +62,6 @@ export function formatDate(dateString: string): string {
 }
 
 /**
- * Genera un ID unico
- */
-export function generateId(): string {
-  return Math.random().toString(36).substring(2, 15) + 
-         Math.random().toString(36).substring(2, 15);
-}
-
-/**
- * Valida un email con regex
- */
-export function isValidEmail(email: string): boolean {
-  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-  return emailRegex.test(email);
-}
-
-/**
- * Valida un codigo postal argentino
- */
-export function isValidPostalCode(code: string): boolean {
-  const postalCodeRegex = /^[A-Za-z]?\d{4}[A-Za-z]{0,3}$/;
-  return postalCodeRegex.test(code);
-}
-
-/**
- * Formatea un numero de telefono argentino
- */
-export function formatPhoneNumber(phone: string): string {
-  const cleaned = phone.replace(/\D/g, '');
-  if (cleaned.length === 10) {
-    return `(${cleaned.slice(0, 2)}) ${cleaned.slice(2, 6)}-${cleaned.slice(6)}`;
-  }
-  if (cleaned.length === 11) {
-    return `+${cleaned.slice(0, 2)} ${cleaned.slice(2, 4)} ${cleaned.slice(4, 8)}-${cleaned.slice(8)}`;
-  }
-  return phone;
-}
-
-/**
  * Debounce function para optimizar eventos frecuentes
  */
 export function debounce<T extends (...args: unknown[]) => unknown>(
@@ -112,48 +74,6 @@ export function debounce<T extends (...args: unknown[]) => unknown>(
     if (timeoutId) clearTimeout(timeoutId);
     timeoutId = setTimeout(() => func(...args), wait);
   };
-}
-
-/**
- * Throttle function para limitar la frecuencia de ejecucion
- */
-export function throttle<T extends (...args: unknown[]) => unknown>(
-  func: T,
-  limit: number
-): (...args: Parameters<T>) => void {
-  let inThrottle: boolean;
-
-  return (...args: Parameters<T>) => {
-    if (!inThrottle) {
-      func(...args);
-      inThrottle = true;
-      setTimeout(() => (inThrottle = false), limit);
-    }
-  };
-}
-
-/**
- * Obtiene las iniciales de un nombre
- */
-export function getInitials(name: string): string {
-  return name
-    .split(' ')
-    .map((word) => word[0])
-    .join('')
-    .toUpperCase()
-    .slice(0, 2);
-}
-
-/**
- * Genera un color de fondo basado en un string
- */
-export function stringToColor(str: string): string {
-  let hash = 0;
-  for (let i = 0; i < str.length; i++) {
-    hash = str.charCodeAt(i) + ((hash << 5) - hash);
-  }
-  const hue = hash % 360;
-  return `hsl(${hue}, 70%, 50%)`;
 }
 
 /**
@@ -171,14 +91,6 @@ export function calculateInstallment(price: number, installments: number): numbe
 }
 
 /**
- * Verifica si el dispositivo es movil
- */
-export function isMobileDevice(): boolean {
-  if (typeof window === 'undefined') return false;
-  return window.innerWidth < 768;
-}
-
-/**
  * Copia texto al portapapeles
  */
 export async function copyToClipboard(text: string): Promise<boolean> {
@@ -188,21 +100,4 @@ export async function copyToClipboard(text: string): Promise<boolean> {
   } catch {
     return false;
   }
-}
-
-/**
- * Scroll suave hacia un elemento
- */
-export function scrollToElement(elementId: string): void {
-  const element = document.getElementById(elementId);
-  if (element) {
-    element.scrollIntoView({ behavior: 'smooth', block: 'start' });
-  }
-}
-
-/**
- * Obtiene el stock disponible para una combinacion de talle y color
- */
-export function getStockKey(size: string, color: string): string {
-  return `${size}-${color}`.toLowerCase();
 }
