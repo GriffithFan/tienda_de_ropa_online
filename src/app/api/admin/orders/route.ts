@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getToken } from 'next-auth/jwt';
 import prisma from '@/lib/prisma';
+import { Prisma } from '@prisma/client';
 
 export async function GET(request: NextRequest) {
   try {
@@ -15,10 +16,10 @@ export async function GET(request: NextRequest) {
     const status = searchParams.get('status');
     const search = searchParams.get('search');
 
-    const where: any = {};
+    const where: Prisma.OrderWhereInput = {};
 
     if (status) {
-      where.status = status;
+      where.status = status as Prisma.EnumOrderStatusFilter;
     }
 
     if (search) {
@@ -43,14 +44,13 @@ export async function GET(request: NextRequest) {
       prisma.order.count({ where }),
     ]);
 
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const formattedOrders = orders.map((order: any) => ({
+    const formattedOrders = orders.map((order) => ({
       ...order,
       subtotal: Number(order.subtotal),
       shippingCost: Number(order.shippingCost),
       discount: Number(order.discount),
       total: Number(order.total),
-      items: order.items.map((item: { price: number | string; [key: string]: unknown }) => ({
+      items: order.items.map((item) => ({
         ...item,
         price: Number(item.price),
       })),

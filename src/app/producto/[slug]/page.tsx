@@ -18,6 +18,7 @@ import {
 import { useCartStore } from '@/store';
 import { formatPrice, calculateTransferPrice, cn } from '@/lib/utils';
 import { PAYMENT_CONFIG, SHIPPING_CONFIG } from '@/lib/constants';
+import type { Product } from '@/types';
 
 interface ProductData {
   id: string;
@@ -124,8 +125,7 @@ export default function ProductPage() {
     }
     
     // Adaptar el producto al formato esperado por el carrito
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const cartProduct: any = {
+    const cartProduct: Product = {
       id: product.id,
       name: product.name,
       slug: product.slug,

@@ -13,6 +13,24 @@ interface CategoryData {
   description?: string;
 }
 
+interface ApiProduct {
+  id: string;
+  name: string;
+  slug: string;
+  description: string;
+  price: number;
+  compareAtPrice?: number | null;
+  images: string[];
+  sizes: { size: string; stock: number }[];
+  colors: { name: string; hexCode: string }[];
+  category: CategoryData;
+  tags: string[];
+  isFeatured: boolean;
+  isNew: boolean;
+  isOnSale: boolean;
+  createdAt: string;
+}
+
 /**
  * Pagina de categoria individual
  * Muestra productos de una categoria especifica con filtros
@@ -76,8 +94,7 @@ export default function CategoryPage() {
       
       if (response.ok) {
         // Mapear productos
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        const mappedProducts: Product[] = (data.products || []).map((p: any) => ({
+        const mappedProducts: Product[] = (data.products || []).map((p: ApiProduct) => ({
           id: p.id,
           name: p.name,
           slug: p.slug,

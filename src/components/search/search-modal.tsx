@@ -1,29 +1,34 @@
 'use client';
 
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef, useCallback } from 'react';
 import Link from 'next/link';
+import Image from 'next/image';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Search, X, ArrowRight, Clock, TrendingUp } from 'lucide-react';
-import { products } from '@/data/products';
-import { formatPrice, cn, debounce } from '@/lib/utils';
-import type { Product } from '@/types';
+import { Search, X, ArrowRight, TrendingUp } from 'lucide-react';
+import { formatPrice, cn } from '@/lib/utils';
+
+interface SearchResult {
+  id: string;
+  name: string;
+  slug: string;
+  price: number;
+  compareAtPrice?: number | null;
+  images: string[];
+}
 
 interface SearchModalProps {
   isOpen: boolean;
   onClose: () => void;
 }
 
-/**
- * Modal de busqueda de productos
- * Incluye busqueda en tiempo real, sugerencias y resultados
- */
 export function SearchModal({ isOpen, onClose }: SearchModalProps) {
   const [query, setQuery] = useState('');
-  const [results, setResults] = useState<Product[]>([]);
+  const [results, setResults] = useState<SearchResult[]>([]);
+  const [totalResults, setTotalResults] = useState(0);
   const [isSearching, setIsSearching] = useState(false);
   const inputRef = useRef<HTMLInputElement>(null);
+  const abortControllerRef = useRef<AbortController | null>(null);
 
-  // Terminos populares de busqueda
   const popularSearches = [
     'remera oversize',
     'hoodie',
@@ -32,17 +37,16 @@ export function SearchModal({ isOpen, onClose }: SearchModalProps) {
     'kitsune',
   ];
 
-  // Focus en el input al abrir
   useEffect(() => {
     if (isOpen) {
       setTimeout(() => inputRef.current?.focus(), 100);
     } else {
       setQuery('');
       setResults([]);
+      setTotalResults(0);
     }
   }, [isOpen]);
 
-  // Bloquear scroll
   useEffect(() => {
     if (isOpen) {
       document.body.style.overflow = 'hidden';
@@ -54,33 +58,71 @@ export function SearchModal({ isOpen, onClose }: SearchModalProps) {
     };
   }, [isOpen]);
 
-  // Busqueda con debounce
+  const searchProducts = useCallback(async (searchQuery: string) => {
+    if (!searchQuery.trim()) {
+      setResults([]);
+      setTotalResults(0);
+      setIsSearching(false);
+      return;
+    }
+
+    // Cancelar búsqueda anterior
+    if (abortControllerRef.current) {
+      abortControllerRef.current.abort();
+    }
+
+    const controller = new AbortController();
+    abortControllerRef.current = controller;
+
+    setIsSearching(true);
+
+    try {
+      const params = new URLSearchParams({
+        search: searchQuery,
+        limit: '6',
+      });
+
+      const response = await fetch(`/api/products?${params}`, {
+        signal: controller.signal,
+      });
+
+      if (!response.ok) throw new Error('Error en búsqueda');
+
+      const data = await response.json();
+
+      setResults(
+        (data.products || []).map((p: SearchResult) => ({
+          id: p.id,
+          name: p.name,
+          slug: p.slug,
+          price: p.price,
+          compareAtPrice: p.compareAtPrice,
+          images: p.images || [],
+        }))
+      );
+      setTotalResults(data.pagination?.totalProducts || 0);
+    } catch (error) {
+      if (error instanceof DOMException && error.name === 'AbortError') return;
+      setResults([]);
+      setTotalResults(0);
+    } finally {
+      setIsSearching(false);
+    }
+  }, []);
+
+  // Búsqueda con debounce
   useEffect(() => {
     if (!query.trim()) {
       setResults([]);
+      setTotalResults(0);
       setIsSearching(false);
       return;
     }
 
     setIsSearching(true);
-
-    const searchTimeout = setTimeout(() => {
-      const searchResults = products.filter((product) => {
-        const searchTerm = query.toLowerCase();
-        return (
-          product.name.toLowerCase().includes(searchTerm) ||
-          product.description.toLowerCase().includes(searchTerm) ||
-          product.tags.some((tag) => tag.toLowerCase().includes(searchTerm)) ||
-          product.category.name.toLowerCase().includes(searchTerm)
-        );
-      });
-
-      setResults(searchResults);
-      setIsSearching(false);
-    }, 300);
-
-    return () => clearTimeout(searchTimeout);
-  }, [query]);
+    const timeout = setTimeout(() => searchProducts(query), 300);
+    return () => clearTimeout(timeout);
+  }, [query, searchProducts]);
 
   // Cerrar con Escape
   useEffect(() => {
@@ -189,14 +231,24 @@ export function SearchModal({ isOpen, onClose }: SearchModalProps) {
                       {results.length} resultado{results.length !== 1 && 's'} para &ldquo;{query}&rdquo;
                     </p>
                     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-                      {results.slice(0, 6).map((product) => (
+                      {results.map((product) => (
                         <Link
                           key={product.id}
                           href={`/producto/${product.slug}`}
                           onClick={handleResultClick}
                           className="flex items-center gap-4 p-3 rounded-lg hover:bg-background transition-colors group"
                         >
-                          <div className="w-16 h-20 bg-background rounded-lg flex-shrink-0" />
+                          <div className="w-16 h-20 bg-background rounded-lg flex-shrink-0 relative overflow-hidden">
+                            {product.images[0] && (
+                              <Image
+                                src={product.images[0]}
+                                alt={product.name}
+                                fill
+                                className="object-cover"
+                                sizes="64px"
+                              />
+                            )}
+                          </div>
                           <div className="flex-1 min-w-0">
                             <h4 className="font-medium text-sm line-clamp-2 group-hover:text-accent transition-colors">
                               {product.name}
@@ -209,13 +261,13 @@ export function SearchModal({ isOpen, onClose }: SearchModalProps) {
                         </Link>
                       ))}
                     </div>
-                    {results.length > 6 && (
+                    {totalResults > 6 && (
                       <Link
                         href={`/productos?search=${encodeURIComponent(query)}`}
                         onClick={handleResultClick}
                         className="flex items-center justify-center gap-2 mt-4 py-3 text-sm text-accent-muted hover:text-accent transition-colors"
                       >
-                        Ver todos los resultados ({results.length})
+                        Ver todos los resultados ({totalResults})
                         <ArrowRight className="w-4 h-4" />
                       </Link>
                     )}

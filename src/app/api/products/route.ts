@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import prisma from '@/lib/prisma';
+import { Prisma } from '@prisma/client';
 
 export async function GET(request: NextRequest) {
   try {
@@ -18,8 +19,7 @@ export async function GET(request: NextRequest) {
     const page = parseInt(searchParams.get('page') || '1');
     const limit = parseInt(searchParams.get('limit') || '12');
 
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const where: any = {
+    const where: Prisma.ProductWhereInput = {
       isActive: true,
     };
 
@@ -77,8 +77,7 @@ export async function GET(request: NextRequest) {
       where.isOnSale = true;
     }
 
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    let orderBy: any = { createdAt: 'desc' };
+    let orderBy: Prisma.ProductOrderByWithRelationInput = { createdAt: 'desc' };
 
     switch (sort) {
       case 'price-asc':
@@ -118,8 +117,7 @@ export async function GET(request: NextRequest) {
 
     const totalPages = Math.ceil(totalProducts / limit);
 
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const formattedProducts = products.map((product: any) => ({
+    const formattedProducts = products.map((product) => ({
       id: product.id,
       name: product.name,
       slug: product.slug,

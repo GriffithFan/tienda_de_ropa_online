@@ -32,16 +32,16 @@ export interface ProductImage {
   id: string;
   url: string;
   alt: string;
-  isPrimary: boolean;
+  isPrimary?: boolean;
 }
 
 export interface Category {
   id: string;
   slug: string;
   name: string;
-  description: string;
-  image: string;
-  productCount: number;
+  description?: string;
+  image?: string;
+  productCount?: number;
 }
 
 export interface Size {

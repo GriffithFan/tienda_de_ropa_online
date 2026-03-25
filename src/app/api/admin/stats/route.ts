@@ -75,15 +75,13 @@ export async function GET(request: NextRequest) {
       ? ((monthlyRevenue - lastMonthRevenue) / lastMonthRevenue) * 100 
       : 0;
 
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const topProductIds = topProducts.map((p: any) => p.productId);
+    const topProductIds = topProducts.map((p) => p.productId);
     const topProductDetails = await prisma.product.findMany({
       where: { id: { in: topProductIds } },
       select: { id: true, name: true, slug: true },
     });
 
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const topProductsWithDetails = topProducts.map((p: any) => ({
+    const topProductsWithDetails = topProducts.map((p) => ({
       ...p,
       product: topProductDetails.find((d: { id: string }) => d.id === p.productId),
     }));
@@ -97,8 +95,7 @@ export async function GET(request: NextRequest) {
       monthlyRevenue: monthlyRevenue || 0,
       lastMonthRevenue: lastMonthRevenue || 0,
       revenueGrowth: Math.round(revenueGrowth * 100) / 100,
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      recentOrders: recentOrders.map((order: any) => ({
+      recentOrders: recentOrders.map((order) => ({
         ...order,
         total: Number(order.total),
       })),

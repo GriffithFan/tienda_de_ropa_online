@@ -72,8 +72,7 @@ export async function GET(
       isFeatured: product.isFeatured,
       isOnSale: product.isOnSale,
       tags: product.tags || [],
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      reviews: product.reviews?.map((r: any) => ({
+      reviews: product.reviews?.map((r) => ({
         id: r.id,
         rating: r.rating,
         title: r.title,
@@ -83,8 +82,7 @@ export async function GET(
       })) || [],
     };
 
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const formattedRelated = relatedProducts.map((p: any) => ({
+    const formattedRelated = relatedProducts.map((p) => ({
       id: p.id,
       name: p.name,
       slug: p.slug,

@@ -49,7 +49,7 @@ function CategoryCard({ category, index }: CategoryCardProps) {
       >
         {/* Background image */}
         <Image
-          src={category.image}
+          src={category.image || ''}
           alt={category.name}
           fill
           className="object-cover transition-transform duration-500 group-hover:scale-105"

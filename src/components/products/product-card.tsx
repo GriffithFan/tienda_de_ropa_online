@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, memo } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { motion } from 'framer-motion';
@@ -18,7 +18,7 @@ interface ProductCardProps {
  * Card de producto para listados
  * Incluye imagen, nombre, precio, tags y acciones rapidas
  */
-export function ProductCard({ product, priority = false }: ProductCardProps) {
+export const ProductCard = memo(function ProductCard({ product, priority = false }: ProductCardProps) {
   const [isHovered, setIsHovered] = useState(false);
   const [imageError, setImageError] = useState(false);
   const [mounted, setMounted] = useState(false);
@@ -208,4 +208,4 @@ export function ProductCard({ product, priority = false }: ProductCardProps) {
       </motion.article>
     </Link>
   );
-}
+});

@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { getToken } from 'next-auth/jwt';
 import { z } from 'zod';
 import prisma from '@/lib/prisma';
+import { Prisma } from '@prisma/client';
 import { Resend } from 'resend';
 
 const resend = new Resend(process.env.RESEND_API_KEY);
@@ -83,7 +84,7 @@ export async function PATCH(
       );
     }
 
-    const updateData: any = { ...validation.data };
+    const updateData: Prisma.OrderUpdateInput = { ...validation.data };
 
     if (validation.data.status === 'SHIPPED') {
       updateData.shippedAt = new Date();
