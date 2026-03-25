@@ -19,7 +19,7 @@ interface HeroBannerProps {
  */
 export function HeroBanner({
   slides,
-  autoPlayInterval = 5000,
+  autoPlayInterval = 7000,
 }: HeroBannerProps) {
   const [currentIndex, setCurrentIndex] = useState(0);
   const [isPaused, setIsPaused] = useState(false);
@@ -59,7 +59,7 @@ export function HeroBanner({
           initial={{ opacity: 0, scale: 1.05 }}
           animate={{ opacity: 1, scale: 1 }}
           exit={{ opacity: 0 }}
-          transition={{ duration: 0.5 }}
+          transition={{ duration: 0.8, ease: 'easeInOut' }}
           className="absolute inset-0"
         >
           {/* Background image */}
@@ -78,9 +78,9 @@ export function HeroBanner({
           {/* Content */}
           <div className="container-custom h-full flex items-center">
             <motion.div
-              initial={{ opacity: 0, y: 30 }}
+              initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.2, duration: 0.5 }}
+              transition={{ delay: 0.3, duration: 0.6, ease: 'easeOut' }}
               className="max-w-xl px-2 sm:px-0"
             >
               {currentSlide.subtitle && (
