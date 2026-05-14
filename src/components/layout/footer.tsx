@@ -227,51 +227,81 @@ function BenefitsBar() {
 function NewsletterForm() {
   const [email, setEmail] = useState('');
   const [status, setStatus] = useState<'idle' | 'loading' | 'success' | 'error'>('idle');
+  const [message, setMessage] = useState('');
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setStatus('loading');
+    setMessage('');
 
-    // Simulacion de envio
-    await new Promise((resolve) => setTimeout(resolve, 1000));
+    try {
+      const response = await fetch('/api/newsletter', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email }),
+      });
 
-    setStatus('success');
-    setEmail('');
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(data.error || 'No se pudo completar la suscripcion');
+      }
+
+      setStatus('success');
+      setMessage('Listo, ya estas suscripto.');
+      setEmail('');
+    } catch (error) {
+      setStatus('error');
+      setMessage(error instanceof Error ? error.message : 'No se pudo completar la suscripcion');
+    }
 
     // Reset despues de 3 segundos
-    setTimeout(() => setStatus('idle'), 3000);
+    setTimeout(() => {
+      setStatus('idle');
+      setMessage('');
+    }, 3000);
   };
 
   return (
-    <form onSubmit={handleSubmit} className="flex gap-2">
-      <input
-        type="email"
-        value={email}
-        onChange={(e) => setEmail(e.target.value)}
-        placeholder="tu@email.com"
-        required
-        disabled={status === 'loading'}
-        className="flex-1 px-3 py-2 text-sm bg-background"
-      />
-      <button
-        type="submit"
-        disabled={status === 'loading'}
-        className={cn(
-          'px-3 py-2 rounded-lg transition-colors',
-          status === 'success'
-            ? 'bg-success text-white'
-            : 'bg-accent text-background hover:bg-accent/90'
-        )}
-      >
-        {status === 'loading' ? (
-          <span className="w-5 h-5 block border-2 border-current border-t-transparent rounded-full animate-spin" />
-        ) : status === 'success' ? (
-          <Shield className="w-5 h-5" />
-        ) : (
-          <Send className="w-5 h-5" />
-        )}
-      </button>
-    </form>
+    <div>
+      <form onSubmit={handleSubmit} className="flex gap-2">
+        <input
+          type="email"
+          value={email}
+          onChange={(e) => setEmail(e.target.value)}
+          placeholder="tu@email.com"
+          required
+          disabled={status === 'loading'}
+          className="flex-1 px-3 py-2 text-sm bg-background"
+        />
+        <button
+          type="submit"
+          disabled={status === 'loading'}
+          className={cn(
+            'px-3 py-2 rounded-lg transition-colors',
+            status === 'success'
+              ? 'bg-success text-white'
+              : status === 'error'
+                ? 'bg-error text-white'
+                : 'bg-accent text-background hover:bg-accent/90'
+          )}
+          aria-label="Suscribirse al newsletter"
+        >
+          {status === 'loading' ? (
+            <span className="w-5 h-5 block border-2 border-current border-t-transparent rounded-full animate-spin" />
+          ) : status === 'success' ? (
+            <Shield className="w-5 h-5" />
+          ) : (
+            <Send className="w-5 h-5" />
+          )}
+        </button>
+      </form>
+      {message && (
+        <p className={cn('text-xs mt-2', status === 'error' ? 'text-error' : 'text-success')}>
+          {message}
+        </p>
+      )}
+    </div>
   );
 }
 

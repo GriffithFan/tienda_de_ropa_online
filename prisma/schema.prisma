@@ -28,6 +28,8 @@ model User {
   sessions      Session[]
   accounts      Account[]
 
+  @@index([role])
+  @@index([createdAt])
   @@map("users")
 }
 
@@ -95,6 +97,7 @@ model Address {
   user   User    @relation(fields: [userId], references: [id], onDelete: Cascade)
   orders Order[]
 
+  @@index([userId])
   @@map("addresses")
 }
 
@@ -112,6 +115,7 @@ model Category {
 
   products Product[]
 
+  @@index([isActive, order])
   @@map("categories")
 }
 
@@ -143,6 +147,11 @@ model Product {
   reviews    Review[]
   favorites  Favorite[]
 
+  @@index([categoryId, isActive])
+  @@index([isActive, createdAt])
+  @@index([isActive, price])
+  @@index([isFeatured, isActive])
+  @@index([isOnSale, isActive])
   @@map("products")
 }
 
@@ -155,6 +164,7 @@ model ProductImage {
 
   product Product @relation(fields: [productId], references: [id], onDelete: Cascade)
 
+  @@index([productId, order])
   @@map("product_images")
 }
 
@@ -166,6 +176,7 @@ model ProductSize {
 
   product Product @relation(fields: [productId], references: [id], onDelete: Cascade)
 
+  @@index([productId, size])
   @@map("product_sizes")
 }
 
@@ -177,6 +188,7 @@ model ProductColor {
 
   product Product @relation(fields: [productId], references: [id], onDelete: Cascade)
 
+  @@index([productId, name])
   @@map("product_colors")
 }
 
@@ -213,6 +225,10 @@ model Order {
   address Address?    @relation(fields: [addressId], references: [id])
   items   OrderItem[]
 
+  @@index([userId, createdAt])
+  @@index([customerEmail])
+  @@index([status, createdAt])
+  @@index([paymentStatus, createdAt])
   @@map("orders")
 }
 
@@ -230,6 +246,8 @@ model OrderItem {
   order   Order   @relation(fields: [orderId], references: [id], onDelete: Cascade)
   product Product @relation(fields: [productId], references: [id])
 
+  @@index([orderId])
+  @@index([productId])
   @@map("order_items")
 }
 
@@ -272,6 +290,7 @@ model Review {
   user    User    @relation(fields: [userId], references: [id], onDelete: Cascade)
   product Product @relation(fields: [productId], references: [id], onDelete: Cascade)
 
+  @@index([productId, isVisible])
   @@unique([userId, productId])
   @@map("reviews")
 }
@@ -286,6 +305,7 @@ model Favorite {
   user    User    @relation(fields: [userId], references: [id], onDelete: Cascade)
   product Product @relation(fields: [productId], references: [id], onDelete: Cascade)
 
+  @@index([userId, createdAt])
   @@unique([userId, productId])
   @@map("favorites")
 }
@@ -306,6 +326,7 @@ model Banner {
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
 
+  @@index([isActive, order])
   @@map("banners")
 }
 
@@ -319,6 +340,7 @@ model Announcement {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
+  @@index([isActive, order])
   @@map("announcements")
 }
 
@@ -338,6 +360,7 @@ model Coupon {
   createdAt      DateTime     @default(now())
   updatedAt      DateTime     @updatedAt
 
+  @@index([isActive, code])
   @@map("coupons")
 }
 
@@ -357,6 +380,7 @@ model ContactMessage {
   isRead    Boolean  @default(false)
   createdAt DateTime @default(now())
 
+  @@index([isRead, createdAt])
   @@map("contact_messages")
 }
 
@@ -367,5 +391,6 @@ model Subscriber {
   isActive  Boolean  @default(true)
   createdAt DateTime @default(now())
 
+  @@index([isActive, createdAt])
   @@map("subscribers")
 }

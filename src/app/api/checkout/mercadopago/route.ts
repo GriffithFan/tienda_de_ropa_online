@@ -7,6 +7,7 @@ import {
   OrderValidationError,
   validateAndPriceOrder,
 } from '@/lib/order-validation';
+import { rateLimit } from '@/lib/rate-limit';
 
 /**
  * Inicializacion del cliente de MercadoPago
@@ -57,6 +58,14 @@ const mercadoPagoOrderSchema = z.object({
  */
 export async function POST(request: NextRequest) {
   try {
+    const limited = rateLimit(request, {
+      keyPrefix: 'checkout:mercadopago',
+      limit: 10,
+      windowMs: 60_000,
+    });
+
+    if (limited) return limited;
+
     const body = await request.json();
     const validation = mercadoPagoOrderSchema.safeParse(body);
 

@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { z } from 'zod';
 import prisma from '@/lib/prisma';
 import { Resend } from 'resend';
+import { rateLimit } from '@/lib/rate-limit';
 
 const resend = new Resend(process.env.RESEND_API_KEY);
 
@@ -24,6 +25,14 @@ const contactSchema = z.object({
 
 export async function POST(request: NextRequest) {
   try {
+    const limited = rateLimit(request, {
+      keyPrefix: 'contact:post',
+      limit: 5,
+      windowMs: 60_000,
+    });
+
+    if (limited) return limited;
+
     const body = await request.json();
     const validation = contactSchema.safeParse(body);
 

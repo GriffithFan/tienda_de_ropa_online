@@ -6,6 +6,7 @@ import {
   OrderValidationError,
   validateAndPriceOrder,
 } from '@/lib/order-validation';
+import { rateLimit } from '@/lib/rate-limit';
 
 const transferOrderSchema = z.object({
   paymentMethod: z.enum(['TRANSFER', 'CASH']).default('TRANSFER'),
@@ -42,6 +43,14 @@ const transferOrderSchema = z.object({
 
 export async function POST(request: NextRequest) {
   try {
+    const limited = rateLimit(request, {
+      keyPrefix: 'orders:transfer:post',
+      limit: 10,
+      windowMs: 60_000,
+    });
+
+    if (limited) return limited;
+
     const body = await request.json();
     const validation = transferOrderSchema.safeParse(body);
 
@@ -138,6 +147,14 @@ export async function POST(request: NextRequest) {
 
 export async function GET(request: NextRequest) {
   try {
+    const limited = rateLimit(request, {
+      keyPrefix: 'orders:transfer:get',
+      limit: 30,
+      windowMs: 60_000,
+    });
+
+    if (limited) return limited;
+
     const { searchParams } = new URL(request.url);
     const orderId = searchParams.get('orderId');
     const email = searchParams.get('email');
