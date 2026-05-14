@@ -1,13 +1,11 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useCallback, useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { 
   Users, 
   Search, 
-  Mail, 
   Phone,
-  MapPin,
   ShoppingBag,
   Shield,
   ShieldCheck,
@@ -41,11 +39,7 @@ export default function UsuariosPage() {
   const [totalPages, setTotalPages] = useState(1);
   const [selectedUser, setSelectedUser] = useState<User | null>(null);
 
-  useEffect(() => {
-    fetchUsers();
-  }, [page, roleFilter]);
-
-  const fetchUsers = async () => {
+  const fetchUsers = useCallback(async () => {
     setLoading(true);
     try {
       const params = new URLSearchParams({
@@ -64,7 +58,11 @@ export default function UsuariosPage() {
     } finally {
       setLoading(false);
     }
-  };
+  }, [page, roleFilter, search]);
+
+  useEffect(() => {
+    fetchUsers();
+  }, [fetchUsers]);
 
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();

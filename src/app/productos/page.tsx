@@ -44,13 +44,8 @@ function ProductsContent() {
         params.set('search', searchQuery);
       }
       
-      if (filters.sizes.length > 0) {
-        params.set('size', filters.sizes[0]); // API acepta un talle a la vez
-      }
-      
-      if (filters.colors.length > 0) {
-        params.set('color', filters.colors[0]); // API acepta un color a la vez
-      }
+      filters.sizes.forEach((size) => params.append('size', size));
+      filters.colors.forEach((color) => params.append('color', color));
       
       if (filters.priceRange[0] > 0) {
         params.set('minPrice', filters.priceRange[0].toString());
@@ -121,7 +116,7 @@ function ProductsContent() {
         } else {
           setProducts(mappedProducts);
         }
-        setTotalProducts(data.pagination?.total || mappedProducts.length);
+        setTotalProducts(data.pagination?.totalProducts || mappedProducts.length);
       }
     } catch (error) {
       console.error('Error fetching products:', error);

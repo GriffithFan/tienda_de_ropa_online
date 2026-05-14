@@ -44,7 +44,8 @@ export const useAuthStore = create<AuthState>()(
       isAuthenticated: false,
       isLoading: false,
 
-      login: async (email: string, _password: string) => {
+      login: async (email: string, password: string) => {
+        void password;
         set({ isLoading: true });
         
         try {
@@ -165,12 +166,15 @@ export const useAuthStore = create<AuthState>()(
         });
       },
 
-      requestPasswordReset: async (_email: string) => {
+      requestPasswordReset: async (email: string) => {
+        void email;
         await new Promise((resolve) => setTimeout(resolve, 1000));
         // En produccion, aqui se enviaria un email con el token
       },
 
-      resetPassword: async (_token: string, _newPassword: string) => {
+      resetPassword: async (token: string, newPassword: string) => {
+        void token;
+        void newPassword;
         await new Promise((resolve) => setTimeout(resolve, 1000));
         // En produccion, aqui se validaria el token y actualizaria la contrasena
       },

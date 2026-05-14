@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useMemo } from 'react';
+import { useMemo } from 'react';
 import Link from 'next/link';
 import { motion } from 'framer-motion';
 import { Tag, Percent, Clock, ArrowRight } from 'lucide-react';

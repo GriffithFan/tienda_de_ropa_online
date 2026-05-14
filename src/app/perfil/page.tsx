@@ -8,6 +8,7 @@ import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { useSession, signOut } from 'next-auth/react';
+import toast from 'react-hot-toast';
 import {
   User,
   Package,
@@ -33,6 +34,13 @@ const profileSchema = z.object({
 });
 
 type ProfileForm = z.infer<typeof profileSchema>;
+
+interface ProfileUser {
+  firstName?: string | null;
+  lastName?: string | null;
+  email?: string | null;
+  phone?: string | null;
+}
 
 /**
  * Pagina de perfil de usuario
@@ -168,8 +176,9 @@ export default function PerfilPage() {
 /**
  * Seccion de perfil
  */
-function ProfileSection({ user }: { user: any }) {
+function ProfileSection({ user }: { user: ProfileUser }) {
   const [isEditing, setIsEditing] = useState(false);
+  const [isSaving, setIsSaving] = useState(false);
 
   const {
     register,
@@ -185,9 +194,31 @@ function ProfileSection({ user }: { user: any }) {
     },
   });
 
-  const onSubmit = (data: ProfileForm) => {
-    // TODO: Implementar llamada a API para actualizar perfil
-    setIsEditing(false);
+  const onSubmit = async (data: ProfileForm) => {
+    setIsSaving(true);
+    try {
+      const response = await fetch('/api/user/profile', {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          firstName: data.firstName,
+          lastName: data.lastName,
+          phone: data.phone,
+        }),
+      });
+
+      if (!response.ok) {
+        const error = await response.json();
+        throw new Error(error.error || 'No se pudo actualizar el perfil');
+      }
+
+      toast.success('Perfil actualizado');
+      setIsEditing(false);
+    } catch (error) {
+      toast.error(error instanceof Error ? error.message : 'Error al actualizar perfil');
+    } finally {
+      setIsSaving(false);
+    }
   };
 
   return (
@@ -213,6 +244,7 @@ function ProfileSection({ user }: { user: any }) {
               disabled={!isEditing}
               className={cn(!isEditing && 'bg-surface cursor-not-allowed')}
             />
+            {errors.firstName && <p className="input-error">{errors.firstName.message}</p>}
           </div>
           <div className="input-group">
             <label className="input-label">Apellido</label>
@@ -222,6 +254,7 @@ function ProfileSection({ user }: { user: any }) {
               disabled={!isEditing}
               className={cn(!isEditing && 'bg-surface cursor-not-allowed')}
             />
+            {errors.lastName && <p className="input-error">{errors.lastName.message}</p>}
           </div>
         </div>
 
@@ -230,8 +263,8 @@ function ProfileSection({ user }: { user: any }) {
           <input
             type="email"
             {...register('email')}
-            disabled={!isEditing}
-            className={cn(!isEditing && 'bg-surface cursor-not-allowed')}
+            disabled
+            className="bg-surface cursor-not-allowed"
           />
         </div>
 
@@ -243,11 +276,12 @@ function ProfileSection({ user }: { user: any }) {
             disabled={!isEditing}
             className={cn(!isEditing && 'bg-surface cursor-not-allowed')}
           />
+            {errors.phone && <p className="input-error">{errors.phone.message}</p>}
         </div>
 
         {isEditing && (
-          <button type="submit" className="btn-primary">
-            Guardar cambios
+          <button type="submit" className="btn-primary" disabled={isSaving}>
+            {isSaving ? 'Guardando...' : 'Guardar cambios'}
           </button>
         )}
       </form>

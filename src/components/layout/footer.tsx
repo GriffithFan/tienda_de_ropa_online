@@ -1,7 +1,6 @@
 'use client';
 
 import Link from 'next/link';
-import Image from 'next/image';
 import { useState } from 'react';
 import {
   Instagram,
@@ -15,7 +14,7 @@ import {
   RefreshCcw,
   Shield,
 } from 'lucide-react';
-import { SITE_CONFIG, FOOTER_LINKS, PAYMENT_CONFIG, SHIPPING_CONFIG } from '@/lib/constants';
+import { SITE_CONFIG, FOOTER_LINKS, SHIPPING_CONFIG } from '@/lib/constants';
 import { cn } from '@/lib/utils';
 
 /**

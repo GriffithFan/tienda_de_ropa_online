@@ -62,7 +62,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
         canonical: `${BASE_URL}/producto/${product.slug}`,
       },
     }
-  } catch (error) {
+  } catch {
     return {
       title: 'KURO - Producto',
       description: 'Tienda de ropa alternativa y streetwear japonés',

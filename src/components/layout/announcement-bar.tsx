@@ -1,9 +1,8 @@
 'use client';
 
-import { useEffect, useRef } from 'react';
+import { useRef } from 'react';
 import Link from 'next/link';
 import { announcements } from '@/data/products';
-import { cn } from '@/lib/utils';
 
 /**
  * Cinta de anuncios animada que se desplaza horizontalmente

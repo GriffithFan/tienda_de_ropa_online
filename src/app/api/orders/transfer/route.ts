@@ -1,8 +1,14 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { z } from 'zod';
 import prisma from '@/lib/prisma';
+import {
+  createOrderNumber,
+  OrderValidationError,
+  validateAndPriceOrder,
+} from '@/lib/order-validation';
 
 const transferOrderSchema = z.object({
+  paymentMethod: z.enum(['TRANSFER', 'CASH']).default('TRANSFER'),
   customer: z.object({
     firstName: z.string().min(2),
     lastName: z.string().min(2),
@@ -27,18 +33,11 @@ const transferOrderSchema = z.object({
   items: z.array(
     z.object({
       productId: z.string(),
-      name: z.string(),
-      price: z.number(),
-      quantity: z.number(),
+      quantity: z.number().int().min(1),
       size: z.string(),
       color: z.string(),
-      image: z.string().optional(),
     })
   ),
-  subtotal: z.number(),
-  shippingCost: z.number(),
-  discount: z.number(),
-  total: z.number(),
 });
 
 export async function POST(request: NextRequest) {
@@ -53,49 +52,82 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    const { customer, shipping, items, subtotal, shippingCost, discount, total } = validation.data;
+    const { customer, shipping, items, paymentMethod } = validation.data;
 
-    const orderNumber = `KURO-${Date.now().toString(36).toUpperCase()}-TF`;
+    const order = await prisma.$transaction(async (tx) => {
+      const pricedOrder = await validateAndPriceOrder(tx, items, paymentMethod);
 
-    const order = await prisma.order.create({
-      data: {
-        orderNumber,
-        customerEmail: customer.email,
-        customerName: `${customer.firstName} ${customer.lastName}`,
-        customerPhone: customer.phone,
-        customerDni: customer.dni,
-        paymentMethod: 'TRANSFER',
-        shippingMethod: shipping.method,
-        shippingAddress: shipping.address,
-        subtotal,
-        shippingCost,
-        discount,
-        total,
-        expiresAt: new Date(Date.now() + 48 * 60 * 60 * 1000),
-        items: {
-          create: items.map((item) => ({
-            productId: item.productId,
-            name: item.name,
-            price: item.price,
-            quantity: item.quantity,
-            size: item.size,
-            color: item.color,
-            image: item.image,
-          })),
+      for (const item of pricedOrder.items) {
+        const productUpdate = await tx.product.updateMany({
+          where: { id: item.productId, stock: { gte: item.quantity } },
+          data: { stock: { decrement: item.quantity } },
+        });
+
+        if (productUpdate.count !== 1) {
+          throw new OrderValidationError(`Stock insuficiente para ${item.name}`);
+        }
+
+        if (item.stockSource === 'size') {
+          const sizeUpdate = await tx.productSize.updateMany({
+            where: {
+              productId: item.productId,
+              size: item.size,
+              stock: { gte: item.quantity },
+            },
+            data: { stock: { decrement: item.quantity } },
+          });
+
+          if (sizeUpdate.count !== 1) {
+            throw new OrderValidationError(`Stock insuficiente para ${item.name}`);
+          }
+        }
+      }
+
+      return tx.order.create({
+        data: {
+          orderNumber: createOrderNumber(paymentMethod === 'TRANSFER' ? 'TF' : 'EF'),
+          customerEmail: customer.email,
+          customerName: `${customer.firstName} ${customer.lastName}`,
+          customerPhone: customer.phone,
+          customerDni: customer.dni,
+          paymentMethod,
+          shippingMethod: shipping.method,
+          shippingAddress: shipping.address,
+          subtotal: pricedOrder.subtotal,
+          shippingCost: pricedOrder.shippingCost,
+          discount: pricedOrder.discount,
+          total: pricedOrder.total,
+          expiresAt: new Date(Date.now() + 48 * 60 * 60 * 1000),
+          items: {
+            create: pricedOrder.items.map((item) => ({
+              productId: item.productId,
+              name: item.name,
+              price: item.price,
+              quantity: item.quantity,
+              size: item.size,
+              color: item.color,
+              image: item.image,
+            })),
+          },
         },
-      },
-      include: {
-        items: true,
-      },
+        include: {
+          items: true,
+        },
+      });
     });
 
     return NextResponse.json({
       success: true,
       orderId: order.orderNumber,
+      total: Number(order.total),
       expiresAt: order.expiresAt,
       message: 'Orden creada. Realiza la transferencia y envia el comprobante.',
     });
   } catch (error) {
+    if (error instanceof OrderValidationError) {
+      return NextResponse.json({ error: error.message }, { status: 400 });
+    }
+
     console.error('Error creando orden por transferencia:', error);
     return NextResponse.json(
       { error: 'Error al crear la orden' },
@@ -108,10 +140,11 @@ export async function GET(request: NextRequest) {
   try {
     const { searchParams } = new URL(request.url);
     const orderId = searchParams.get('orderId');
+    const email = searchParams.get('email');
 
-    if (!orderId) {
+    if (!orderId || !email) {
       return NextResponse.json(
-        { error: 'ID de orden requerido' },
+        { error: 'ID de orden y email requeridos' },
         { status: 400 }
       );
     }
@@ -123,7 +156,7 @@ export async function GET(request: NextRequest) {
       },
     });
 
-    if (!order) {
+    if (!order || order.customerEmail.toLowerCase() !== email.toLowerCase()) {
       return NextResponse.json(
         { error: 'Orden no encontrada' },
         { status: 404 }

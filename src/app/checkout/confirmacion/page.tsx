@@ -4,7 +4,7 @@ import { Suspense } from 'react';
 import Link from 'next/link';
 import { useSearchParams } from 'next/navigation';
 import { motion } from 'framer-motion';
-import { CheckCircle2, Package, Mail, Phone, ArrowRight, Home, CreditCard, Banknote, Building2 } from 'lucide-react';
+import { CheckCircle2, Mail, Phone, ArrowRight, Home, CreditCard, Banknote, Building2 } from 'lucide-react';
 import { SITE_CONFIG } from '@/lib/constants';
 
 /**
@@ -49,6 +49,7 @@ function ConfirmationContent() {
   };
 
   const paymentInfo = getPaymentInfo();
+  const PaymentIcon = paymentInfo.icon;
 
   return (
     <div className="min-h-screen flex items-center justify-center p-4">
@@ -75,7 +76,7 @@ function ConfirmationContent() {
           transition={{ delay: 0.3 }}
           className="font-display text-2xl lg:text-3xl font-bold mb-2"
         >
-          ¡Gracias por tu compra!
+          {isPaymentApproved ? '¡Gracias por tu compra!' : 'Pago pendiente'}
         </motion.h1>
 
         <motion.p
@@ -96,6 +97,19 @@ function ConfirmationContent() {
         >
           <p className="text-sm text-accent-muted mb-1">Numero de orden</p>
           <p className="font-mono font-bold text-lg tracking-wider">{orderNumber}</p>
+        </motion.div>
+
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.55 }}
+          className="p-4 border border-border rounded-lg mb-8 text-left"
+        >
+          <div className="flex items-center gap-3 mb-2">
+            <PaymentIcon className="w-5 h-5 text-accent" />
+            <p className="font-medium">{paymentInfo.title}</p>
+          </div>
+          <p className="text-sm text-accent-muted">{paymentInfo.description}</p>
         </motion.div>
 
         {/* Proximos pasos */}

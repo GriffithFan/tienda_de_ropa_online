@@ -6,7 +6,7 @@ import Link from 'next/link';
 import { motion, AnimatePresence } from 'framer-motion';
 import { X, Minus, Plus, Trash2, ShoppingBag, ArrowRight } from 'lucide-react';
 import { useCartStore } from '@/store';
-import { formatPrice, calculateTransferPrice, cn } from '@/lib/utils';
+import { formatPrice, calculateTransferPrice } from '@/lib/utils';
 import { SHIPPING_CONFIG, PAYMENT_CONFIG } from '@/lib/constants';
 
 interface CartDrawerProps {
@@ -23,7 +23,6 @@ export function CartDrawer({ isOpen, onClose }: CartDrawerProps) {
   const removeItem = useCartStore((state) => state.removeItem);
   const updateQuantity = useCartStore((state) => state.updateQuantity);
   const getSubtotal = useCartStore((state) => state.getSubtotal);
-  const clearCart = useCartStore((state) => state.clearCart);
 
   const subtotal = getSubtotal();
   const transferPrice = calculateTransferPrice(subtotal, PAYMENT_CONFIG.transferDiscount);
@@ -203,7 +202,7 @@ interface CartItemProps {
       id: string;
       name: string;
       price: number;
-      images: { url: string; alt: string }[];
+      images: ({ url: string; alt?: string } | string)[];
     };
     quantity: number;
     size: string;
@@ -215,6 +214,9 @@ interface CartItemProps {
 
 function CartItem({ item, onUpdateQuantity, onRemove }: CartItemProps) {
   const { product, quantity, size, color } = item;
+  const firstImage = product.images?.[0];
+  const imageUrl = typeof firstImage === 'string' ? firstImage : firstImage?.url;
+  const imageAlt = typeof firstImage === 'string' ? product.name : firstImage?.alt || product.name;
 
   return (
     <motion.div
@@ -226,9 +228,19 @@ function CartItem({ item, onUpdateQuantity, onRemove }: CartItemProps) {
     >
       {/* Imagen del producto */}
       <div className="w-20 h-24 bg-background rounded-lg overflow-hidden flex-shrink-0 relative">
-        <div className="absolute inset-0 flex items-center justify-center text-accent-muted">
-          <ShoppingBag className="w-8 h-8" />
-        </div>
+        {imageUrl ? (
+          <Image
+            src={imageUrl}
+            alt={imageAlt}
+            fill
+            className="object-cover"
+            sizes="80px"
+          />
+        ) : (
+          <div className="absolute inset-0 flex items-center justify-center text-accent-muted">
+            <ShoppingBag className="w-8 h-8" />
+          </div>
+        )}
       </div>
 
       {/* Informacion del producto */}

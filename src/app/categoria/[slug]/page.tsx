@@ -69,13 +69,8 @@ export default function CategoryPage() {
       queryParams.set('limit', productsPerPage.toString());
       queryParams.set('sort', sortBy);
       
-      if (filters.sizes.length > 0) {
-        queryParams.set('size', filters.sizes[0]);
-      }
-      
-      if (filters.colors.length > 0) {
-        queryParams.set('color', filters.colors[0]);
-      }
+      filters.sizes.forEach((size) => queryParams.append('size', size));
+      filters.colors.forEach((color) => queryParams.append('color', color));
       
       if (filters.priceRange[0] > 0) {
         queryParams.set('minPrice', filters.priceRange[0].toString());
@@ -143,7 +138,7 @@ export default function CategoryPage() {
         } else {
           setProducts(mappedProducts);
         }
-        setTotalProducts(data.pagination?.total || mappedProducts.length);
+        setTotalProducts(data.pagination?.totalProducts || mappedProducts.length);
       }
     } catch (error) {
       console.error('Error fetching products:', error);
@@ -155,7 +150,7 @@ export default function CategoryPage() {
   useEffect(() => {
     setPage(1);
     fetchData(1, false);
-  }, [slug, sortBy, filters]); // Solo re-ejecutar cuando cambia slug, sort o filtros
+  }, [fetchData]);
 
   const loadMore = () => {
     const nextPage = page + 1;

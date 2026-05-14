@@ -2,22 +2,24 @@ import { NextRequest, NextResponse } from 'next/server';
 import prisma from '@/lib/prisma';
 import { Prisma } from '@prisma/client';
 
+export const dynamic = 'force-dynamic';
+
 export async function GET(request: NextRequest) {
   try {
     const { searchParams } = new URL(request.url);
 
     const category = searchParams.get('category');
-    const size = searchParams.get('size');
-    const color = searchParams.get('color');
+    const sizes = searchParams.getAll('size').flatMap((value) => value.split(',')).filter(Boolean);
+    const colors = searchParams.getAll('color').flatMap((value) => value.split(',')).filter(Boolean);
     const minPrice = searchParams.get('minPrice');
     const maxPrice = searchParams.get('maxPrice');
     const sort = searchParams.get('sort') || 'newest';
-    const search = searchParams.get('search');
+    const search = searchParams.get('search')?.trim().slice(0, 80);
     const featured = searchParams.get('featured');
     const onSale = searchParams.get('onSale');
     const slugs = searchParams.get('slugs');
-    const page = parseInt(searchParams.get('page') || '1');
-    const limit = parseInt(searchParams.get('limit') || '12');
+    const page = Math.max(1, parseInt(searchParams.get('page') || '1'));
+    const limit = Math.min(48, Math.max(1, parseInt(searchParams.get('limit') || '12')));
 
     const where: Prisma.ProductWhereInput = {
       isActive: true,
@@ -35,20 +37,20 @@ export async function GET(request: NextRequest) {
       };
     }
 
-    if (size) {
+    if (sizes.length > 0) {
       where.sizes = {
         some: {
-          size: size,
+          size: { in: sizes },
           stock: { gt: 0 },
         },
       };
     }
 
-    if (color) {
+    if (colors.length > 0) {
       where.colors = {
         some: {
           name: {
-            equals: color,
+            in: colors,
             mode: 'insensitive',
           },
         },
@@ -88,6 +90,12 @@ export async function GET(request: NextRequest) {
         break;
       case 'name-asc':
         orderBy = { name: 'asc' };
+        break;
+      case 'name-desc':
+        orderBy = { name: 'desc' };
+        break;
+      case 'oldest':
+        orderBy = { createdAt: 'asc' };
         break;
       case 'newest':
       default:
@@ -143,6 +151,7 @@ export async function GET(request: NextRequest) {
         page,
         limit,
         totalProducts,
+        total: totalProducts,
         totalPages,
         hasNextPage: page < totalPages,
         hasPrevPage: page > 1,

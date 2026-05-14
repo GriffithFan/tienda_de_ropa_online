@@ -3,6 +3,28 @@ import { getToken } from 'next-auth/jwt';
 import { z } from 'zod';
 import prisma from '@/lib/prisma';
 
+const imageSchema = z.union([
+  z.string(),
+  z.object({
+    url: z.string(),
+    alt: z.string().optional(),
+  }),
+]);
+
+const sizeSchema = z.union([
+  z.string(),
+  z.object({
+    size: z.string(),
+    stock: z.number().int().min(0),
+  }),
+]);
+
+const colorSchema = z.object({
+  name: z.string().min(1),
+  hex: z.string().optional(),
+  hexCode: z.string().optional(),
+});
+
 const updateProductSchema = z.object({
   name: z.string().min(1, 'Nombre es requerido').optional(),
   slug: z.string().min(1).optional(),
@@ -17,9 +39,9 @@ const updateProductSchema = z.object({
   isFeatured: z.boolean().optional(),
   isOnSale: z.boolean().optional(),
   tags: z.array(z.string()).optional(),
-  images: z.array(z.any()).optional(),
-  sizes: z.array(z.any()).optional(),
-  colors: z.array(z.any()).optional(),
+  images: z.array(imageSchema).optional(),
+  sizes: z.array(sizeSchema).optional(),
+  colors: z.array(colorSchema).optional(),
 });
 
 export async function GET(
@@ -140,6 +162,22 @@ async function handleUpdate(request: NextRequest, productId: string) {
       });
 
       await prisma.productSize.createMany({ data: normalizedSizes });
+    }
+
+    if (colors && colors.length > 0) {
+      await prisma.productColor.deleteMany({ where: { productId } });
+
+      const normalizedColors = colors
+        .map((color) => ({
+          name: color.name,
+          hex: color.hex || color.hexCode || '#000000',
+          productId,
+        }))
+        .filter((color) => color.name.trim() !== '');
+
+      if (normalizedColors.length > 0) {
+        await prisma.productColor.createMany({ data: normalizedColors });
+      }
     }
 
     // Obtener producto actualizado con relaciones

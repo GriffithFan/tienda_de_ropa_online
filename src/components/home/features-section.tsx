@@ -6,7 +6,6 @@ import {
   CreditCard,
   RefreshCcw,
   Shield,
-  Clock,
   Headphones,
 } from 'lucide-react';
 

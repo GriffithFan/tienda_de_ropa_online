@@ -1,5 +1,12 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { MercadoPagoConfig, Preference } from 'mercadopago';
+import { z } from 'zod';
+import prisma from '@/lib/prisma';
+import {
+  createOrderNumber,
+  OrderValidationError,
+  validateAndPriceOrder,
+} from '@/lib/order-validation';
 
 /**
  * Inicializacion del cliente de MercadoPago
@@ -9,38 +16,37 @@ const client = new MercadoPagoConfig({
   accessToken: process.env.MERCADOPAGO_ACCESS_TOKEN || '',
 });
 
-/**
- * Interfaz para los items del carrito
- */
-interface CartItem {
-  id: string;
-  title: string;
-  quantity: number;
-  unit_price: number;
-  picture_url?: string;
-}
-
-/**
- * Interfaz para los datos del comprador
- */
-interface PayerData {
-  name: string;
-  surname: string;
-  email: string;
-  phone: {
-    area_code: string;
-    number: string;
-  };
-  identification: {
-    type: string;
-    number: string;
-  };
-  address: {
-    street_name: string;
-    street_number: string;
-    zip_code: string;
-  };
-}
+const mercadoPagoOrderSchema = z.object({
+  customer: z.object({
+    firstName: z.string().min(2),
+    lastName: z.string().min(2),
+    email: z.string().email(),
+    phone: z.string().min(8),
+    dni: z.string().min(7),
+  }),
+  shipping: z.object({
+    method: z.string(),
+    address: z
+      .object({
+        street: z.string().min(3),
+        number: z.string().min(1),
+        floor: z.string().optional(),
+        apartment: z.string().optional(),
+        city: z.string().min(2),
+        province: z.string().min(2),
+        postalCode: z.string().min(4),
+      })
+      .optional(),
+  }),
+  items: z.array(
+    z.object({
+      productId: z.string(),
+      quantity: z.number().int().min(1),
+      size: z.string(),
+      color: z.string(),
+    })
+  ),
+});
 
 /**
  * POST /api/checkout/mercadopago
@@ -52,56 +58,114 @@ interface PayerData {
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json();
-    const { items, payer, orderId } = body as {
-      items: CartItem[];
-      payer: PayerData;
-      orderId: string;
-    };
+    const validation = mercadoPagoOrderSchema.safeParse(body);
 
     const baseUrl = process.env.NEXT_PUBLIC_APP_URL || process.env.APP_URL || 'http://localhost:3000';
 
-    if (!items || items.length === 0) {
+    if (!validation.success) {
       return NextResponse.json(
-        { error: 'No hay items en el carrito' },
+        { error: 'Datos de checkout invalidos', details: validation.error.errors },
         { status: 400 }
       );
     }
 
-    if (!payer || !payer.email) {
-      return NextResponse.json(
-        { error: 'Datos del comprador incompletos' },
-        { status: 400 }
-      );
-    }
+    const { customer, shipping, items } = validation.data;
 
-    const validatedItems = items.map((item) => ({
-      id: String(item.id),
-      title: String(item.title || 'Producto'),
-      quantity: Number(item.quantity) || 1,
-      unit_price: Number(item.unit_price) || 0,
-      currency_id: 'ARS' as const,
-    }));
+    const { order, pricedOrder } = await prisma.$transaction(async (tx) => {
+      const priced = await validateAndPriceOrder(tx, items, 'MERCADOPAGO');
 
-    for (const item of validatedItems) {
-      if (isNaN(item.unit_price) || item.unit_price <= 0) {
-        return NextResponse.json(
-          { error: `Precio inválido para: ${item.title}` },
-          { status: 400 }
-        );
+      for (const item of priced.items) {
+        const productUpdate = await tx.product.updateMany({
+          where: { id: item.productId, stock: { gte: item.quantity } },
+          data: { stock: { decrement: item.quantity } },
+        });
+
+        if (productUpdate.count !== 1) {
+          throw new OrderValidationError(`Stock insuficiente para ${item.name}`);
+        }
+
+        if (item.stockSource === 'size') {
+          const sizeUpdate = await tx.productSize.updateMany({
+            where: {
+              productId: item.productId,
+              size: item.size,
+              stock: { gte: item.quantity },
+            },
+            data: { stock: { decrement: item.quantity } },
+          });
+
+          if (sizeUpdate.count !== 1) {
+            throw new OrderValidationError(`Stock insuficiente para ${item.name}`);
+          }
+        }
       }
-    }
+
+      const createdOrder = await tx.order.create({
+        data: {
+          orderNumber: createOrderNumber('MP'),
+          customerEmail: customer.email,
+          customerName: `${customer.firstName} ${customer.lastName}`,
+          customerPhone: customer.phone,
+          customerDni: customer.dni,
+          paymentMethod: 'MERCADOPAGO',
+          shippingMethod: shipping.method,
+          shippingAddress: shipping.address,
+          subtotal: priced.subtotal,
+          shippingCost: priced.shippingCost,
+          discount: priced.discount,
+          total: priced.total,
+          expiresAt: new Date(Date.now() + 60 * 60 * 1000),
+          items: {
+            create: priced.items.map((item) => ({
+              productId: item.productId,
+              name: item.name,
+              price: item.price,
+              quantity: item.quantity,
+              size: item.size,
+              color: item.color,
+              image: item.image,
+            })),
+          },
+        },
+      });
+
+      return { order: createdOrder, pricedOrder: priced };
+    });
 
     const preference = new Preference(client);
     const isLocalhost = baseUrl.includes('localhost') || baseUrl.includes('127.0.0.1');
+    const phoneParts = customer.phone.replace(/\D/g, '');
     
     const preferenceBody: Record<string, unknown> = {
-      items: validatedItems,
+      items: pricedOrder.items.map((item) => ({
+        id: item.productId,
+        title: `${item.name} - ${item.size}`,
+        quantity: item.quantity,
+        unit_price: item.price,
+        currency_id: 'ARS' as const,
+        picture_url: item.image,
+      })),
       payer: {
-        name: payer.name,
-        surname: payer.surname,
-        email: payer.email,
+        name: customer.firstName,
+        surname: customer.lastName,
+        email: customer.email,
+        phone: {
+          area_code: phoneParts.slice(0, 2),
+          number: phoneParts.slice(2),
+        },
+        identification: {
+          type: 'DNI',
+          number: customer.dni,
+        },
+        address: shipping.address
+          ? {
+              street_name: shipping.address.street,
+              street_number: shipping.address.number,
+              zip_code: shipping.address.postalCode,
+            }
+          : undefined,
       },
-      external_reference: orderId,
+      external_reference: order.orderNumber,
       statement_descriptor: 'KURO STORE',
     };
 
@@ -118,10 +182,15 @@ export async function POST(request: NextRequest) {
 
     return NextResponse.json({
       id: preferenceData.id,
+      orderId: order.orderNumber,
       init_point: preferenceData.init_point,
       sandbox_init_point: preferenceData.sandbox_init_point,
     });
   } catch (error: unknown) {
+    if (error instanceof OrderValidationError) {
+      return NextResponse.json({ error: error.message }, { status: 400 });
+    }
+
     console.error('MercadoPago preference creation failed:', error);
 
     const mpError = error as { code?: string; message?: string };

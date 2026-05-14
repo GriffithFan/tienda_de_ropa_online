@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import type { Product } from '@/types';
 import { ProductCard } from './product-card';
@@ -23,7 +23,6 @@ export function ProductGrid({
   onLoadMore,
 }: ProductGridProps) {
   const observerRef = useRef<HTMLDivElement>(null);
-  const [isIntersecting, setIsIntersecting] = useState(false);
 
   // Intersection Observer para carga infinita
   useEffect(() => {

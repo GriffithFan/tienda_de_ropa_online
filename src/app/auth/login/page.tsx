@@ -38,7 +38,7 @@ function LoginContent() {
         router.push(callbackUrl)
         router.refresh()
       }
-    } catch (err) {
+    } catch {
       setError('Error al iniciar sesion')
     } finally {
       setLoading(false)

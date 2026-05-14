@@ -1,15 +1,13 @@
 'use client'
 
-import { useEffect, useState } from 'react'
+import { useCallback, useEffect, useState } from 'react'
 import { 
   Plus, 
   Search, 
   Edit, 
   Trash2, 
-  MoreVertical,
   Package,
   X,
-  Upload,
   Save
 } from 'lucide-react'
 import Image from 'next/image'
@@ -63,12 +61,7 @@ export default function AdminProductos() {
     isFeatured: false,
   })
 
-  useEffect(() => {
-    fetchProducts()
-    fetchCategories()
-  }, [searchQuery, selectedCategory])
-
-  const fetchProducts = async () => {
+  const fetchProducts = useCallback(async () => {
     try {
       const params = new URLSearchParams()
       if (searchQuery) params.set('search', searchQuery)
@@ -83,9 +76,9 @@ export default function AdminProductos() {
     } finally {
       setLoading(false)
     }
-  }
+  }, [searchQuery, selectedCategory])
 
-  const fetchCategories = async () => {
+  const fetchCategories = useCallback(async () => {
     try {
       const res = await fetch('/api/categories')
       if (!res.ok) throw new Error('Error al cargar categorias')
@@ -97,7 +90,12 @@ export default function AdminProductos() {
       console.error(err)
       setCategories([])
     }
-  }
+  }, [])
+
+  useEffect(() => {
+    fetchProducts()
+    fetchCategories()
+  }, [fetchProducts, fetchCategories])
 
   const openModal = (product?: Product) => {
     if (product) {

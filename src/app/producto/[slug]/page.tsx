@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react';
 import { useParams } from 'next/navigation';
 import Link from 'next/link';
 import Image from 'next/image';
+import toast from 'react-hot-toast';
 import {
   Minus,
   Plus,
@@ -120,7 +121,7 @@ export default function ProductPage() {
     const needsColor = hasColors && !selectedColor;
     
     if (needsSize || needsColor) {
-      alert(needsSize && needsColor ? 'Selecciona talle y color' : needsSize ? 'Selecciona un talle' : 'Selecciona un color');
+      toast.error(needsSize && needsColor ? 'Selecciona talle y color' : needsSize ? 'Selecciona un talle' : 'Selecciona un color');
       return;
     }
     

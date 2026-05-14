@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useState } from 'react'
+import { useCallback, useEffect, useState } from 'react'
 import Image from 'next/image'
 import { 
   Search, 
@@ -103,11 +103,7 @@ export default function AdminPedidos() {
   const [selectedOrder, setSelectedOrder] = useState<Order | null>(null)
   const [updatingStatus, setUpdatingStatus] = useState(false)
 
-  useEffect(() => {
-    fetchOrders()
-  }, [searchQuery, statusFilter])
-
-  const fetchOrders = async () => {
+  const fetchOrders = useCallback(async () => {
     try {
       const params = new URLSearchParams()
       if (searchQuery) params.set('search', searchQuery)
@@ -122,7 +118,11 @@ export default function AdminPedidos() {
     } finally {
       setLoading(false)
     }
-  }
+  }, [searchQuery, statusFilter])
+
+  useEffect(() => {
+    fetchOrders()
+  }, [fetchOrders])
 
   const updateOrderStatus = async (orderId: string, newStatus: string) => {
     setUpdatingStatus(true)

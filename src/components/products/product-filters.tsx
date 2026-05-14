@@ -4,14 +4,12 @@ import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { ChevronDown, X, SlidersHorizontal } from 'lucide-react';
 import { cn } from '@/lib/utils';
-import { COLORS, SIZES, SORT_OPTIONS } from '@/lib/constants';
+import { COLORS, SIZES } from '@/lib/constants';
 import type { FilterState } from '@/types';
 
 interface ProductFiltersProps {
   filters: FilterState;
   onFilterChange: (filters: FilterState) => void;
-  onSortChange?: (sort: string) => void;
-  currentSort?: string;
   totalProducts: number;
   categoryType?: 'remeras' | 'hoodies' | 'pants' | 'shorts';
 }
@@ -23,8 +21,6 @@ interface ProductFiltersProps {
 export function ProductFilters({
   filters,
   onFilterChange,
-  onSortChange,
-  currentSort,
   totalProducts,
   categoryType = 'remeras',
 }: ProductFiltersProps) {

@@ -5,7 +5,7 @@ import Link from 'next/link';
 import Image from 'next/image';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Search, X, ArrowRight, TrendingUp } from 'lucide-react';
-import { formatPrice, cn } from '@/lib/utils';
+import { formatPrice } from '@/lib/utils';
 
 interface SearchResult {
   id: string;

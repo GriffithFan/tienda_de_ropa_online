@@ -42,7 +42,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
         canonical: `${BASE_URL}/categoria/${category.slug}`,
       },
     }
-  } catch (error) {
+  } catch {
     return {
       title: 'KURO - Categoría',
       description: 'Tienda de ropa alternativa y streetwear japonés',

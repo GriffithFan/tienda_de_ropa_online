@@ -6,6 +6,7 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { motion } from 'framer-motion';
 import Link from 'next/link';
+import toast from 'react-hot-toast';
 import {
   Mail,
   Phone,
@@ -69,7 +70,7 @@ export default function ContactPage() {
       setIsSubmitted(true);
       reset();
     } catch {
-      alert('No se pudo enviar el mensaje. Intenta nuevamente.');
+      toast.error('No se pudo enviar el mensaje. Intenta nuevamente.');
     } finally {
       setIsSubmitting(false);
     }

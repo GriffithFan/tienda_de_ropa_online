@@ -5,6 +5,15 @@ import { Resend } from 'resend';
 
 const resend = new Resend(process.env.RESEND_API_KEY);
 
+function escapeHtml(value: string) {
+  return value
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#039;');
+}
+
 const contactSchema = z.object({
   name: z.string().min(2, 'Nombre muy corto'),
   email: z.string().email('Email invalido'),
@@ -38,18 +47,24 @@ export async function POST(request: NextRequest) {
     });
 
     if (process.env.RESEND_API_KEY && process.env.CONTACT_EMAIL) {
+      const safeName = escapeHtml(name);
+      const safeEmail = escapeHtml(email);
+      const safePhone = phone ? escapeHtml(phone) : 'No proporcionado';
+      const safeSubject = escapeHtml(subject);
+      const safeMessage = escapeHtml(message).replace(/\n/g, '<br />');
+
       await resend.emails.send({
         from: 'KURO <noreply@kuro.com.ar>',
         to: process.env.CONTACT_EMAIL,
         subject: `Contacto: ${subject}`,
         html: `
           <h2>Nuevo mensaje de contacto</h2>
-          <p><strong>Nombre:</strong> ${name}</p>
-          <p><strong>Email:</strong> ${email}</p>
-          <p><strong>Telefono:</strong> ${phone || 'No proporcionado'}</p>
-          <p><strong>Asunto:</strong> ${subject}</p>
+          <p><strong>Nombre:</strong> ${safeName}</p>
+          <p><strong>Email:</strong> ${safeEmail}</p>
+          <p><strong>Telefono:</strong> ${safePhone}</p>
+          <p><strong>Asunto:</strong> ${safeSubject}</p>
           <hr />
-          <p>${message.replace(/\n/g, '<br />')}</p>
+          <p>${safeMessage}</p>
         `,
       });
     }

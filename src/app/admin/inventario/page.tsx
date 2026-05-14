@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
   Package,
@@ -11,7 +11,6 @@ import {
   Edit2,
   Save,
   ArrowUpDown,
-  Filter,
   Download,
 } from 'lucide-react';
 import toast from 'react-hot-toast';
@@ -102,7 +101,6 @@ export default function InventarioPage() {
   const [expandedProduct, setExpandedProduct] = useState<string | null>(null);
   const [editingVariant, setEditingVariant] = useState<string | null>(null);
   const [editStock, setEditStock] = useState<number>(0);
-  const [loading, setLoading] = useState(false);
 
   // Estadísticas
   const stats = {

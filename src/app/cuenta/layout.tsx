@@ -2,7 +2,7 @@
 
 import { useSession } from 'next-auth/react'
 import { useRouter } from 'next/navigation'
-import { useEffect, useState } from 'react'
+import { useEffect } from 'react'
 import Link from 'next/link'
 import { 
   User, 
@@ -10,8 +10,7 @@ import {
   MapPin,
   Heart,
   LogOut,
-  ChevronRight,
-  Settings
+  ChevronRight
 } from 'lucide-react'
 import { signOut } from 'next-auth/react'
 

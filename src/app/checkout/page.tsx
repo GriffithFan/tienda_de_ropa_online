@@ -7,6 +7,7 @@ import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { motion, AnimatePresence } from 'framer-motion';
+import toast from 'react-hot-toast';
 import {
   ChevronLeft,
   ChevronRight,
@@ -19,7 +20,7 @@ import {
   Banknote,
 } from 'lucide-react';
 import { useCartStore } from '@/store';
-import { formatPrice, calculateTransferPrice, cn } from '@/lib/utils';
+import { formatPrice, cn } from '@/lib/utils';
 import { PAYMENT_CONFIG, SHIPPING_CONFIG } from '@/lib/constants';
 
 /**
@@ -99,43 +100,24 @@ export default function CheckoutPage() {
     try {
       // Si es MercadoPago, crear preferencia y redirigir
       if (selectedPayment === 'mercadopago') {
-        const orderId = `KURO-${Date.now().toString(36).toUpperCase()}`;
-
-        // Preparar items para MercadoPago
-        const mpItems = items.map((item) => ({
-          id: item.productId,
-          title: `${item.product.name} - ${item.size}`,
+        const checkoutItems = items.map((item) => ({
+          productId: item.productId,
           quantity: item.quantity,
-          unit_price: Math.round(Number(item.product.price)),
-          picture_url: item.product.images?.[0] || '',
+          size: item.size,
+          color: item.color,
         }));
 
-        // Preparar datos del comprador
-        const phoneParts = personalData.phone.replace(/\D/g, '');
-        const payer = {
-          name: personalData.firstName,
-          surname: personalData.lastName,
-          email: personalData.email,
-          phone: {
-            area_code: phoneParts.slice(0, 2),
-            number: phoneParts.slice(2),
-          },
-          identification: {
-            type: 'DNI',
-            number: personalData.dni,
-          },
-          address: {
-            street_name: shippingData.street,
-            street_number: shippingData.number,
-            zip_code: shippingData.postalCode,
-          },
-        };
-
-        // Llamar a la API de MercadoPago
         const response = await fetch('/api/checkout/mercadopago', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ items: mpItems, payer, orderId }),
+          body: JSON.stringify({
+            customer: personalData,
+            shipping: {
+              method: selectedShipping,
+              address: shippingData,
+            },
+            items: checkoutItems,
+          }),
         });
 
         const data = await response.json();
@@ -155,24 +137,44 @@ export default function CheckoutPage() {
           : data.sandbox_init_point || data.init_point;
 
         if (checkoutUrl) {
-          window.location.href = checkoutUrl;
+          clearCart();
+          window.location.assign(checkoutUrl);
         } else {
           throw new Error('No se pudo obtener la URL de pago');
         }
         return;
       }
 
-      // Para otros métodos de pago (transferencia, efectivo)
-      const orderId = `KURO-${Date.now().toString(36).toUpperCase()}`;
-      
-      // Aquí podrías guardar la orden en la base de datos
-      // await fetch('/api/orders', { ... });
+      const response = await fetch('/api/orders/transfer', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          paymentMethod: selectedPayment === 'cash' ? 'CASH' : 'TRANSFER',
+          customer: personalData,
+          shipping: {
+            method: selectedShipping,
+            address: shippingData,
+          },
+          items: items.map((item) => ({
+            productId: item.productId,
+            quantity: item.quantity,
+            size: item.size,
+            color: item.color,
+          })),
+        }),
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(data.error || 'Error al crear la orden');
+      }
 
       clearCart();
-      router.push(`/checkout/confirmacion?orderId=${orderId}&method=${selectedPayment}`);
+      router.push(`/checkout/confirmacion?orderId=${data.orderId}&method=${selectedPayment}`);
     } catch (error) {
       console.error('Error en el pago:', error);
-      alert(error instanceof Error ? error.message : 'Error al procesar el pago');
+      toast.error(error instanceof Error ? error.message : 'Error al procesar el pago');
     } finally {
       setIsProcessing(false);
     }

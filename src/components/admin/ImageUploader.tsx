@@ -1,9 +1,9 @@
 'use client';
 
-import { useState, useCallback } from 'react';
+import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import NextImage from 'next/image';
-import { Upload, X, Image as ImageIcon, Loader2 } from 'lucide-react';
+import { Upload, X, Loader2 } from 'lucide-react';
 
 interface UploadedImage {
   url: string;
@@ -64,7 +64,7 @@ export default function ImageUploader({
     }
   };
 
-  const handleDrag = useCallback((e: React.DragEvent) => {
+  const handleDrag = (e: React.DragEvent) => {
     e.preventDefault();
     e.stopPropagation();
     if (e.type === 'dragenter' || e.type === 'dragover') {
@@ -72,16 +72,16 @@ export default function ImageUploader({
     } else if (e.type === 'dragleave') {
       setDragActive(false);
     }
-  }, []);
+  };
 
-  const handleDrop = useCallback((e: React.DragEvent) => {
+  const handleDrop = (e: React.DragEvent) => {
     e.preventDefault();
     e.stopPropagation();
     setDragActive(false);
     if (e.dataTransfer.files && e.dataTransfer.files[0]) {
       handleUpload(e.dataTransfer.files);
     }
-  }, [images]);
+  };
 
   const removeImage = (index: number) => {
     const newImages = [...images];

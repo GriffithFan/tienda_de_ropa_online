@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
-import { Save, Store, Mail, CreditCard, Truck, Globe, Bell, Shield, Palette, Image } from 'lucide-react';
+import { Save, Store, Mail, CreditCard, Truck, Globe, Bell, Shield, Palette, Image as ImageIcon } from 'lucide-react';
 import toast from 'react-hot-toast';
 
 interface SiteSettings {
@@ -275,7 +275,7 @@ export default function ConfiguracionPage() {
           </label>
           <div className="flex items-center gap-4">
             <div className="w-16 h-16 bg-zinc-800 rounded-lg flex items-center justify-center border border-zinc-700">
-              <Image className="w-8 h-8 text-zinc-500" />
+              <ImageIcon className="w-8 h-8 text-zinc-500" />
             </div>
             <button className="px-4 py-2 bg-zinc-800 border border-zinc-700 rounded-lg text-sm hover:bg-zinc-700 transition-colors">
               Cambiar logo
@@ -288,7 +288,7 @@ export default function ConfiguracionPage() {
           </label>
           <div className="flex items-center gap-4">
             <div className="w-16 h-16 bg-zinc-800 rounded-lg flex items-center justify-center border border-zinc-700">
-              <Image className="w-8 h-8 text-zinc-500" />
+              <ImageIcon className="w-8 h-8 text-zinc-500" />
             </div>
             <button className="px-4 py-2 bg-zinc-800 border border-zinc-700 rounded-lg text-sm hover:bg-zinc-700 transition-colors">
               Cambiar favicon
@@ -849,7 +849,7 @@ export default function ConfiguracionPage() {
         </label>
         <div className="flex items-center gap-4">
           <div className="w-32 h-20 bg-zinc-800 rounded-lg flex items-center justify-center border border-zinc-700">
-            <Image className="w-8 h-8 text-zinc-500" />
+            <ImageIcon className="w-8 h-8 text-zinc-500" />
           </div>
           <button className="px-4 py-2 bg-zinc-800 border border-zinc-700 rounded-lg text-sm hover:bg-zinc-700 transition-colors">
             Subir imagen
