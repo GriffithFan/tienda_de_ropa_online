@@ -65,7 +65,7 @@ export const ProductCard = memo(function ProductCard({ product, priority = false
       <motion.article
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
-        className="card-hover"
+        className="card-hover bg-gradient-to-b from-surface/95 to-background/70"
       >
         {/* Contenedor de imagen */}
         <div className="relative aspect-product overflow-hidden bg-surface">
@@ -81,7 +81,7 @@ export const ProductCard = memo(function ProductCard({ product, priority = false
                 src={primaryImage}
                 alt={product.name}
                 fill
-                className="object-cover"
+                className="object-cover transition-transform duration-700 group-hover:scale-[1.035]"
                 sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 25vw"
                 priority={priority}
                 onError={() => setImageError(true)}
@@ -105,7 +105,7 @@ export const ProductCard = memo(function ProductCard({ product, priority = false
                 src={secondaryImage}
                 alt={`${product.name} - alternativa`}
                 fill
-                className="object-cover"
+                className="object-cover transition-transform duration-700 group-hover:scale-[1.035]"
                 sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 25vw"
               />
             </div>
@@ -124,7 +124,7 @@ export const ProductCard = memo(function ProductCard({ product, priority = false
           {/* Acciones rapidas */}
           <div
             className={cn(
-              'absolute bottom-0 left-0 right-0 p-3 flex items-center justify-center gap-2 bg-gradient-to-t from-background/80 to-transparent transition-all duration-300',
+              'absolute bottom-0 left-0 right-0 p-3 flex items-center justify-center gap-2 bg-gradient-to-t from-background/92 via-background/45 to-transparent transition-all duration-300',
               isHovered ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'
             )}
           >
@@ -153,9 +153,9 @@ export const ProductCard = memo(function ProductCard({ product, priority = false
         </div>
 
         {/* Informacion del producto */}
-        <div className="p-4">
+        <div className="p-4 border-t border-border/70">
           {/* Categoria */}
-          <p className="text-xs text-accent-muted uppercase tracking-wider mb-1">
+          <p className="text-xs text-accent-muted uppercase mb-1">
             {typeof product.category === 'string' ? product.category : product.category?.name || 'General'}
           </p>
 

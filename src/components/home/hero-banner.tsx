@@ -4,7 +4,7 @@ import { useState, useEffect, useCallback } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { motion, AnimatePresence } from 'framer-motion';
-import { ChevronLeft, ChevronRight } from 'lucide-react';
+import { ArrowRight, ChevronLeft, ChevronRight } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import type { BannerSlide } from '@/types';
 
@@ -48,7 +48,7 @@ export function HeroBanner({
 
   return (
     <section
-      className="relative w-full aspect-[4/3] sm:aspect-[16/9] lg:aspect-banner min-h-[300px] sm:min-h-[400px] max-h-[600px] overflow-hidden bg-surface"
+      className="relative w-full aspect-[4/3] sm:aspect-[16/9] lg:aspect-banner min-h-[360px] sm:min-h-[440px] max-h-[680px] overflow-hidden bg-surface"
       onMouseEnter={() => setIsPaused(true)}
       onMouseLeave={() => setIsPaused(false)}
     >
@@ -67,13 +67,13 @@ export function HeroBanner({
             src={currentSlide.image}
             alt={currentSlide.title}
             fill
-            className="object-cover"
+            className="object-cover scale-[1.01]"
             priority
             unoptimized
           />
 
           {/* Overlay gradient */}
-          <div className="absolute inset-0 bg-gradient-to-r from-background/95 via-background/60 to-transparent sm:from-background/90 sm:via-background/50" />
+          <div className="absolute inset-0 bg-[linear-gradient(90deg,rgba(9,8,7,0.96)_0%,rgba(9,8,7,0.72)_38%,rgba(9,8,7,0.18)_72%),linear-gradient(180deg,rgba(9,8,7,0.15)_0%,rgba(9,8,7,0.62)_100%)]" />
 
           {/* Content */}
           <div className="container-custom h-full flex items-center">
@@ -84,11 +84,14 @@ export function HeroBanner({
               className="max-w-xl px-2 sm:px-0"
             >
               {currentSlide.subtitle && (
-                <p className="text-accent-muted text-xs sm:text-sm lg:text-base uppercase tracking-widest mb-1 sm:mb-2">
-                  {currentSlide.subtitle}
-                </p>
+                <div className="mb-2 sm:mb-3 flex items-center gap-3 text-accent-muted">
+                  <span className="h-px w-8 bg-brand-red" />
+                  <p className="text-xs sm:text-sm lg:text-base uppercase">
+                    {currentSlide.subtitle}
+                  </p>
+                </div>
               )}
-              <h1 className="font-display text-2xl sm:text-4xl lg:text-5xl xl:text-6xl font-bold tracking-tight mb-3 sm:mb-4">
+              <h1 className="font-display text-3xl sm:text-4xl lg:text-5xl xl:text-6xl font-bold leading-[0.98] mb-4 sm:mb-5 text-balance">
                 {currentSlide.title}
               </h1>
               {currentSlide.buttonText && (
@@ -97,6 +100,7 @@ export function HeroBanner({
                   className="btn-primary text-sm sm:text-base px-4 sm:px-6 lg:px-8 py-2.5 sm:py-3 lg:py-4 inline-flex"
                 >
                   {currentSlide.buttonText}
+                  <ArrowRight className="w-4 h-4" />
                 </Link>
               )}
             </motion.div>
@@ -109,14 +113,14 @@ export function HeroBanner({
         <>
           <button
             onClick={goToPrevious}
-            className="absolute left-2 sm:left-4 top-1/2 -translate-y-1/2 w-10 h-10 sm:w-12 sm:h-12 hidden sm:flex items-center justify-center rounded-full bg-background/50 backdrop-blur-sm border border-border hover:bg-background/80 transition-colors"
+            className="absolute left-2 sm:left-4 top-1/2 -translate-y-1/2 w-10 h-10 sm:w-12 sm:h-12 hidden sm:flex items-center justify-center rounded-full bg-background/55 backdrop-blur-md border border-accent/15 shadow-inner-light hover:bg-background/80 transition-colors"
             aria-label="Slide anterior"
           >
             <ChevronLeft className="w-5 h-5 sm:w-6 sm:h-6" />
           </button>
           <button
             onClick={goToNext}
-            className="absolute right-2 sm:right-4 top-1/2 -translate-y-1/2 w-10 h-10 sm:w-12 sm:h-12 hidden sm:flex items-center justify-center rounded-full bg-background/50 backdrop-blur-sm border border-border hover:bg-background/80 transition-colors"
+            className="absolute right-2 sm:right-4 top-1/2 -translate-y-1/2 w-10 h-10 sm:w-12 sm:h-12 hidden sm:flex items-center justify-center rounded-full bg-background/55 backdrop-blur-md border border-accent/15 shadow-inner-light hover:bg-background/80 transition-colors"
             aria-label="Siguiente slide"
           >
             <ChevronRight className="w-5 h-5 sm:w-6 sm:h-6" />
@@ -135,7 +139,7 @@ export function HeroBanner({
                 'h-1.5 sm:h-2 rounded-full transition-all duration-300',
                 index === currentIndex
                   ? 'w-6 sm:w-8 bg-accent'
-                  : 'w-1.5 sm:w-2 bg-accent/40 hover:bg-accent/60'
+                  : 'w-1.5 sm:w-2 bg-accent/35 hover:bg-accent/60'
               )}
               aria-label={`Ir al slide ${index + 1}`}
             />

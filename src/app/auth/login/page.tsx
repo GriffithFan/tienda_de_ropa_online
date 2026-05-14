@@ -50,7 +50,7 @@ function LoginContent() {
   }
 
   return (
-    <div className="min-h-screen bg-zinc-950 flex items-center justify-center px-4 py-12">
+    <div className="min-h-screen bg-background flex items-center justify-center px-4 py-12">
       <motion.div 
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
@@ -60,13 +60,13 @@ function LoginContent() {
         {/* Logo */}
         <div className="text-center mb-8">
           <Link href="/" className="inline-block">
-            <h1 className="text-3xl font-bold text-white tracking-wider">UNDER</h1>
+            <h1 className="font-display text-3xl font-bold text-accent">UNDER</h1>
           </Link>
-          <p className="text-zinc-500 mt-2">Inicia sesion en tu cuenta</p>
+          <p className="text-accent-muted mt-2">Inicia sesion en tu cuenta</p>
         </div>
 
         {/* Form */}
-        <div className="bg-zinc-900 border border-zinc-800 rounded-2xl p-8">
+        <div className="bg-surface/90 border border-border rounded-lg p-8 shadow-inner-light">
           {/* Error Message */}
           {error && (
             <motion.div 

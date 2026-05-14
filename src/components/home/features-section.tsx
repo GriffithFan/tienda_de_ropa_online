@@ -47,7 +47,7 @@ export function FeaturesSection() {
   ];
 
   return (
-    <section className="py-16 lg:py-20 bg-surface">
+    <section className="py-16 lg:py-20 bg-surface/75 border-y border-border">
       <div className="container-custom">
         <div className="text-center mb-12">
           <h2 className="section-title">Por que elegirnos</h2>
@@ -66,7 +66,7 @@ export function FeaturesSection() {
               transition={{ delay: index * 0.1 }}
               className="text-center group"
             >
-              <div className="w-14 h-14 mx-auto mb-4 flex items-center justify-center rounded-full bg-background border border-border group-hover:border-accent transition-colors">
+              <div className="w-14 h-14 mx-auto mb-4 flex items-center justify-center rounded-lg bg-background border border-border shadow-inner-light group-hover:border-brand-gold group-hover:text-brand-gold transition-colors">
                 <feature.icon className="w-6 h-6" />
               </div>
               <h3 className="font-medium text-sm mb-1">{feature.title}</h3>

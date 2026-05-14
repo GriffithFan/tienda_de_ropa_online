@@ -65,10 +65,10 @@ export function ProductCarousel({
   if (products.length === 0) return null;
 
   return (
-    <section className="py-8 sm:py-12 lg:py-16">
+    <section className="py-10 sm:py-14 lg:py-20">
       <div className="container-custom">
         {/* Header */}
-        <div className="flex items-end justify-between mb-6 sm:mb-8">
+        <div className="flex items-end justify-between gap-4 mb-6 sm:mb-8">
           <div>
             <h2 className="section-title text-xl sm:text-2xl lg:text-3xl">{title}</h2>
             {subtitle && (
@@ -82,7 +82,7 @@ export function ProductCarousel({
               onClick={() => scroll('left')}
               disabled={!canScrollLeft}
               className={cn(
-                'w-10 h-10 flex items-center justify-center rounded-full border border-border transition-all',
+                'w-10 h-10 flex items-center justify-center rounded-full border border-border bg-surface/70 shadow-inner-light transition-all',
                 canScrollLeft
                   ? 'hover:bg-surface hover:border-accent-muted'
                   : 'opacity-30 cursor-not-allowed'
@@ -95,7 +95,7 @@ export function ProductCarousel({
               onClick={() => scroll('right')}
               disabled={!canScrollRight}
               className={cn(
-                'w-10 h-10 flex items-center justify-center rounded-full border border-border transition-all',
+                'w-10 h-10 flex items-center justify-center rounded-full border border-border bg-surface/70 shadow-inner-light transition-all',
                 canScrollRight
                   ? 'hover:bg-surface hover:border-accent-muted'
                   : 'opacity-30 cursor-not-allowed'
@@ -111,7 +111,7 @@ export function ProductCarousel({
         <div className="relative -mx-4 px-4">
           <div
             ref={scrollContainerRef}
-            className="flex gap-4 lg:gap-6 overflow-x-auto scrollbar-hide pb-4 -mb-4"
+            className="flex gap-4 lg:gap-6 overflow-x-auto scrollbar-hide pb-5 -mb-5"
           >
             {products.map((product) => (
               <div
@@ -125,10 +125,10 @@ export function ProductCarousel({
 
           {/* Gradient fade on edges */}
           {canScrollLeft && (
-            <div className="absolute left-0 top-0 bottom-4 w-8 bg-gradient-to-r from-background to-transparent pointer-events-none" />
+            <div className="absolute left-0 top-0 bottom-5 w-8 bg-gradient-to-r from-background to-transparent pointer-events-none" />
           )}
           {canScrollRight && (
-            <div className="absolute right-0 top-0 bottom-4 w-8 bg-gradient-to-l from-background to-transparent pointer-events-none" />
+            <div className="absolute right-0 top-0 bottom-5 w-8 bg-gradient-to-l from-background to-transparent pointer-events-none" />
           )}
         </div>
 

@@ -80,8 +80,8 @@ export function Header() {
         className={cn(
           'fixed top-0 left-0 right-0 z-50 transition-all duration-300',
           isScrolled
-            ? 'bg-background/95 backdrop-blur-md shadow-lg'
-            : 'bg-background'
+            ? 'bg-background/88 backdrop-blur-xl shadow-glow'
+            : 'bg-background/96 backdrop-blur-sm'
         )}
       >
         {/* Cinta de anuncios */}
@@ -93,7 +93,7 @@ export function Header() {
             {/* Logo */}
             <Link
               href="/"
-              className="flex-shrink-0 font-display text-2xl sm:text-3xl font-bold tracking-tighter"
+              className="flex-shrink-0 font-display text-2xl sm:text-3xl font-bold"
             >
               {SITE_CONFIG.name}
             </Link>
@@ -102,7 +102,7 @@ export function Header() {
             <div className="hidden md:flex flex-1 max-w-xl mx-8">
               <button
                 onClick={() => setIsSearchOpen(true)}
-                className="w-full flex items-center gap-3 px-4 py-2.5 bg-surface border border-border rounded-lg text-accent-muted hover:border-border-hover transition-colors"
+                className="w-full flex items-center gap-3 px-4 py-2.5 bg-surface/80 border border-border rounded-lg text-accent-muted shadow-inner-light hover:bg-surface-hover hover:border-border-hover transition-colors"
               >
                 <Search className="w-4 h-4" />
                 <span className="text-sm">Buscar productos...</span>

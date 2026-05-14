@@ -194,7 +194,7 @@ export default function ProductPage() {
           {/* Galeria de imagenes */}
           <div className="space-y-4">
             {/* Imagen principal */}
-            <div className="aspect-product bg-surface rounded-xl overflow-hidden relative">
+            <div className="aspect-product bg-surface rounded-lg overflow-hidden relative border border-border shadow-inner-light">
               {currentImage ? (
                 <Image
                   src={currentImage}
@@ -223,13 +223,13 @@ export default function ProductPage() {
               {/* Acciones */}
               <div className="absolute top-4 right-4 flex flex-col gap-2">
                 <button
-                  className="w-10 h-10 flex items-center justify-center rounded-full bg-background/80 backdrop-blur-sm border border-border hover:bg-background transition-colors"
+                  className="w-10 h-10 flex items-center justify-center rounded-lg bg-background/80 backdrop-blur-sm border border-border shadow-inner-light hover:bg-background transition-colors"
                   aria-label="Agregar a favoritos"
                 >
                   <Heart className="w-5 h-5" />
                 </button>
                 <button
-                  className="w-10 h-10 flex items-center justify-center rounded-full bg-background/80 backdrop-blur-sm border border-border hover:bg-background transition-colors"
+                  className="w-10 h-10 flex items-center justify-center rounded-lg bg-background/80 backdrop-blur-sm border border-border shadow-inner-light hover:bg-background transition-colors"
                   aria-label="Compartir"
                 >
                   <Share2 className="w-5 h-5" />
@@ -245,10 +245,10 @@ export default function ProductPage() {
                     key={index}
                     onClick={() => setActiveImage(index)}
                     className={cn(
-                      'w-20 h-24 flex-shrink-0 bg-surface rounded-lg overflow-hidden border-2 transition-colors relative',
+                      'w-20 h-24 flex-shrink-0 bg-surface rounded-lg overflow-hidden border transition-colors relative shadow-inner-light',
                       activeImage === index
                         ? 'border-accent'
-                        : 'border-transparent hover:border-border'
+                        : 'border-border hover:border-border-hover'
                     )}
                   >
                     <Image
@@ -268,7 +268,7 @@ export default function ProductPage() {
           <div className="space-y-6">
             {/* Categoria y nombre */}
             <div>
-              <p className="text-sm text-accent-muted uppercase tracking-wider mb-2">
+              <p className="text-sm text-accent-muted uppercase mb-2">
                 {product.category?.name || 'General'}
               </p>
               <h1 className="font-display text-2xl sm:text-3xl lg:text-4xl font-bold">
@@ -312,7 +312,7 @@ export default function ProductPage() {
                       key={color.name}
                       onClick={() => setSelectedColor(color.name)}
                       className={cn(
-                        'w-10 h-10 rounded-full border-2 transition-all',
+                        'w-10 h-10 rounded-full border-2 transition-all shadow-inner-light',
                         selectedColor === color.name
                           ? 'border-accent scale-110'
                           : 'border-border hover:border-accent-muted'

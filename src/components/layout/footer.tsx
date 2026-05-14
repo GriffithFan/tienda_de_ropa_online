@@ -23,7 +23,7 @@ import { cn } from '@/lib/utils';
  */
 export function Footer() {
   return (
-    <footer className="bg-surface border-t border-border">
+    <footer className="bg-surface/85 border-t border-border shadow-inner-light">
       {/* Seccion de beneficios */}
       <BenefitsBar />
 
@@ -34,7 +34,7 @@ export function Footer() {
           <div className="space-y-4">
             <Link
               href="/"
-              className="inline-block font-display text-2xl font-bold tracking-tighter"
+              className="inline-block font-display text-2xl font-bold"
             >
               {SITE_CONFIG.name}
             </Link>
@@ -49,7 +49,7 @@ export function Footer() {
                 href={SITE_CONFIG.social.instagram}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="w-10 h-10 flex items-center justify-center rounded-full bg-background border border-border hover:border-accent hover:text-accent transition-colors"
+                className="w-10 h-10 flex items-center justify-center rounded-lg bg-background border border-border shadow-inner-light hover:border-brand-gold hover:text-brand-gold transition-colors"
                 aria-label="Instagram"
               >
                 <Instagram className="w-5 h-5" />
@@ -58,7 +58,7 @@ export function Footer() {
                 href={SITE_CONFIG.social.tiktok}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="w-10 h-10 flex items-center justify-center rounded-full bg-background border border-border hover:border-accent hover:text-accent transition-colors"
+                className="w-10 h-10 flex items-center justify-center rounded-lg bg-background border border-border shadow-inner-light hover:border-brand-gold hover:text-brand-gold transition-colors"
                 aria-label="TikTok"
               >
                 <Music2 className="w-5 h-5" />

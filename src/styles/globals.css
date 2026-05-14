@@ -23,6 +23,11 @@
 
   body {
     @apply bg-background text-accent min-h-screen;
+    background-image:
+      linear-gradient(135deg, rgba(209, 70, 63, 0.08) 0%, transparent 28%),
+      linear-gradient(180deg, rgba(198, 161, 91, 0.05) 0%, transparent 34%),
+      repeating-linear-gradient(90deg, rgba(244, 239, 230, 0.018) 0, rgba(244, 239, 230, 0.018) 1px, transparent 1px, transparent 72px);
+    background-attachment: fixed;
     font-feature-settings: 'rlig' 1, 'calt' 1;
   }
 
@@ -50,7 +55,7 @@
   input,
   textarea,
   select {
-    @apply bg-surface border border-border rounded-lg px-4 py-3 text-accent outline-none transition-all duration-200;
+    @apply bg-surface/90 border border-border rounded-lg px-4 py-3 text-accent outline-none transition-all duration-200 shadow-inner-light;
   }
 
   input:focus,
@@ -87,15 +92,15 @@
   }
 
   .btn-primary {
-    @apply btn bg-accent text-background hover:bg-accent/90 active:scale-[0.98];
+    @apply btn bg-accent text-background shadow-inner-light hover:bg-primary-100 hover:shadow-glow active:scale-[0.98];
   }
 
   .btn-secondary {
-    @apply btn bg-surface border border-border text-accent hover:bg-surface-hover hover:border-border-hover active:scale-[0.98];
+    @apply btn bg-surface/90 border border-border text-accent shadow-inner-light hover:bg-surface-hover hover:border-border-hover active:scale-[0.98];
   }
 
   .btn-outline {
-    @apply btn bg-transparent border border-accent text-accent hover:bg-accent hover:text-background active:scale-[0.98];
+    @apply btn bg-transparent border border-accent/70 text-accent hover:bg-accent hover:text-background active:scale-[0.98];
   }
 
   .btn-ghost {
@@ -103,7 +108,7 @@
   }
 
   .btn-icon {
-    @apply inline-flex items-center justify-center p-2.5 rounded-lg transition-all duration-200 hover:bg-surface active:scale-95;
+    @apply inline-flex items-center justify-center p-2.5 rounded-lg transition-all duration-200 hover:bg-surface hover:text-primary-100 active:scale-95;
   }
 
   .btn-sm {
@@ -115,11 +120,11 @@
   }
 
   .card {
-    @apply bg-surface border border-border rounded-xl overflow-hidden transition-all duration-300;
+    @apply bg-surface/90 border border-border rounded-lg overflow-hidden shadow-inner-light transition-all duration-300;
   }
 
   .card-hover {
-    @apply card hover:border-border-hover hover:shadow-glow;
+    @apply card hover:-translate-y-1 hover:border-border-hover hover:shadow-glow;
   }
 
   .badge {
@@ -175,7 +180,7 @@
   }
 
   .section-title {
-    @apply text-2xl sm:text-3xl lg:text-4xl font-display font-bold tracking-tight;
+    @apply text-2xl sm:text-3xl lg:text-4xl font-display font-bold;
   }
 
   .section-subtitle {
@@ -195,15 +200,15 @@
   }
 
   .tag {
-    @apply absolute top-3 left-3 px-2.5 py-1 text-xs font-bold uppercase rounded;
+    @apply inline-flex px-2.5 py-1 text-[11px] font-bold uppercase rounded-md shadow-inner-light;
   }
 
   .tag-sale {
-    @apply tag bg-error text-white;
+    @apply tag bg-brand-red text-white;
   }
 
   .tag-new {
-    @apply tag bg-info text-white;
+    @apply tag bg-brand-gold text-background;
   }
 
   .tag-limited {

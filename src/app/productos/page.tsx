@@ -152,8 +152,8 @@ function ProductsContent() {
   return (
     <div className="min-h-screen">
       {/* Header de la pagina */}
-      <div className="bg-surface border-b border-border">
-        <div className="container-custom py-8">
+      <div className="bg-surface/70 border-b border-border shadow-inner-light">
+        <div className="container-custom py-10">
           <nav className="text-sm text-accent-muted mb-4">
             <a href="/" className="hover:text-accent">
               Inicio
@@ -161,7 +161,7 @@ function ProductsContent() {
             <span className="mx-2">/</span>
             <span className="text-accent">Productos</span>
           </nav>
-          <h1 className="section-title">{getPageTitle()}</h1>
+          <h1 className="section-title text-balance">{getPageTitle()}</h1>
           {searchQuery && (
             <p className="text-accent-muted mt-2">
               {totalProducts} resultado
@@ -173,7 +173,7 @@ function ProductsContent() {
       </div>
 
       {/* Contenido principal */}
-      <div className="container-custom py-8">
+      <div className="container-custom py-8 lg:py-10">
         <div className="flex gap-8">
           {/* Filtros - Desktop */}
           <ProductFilters
@@ -185,7 +185,7 @@ function ProductsContent() {
           {/* Grid de productos */}
           <div className="flex-1 min-w-0">
             {/* Barra superior con ordenamiento */}
-            <div className="flex items-center justify-between mb-6 pb-4 border-b border-border">
+            <div className="flex items-center justify-between gap-4 mb-6 pb-4 border-b border-border">
               <p className="text-sm text-accent-muted">
                 {loading ? 'Cargando...' : `${totalProducts} producto${totalProducts !== 1 ? 's' : ''}`}
               </p>
@@ -197,7 +197,7 @@ function ProductsContent() {
                   id="sort"
                   value={sortBy}
                   onChange={(e) => setSortBy(e.target.value)}
-                  className="bg-surface border border-border rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-accent"
+                  className="bg-surface/90 border border-border rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-accent"
                 >
                   <option value="newest">Más nuevo</option>
                   <option value="oldest">Más antiguo</option>
