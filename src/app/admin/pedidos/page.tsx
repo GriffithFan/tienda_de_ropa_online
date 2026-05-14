@@ -1,6 +1,7 @@
 'use client'
 
 import { useCallback, useEffect, useState } from 'react'
+import toast from 'react-hot-toast'
 import Image from 'next/image'
 import { 
   Search, 
@@ -128,7 +129,7 @@ export default function AdminPedidos() {
     setUpdatingStatus(true)
     try {
       const res = await fetch(`/api/admin/orders/${orderId}`, {
-        method: 'PUT',
+        method: 'PATCH',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ status: newStatus }),
       })
@@ -140,9 +141,10 @@ export default function AdminPedidos() {
       if (selectedOrder?.id === orderId) {
         setSelectedOrder({ ...selectedOrder, status: newStatus })
       }
+      toast.success('Estado del pedido actualizado')
     } catch (err) {
       console.error(err)
-      alert('Error al actualizar el estado del pedido')
+      toast.error('Error al actualizar el estado del pedido')
     } finally {
       setUpdatingStatus(false)
     }

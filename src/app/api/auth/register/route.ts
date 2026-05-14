@@ -2,6 +2,9 @@ import { NextRequest, NextResponse } from 'next/server';
 import { z } from 'zod';
 import bcrypt from 'bcryptjs';
 import prisma from '@/lib/prisma';
+import { rateLimit } from '@/lib/rate-limit';
+
+export const dynamic = 'force-dynamic';
 
 const registerSchema = z.object({
   email: z.string().email('Email invalido'),
@@ -13,6 +16,14 @@ const registerSchema = z.object({
 
 export async function POST(request: NextRequest) {
   try {
+    const limited = rateLimit(request, {
+      keyPrefix: 'auth:register',
+      limit: 5,
+      windowMs: 60_000,
+    });
+
+    if (limited) return limited;
+
     const body = await request.json();
     const validation = registerSchema.safeParse(body);
 

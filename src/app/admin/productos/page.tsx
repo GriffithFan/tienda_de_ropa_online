@@ -1,6 +1,7 @@
 'use client'
 
 import { useCallback, useEffect, useState } from 'react'
+import toast from 'react-hot-toast'
 import { 
   Plus, 
   Search, 
@@ -197,9 +198,10 @@ export default function AdminProductos() {
 
       await fetchProducts()
       closeModal()
+      toast.success(editingProduct ? 'Producto actualizado' : 'Producto creado')
     } catch (err) {
       console.error(err)
-      alert(err instanceof Error ? err.message : 'Error al guardar')
+      toast.error(err instanceof Error ? err.message : 'Error al guardar')
     } finally {
       setSaving(false)
     }
@@ -215,9 +217,10 @@ export default function AdminProductos() {
 
       await fetchProducts()
       setDeleteConfirm(null)
+      toast.success('Producto eliminado')
     } catch (err) {
       console.error(err)
-      alert('Error al eliminar producto')
+      toast.error('Error al eliminar producto')
     }
   }
 
@@ -623,12 +626,14 @@ export default function AdminProductos() {
                             const data = await res.json()
                             const newImages = [...formData.images.filter(img => img.trim() !== ''), data.url]
                             setFormData({ ...formData, images: newImages })
+                            toast.success('Imagen subida')
                           } else {
-                            alert('Error al subir imagen')
+                            const data = await res.json().catch(() => null)
+                            toast.error(data?.error || 'Error al subir imagen')
                           }
                         } catch (err) {
                           console.error(err)
-                          alert('Error al subir imagen')
+                          toast.error('Error al subir imagen')
                         }
                         e.target.value = ''
                       }}

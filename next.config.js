@@ -1,4 +1,6 @@
 /** @type {import('next').NextConfig} */
+const cloudinaryCloudName = process.env.CLOUDINARY_CLOUD_NAME;
+
 const nextConfig = {
   reactStrictMode: true,
   images: {
@@ -6,10 +8,14 @@ const nextConfig = {
       {
         protocol: 'https',
         hostname: 'images.unsplash.com',
+        pathname: '/photo-*',
       },
       {
         protocol: 'https',
         hostname: 'res.cloudinary.com',
+        pathname: cloudinaryCloudName
+          ? `/${cloudinaryCloudName}/image/upload/**`
+          : '/**/image/upload/**',
       },
     ],
     formats: ['image/avif', 'image/webp'],

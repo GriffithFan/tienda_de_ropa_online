@@ -5,7 +5,7 @@ import prisma from '@/lib/prisma'
 import { z } from 'zod'
 
 const addressSchema = z.object({
-  label: z.string().min(1).max(100),
+  label: z.string().min(1).max(100).optional().nullable(),
   street: z.string().min(1).max(200),
   number: z.string().min(1).max(20),
   floor: z.string().max(10).optional().nullable(),
@@ -79,7 +79,7 @@ export async function POST(request: NextRequest) {
     const newAddress = await prisma.address.create({
       data: {
         userId: session.user.id,
-        label,
+        label: label || null,
         street,
         number,
         floor,

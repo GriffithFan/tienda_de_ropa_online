@@ -2,6 +2,13 @@ import { NextRequest, NextResponse } from 'next/server';
 import { getToken } from 'next-auth/jwt';
 import { z } from 'zod';
 import prisma from '@/lib/prisma';
+import { Prisma } from '@prisma/client';
+
+function clampNumber(value: string | null, fallback: number, min: number, max: number) {
+  const parsed = Number.parseInt(value || '', 10);
+  if (Number.isNaN(parsed)) return fallback;
+  return Math.min(Math.max(parsed, min), max);
+}
 
 // Schema flexible para aceptar ambos formatos
 const productSchema = z.object({
@@ -47,16 +54,23 @@ export async function GET(request: NextRequest) {
     }
 
     const { searchParams } = new URL(request.url);
-    const page = parseInt(searchParams.get('page') || '1');
-    const limit = parseInt(searchParams.get('limit') || '20');
-    const search = searchParams.get('search');
+    const page = clampNumber(searchParams.get('page'), 1, 1, 10_000);
+    const limit = clampNumber(searchParams.get('limit'), 20, 1, 100);
+    const search = searchParams.get('search')?.trim().slice(0, 120);
+    const category = searchParams.get('category')?.trim();
 
-    const where = search ? {
-      OR: [
+    const where: Prisma.ProductWhereInput = {};
+
+    if (search) {
+      where.OR = [
         { name: { contains: search, mode: 'insensitive' as const } },
         { slug: { contains: search, mode: 'insensitive' as const } },
-      ],
-    } : {};
+      ];
+    }
+
+    if (category) {
+      where.categoryId = category;
+    }
 
     const [products, total] = await Promise.all([
       prisma.product.findMany({

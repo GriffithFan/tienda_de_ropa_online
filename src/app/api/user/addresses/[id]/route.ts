@@ -5,7 +5,7 @@ import prisma from '@/lib/prisma'
 import { z } from 'zod'
 
 const addressUpdateSchema = z.object({
-  label: z.string().min(1).max(100).optional(),
+  label: z.string().min(1).max(100).optional().nullable(),
   street: z.string().min(1).max(200).optional(),
   number: z.string().min(1).max(20).optional(),
   floor: z.string().max(10).optional().nullable(),
@@ -109,14 +109,16 @@ export async function PUT(
       })
     }
 
+    const hasField = (field: keyof typeof validatedData) => Object.prototype.hasOwnProperty.call(validatedData, field)
+
     const updatedAddress = await prisma.address.update({
       where: { id },
       data: {
-        label: validatedData.label ?? existingAddress.label,
+        label: hasField('label') ? validatedData.label : existingAddress.label,
         street: validatedData.street ?? existingAddress.street,
         number: validatedData.number ?? existingAddress.number,
-        floor: validatedData.floor ?? existingAddress.floor,
-        apartment: validatedData.apartment ?? existingAddress.apartment,
+        floor: hasField('floor') ? validatedData.floor : existingAddress.floor,
+        apartment: hasField('apartment') ? validatedData.apartment : existingAddress.apartment,
         city: validatedData.city ?? existingAddress.city,
         province: validatedData.province ?? existingAddress.province,
         postalCode: validatedData.postalCode ?? existingAddress.postalCode,

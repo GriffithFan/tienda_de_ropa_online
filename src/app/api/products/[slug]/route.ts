@@ -1,11 +1,22 @@
 import { NextRequest, NextResponse } from 'next/server';
 import prisma from '@/lib/prisma';
+import { rateLimit } from '@/lib/rate-limit';
+
+export const dynamic = 'force-dynamic';
 
 export async function GET(
   request: NextRequest,
   { params }: { params: { slug: string } }
 ) {
   try {
+    const limited = rateLimit(request, {
+      keyPrefix: 'products:detail',
+      limit: 120,
+      windowMs: 60_000,
+    });
+
+    if (limited) return limited;
+
     const { slug } = params;
 
     const product = await prisma.product.findUnique({

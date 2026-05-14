@@ -3,6 +3,14 @@ import { getToken } from 'next-auth/jwt';
 import prisma from '@/lib/prisma';
 import { Prisma } from '@prisma/client';
 
+const ORDER_STATUSES = ['PENDING', 'CONFIRMED', 'PROCESSING', 'SHIPPED', 'DELIVERED', 'CANCELLED', 'REFUNDED'] as const;
+
+function clampNumber(value: string | null, fallback: number, min: number, max: number) {
+  const parsed = Number.parseInt(value || '', 10);
+  if (Number.isNaN(parsed)) return fallback;
+  return Math.min(Math.max(parsed, min), max);
+}
+
 export const dynamic = 'force-dynamic';
 
 export async function GET(request: NextRequest) {
@@ -13,14 +21,14 @@ export async function GET(request: NextRequest) {
     }
 
     const { searchParams } = new URL(request.url);
-    const page = parseInt(searchParams.get('page') || '1');
-    const limit = parseInt(searchParams.get('limit') || '20');
+    const page = clampNumber(searchParams.get('page'), 1, 1, 10_000);
+    const limit = clampNumber(searchParams.get('limit'), 20, 1, 100);
     const status = searchParams.get('status');
-    const search = searchParams.get('search');
+    const search = searchParams.get('search')?.trim().slice(0, 120);
 
     const where: Prisma.OrderWhereInput = {};
 
-    if (status) {
+    if (status && ORDER_STATUSES.includes(status as typeof ORDER_STATUSES[number])) {
       where.status = status as Prisma.EnumOrderStatusFilter;
     }
 

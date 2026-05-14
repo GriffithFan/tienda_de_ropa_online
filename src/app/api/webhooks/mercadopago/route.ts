@@ -32,16 +32,18 @@ function verifyWebhookSignature(request: NextRequest, body: string): boolean {
   if (!ts || !hash) return false;
 
   const dataId = JSON.parse(body).data?.id;
+  if (!dataId) return false;
+
   const manifest = `id:${dataId};request-id:${xRequestId};ts:${ts};`;
   const expectedHash = crypto
     .createHmac('sha256', secret)
     .update(manifest)
     .digest('hex');
 
-  return crypto.timingSafeEqual(
-    Buffer.from(hash),
-    Buffer.from(expectedHash)
-  );
+  const received = Buffer.from(hash, 'hex');
+  const expected = Buffer.from(expectedHash, 'hex');
+
+  return received.length === expected.length && crypto.timingSafeEqual(received, expected);
 }
 
 export async function POST(request: NextRequest) {
@@ -79,16 +81,18 @@ export async function POST(request: NextRequest) {
 
       switch (status) {
         case 'approved':
-          await prisma.order.update({
-            where: { orderNumber: orderId },
-            data: {
-              status: 'CONFIRMED',
-              paymentStatus: 'APPROVED',
-              paymentId: paymentId.toString(),
-              paidAt: new Date(),
-            },
-          });
-          await sendConfirmationEmail(order.customerEmail, orderId);
+          if (order.paymentStatus !== 'APPROVED') {
+            await prisma.order.update({
+              where: { orderNumber: orderId },
+              data: {
+                status: 'CONFIRMED',
+                paymentStatus: 'APPROVED',
+                paymentId: paymentId.toString(),
+                paidAt: new Date(),
+              },
+            });
+            await sendConfirmationEmail(order.customerEmail, orderId);
+          }
           break;
 
         case 'pending':

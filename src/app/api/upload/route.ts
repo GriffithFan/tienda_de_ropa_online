@@ -1,6 +1,20 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getToken } from 'next-auth/jwt';
 import { uploadImage, deleteImage } from '@/lib/cloudinary';
+import { rateLimit } from '@/lib/rate-limit';
+
+export const dynamic = 'force-dynamic';
+
+const MAX_UPLOAD_FILES = 8;
+const MAX_UPLOAD_SIZE = 10 * 1024 * 1024;
+const allowedTypes = new Set(['image/jpeg', 'image/jpg', 'image/png', 'image/webp', 'image/gif']);
+
+function sanitizeFolder(folder: FormDataEntryValue | null) {
+  if (typeof folder !== 'string') return 'products';
+
+  const normalized = folder.trim().toLowerCase().replace(/[^a-z0-9/_-]/g, '').replace(/\/+/g, '/');
+  return normalized && !normalized.startsWith('/') && !normalized.includes('..') ? normalized : 'products';
+}
 
 /**
  * POST /api/upload
@@ -8,6 +22,14 @@ import { uploadImage, deleteImage } from '@/lib/cloudinary';
  */
 export async function POST(request: NextRequest) {
   try {
+    const limited = rateLimit(request, {
+      keyPrefix: 'upload:post',
+      limit: 20,
+      windowMs: 60_000,
+    });
+
+    if (limited) return limited;
+
     // Verificar autenticacion y permisos de admin
     const token = await getToken({ req: request, secret: process.env.NEXTAUTH_SECRET });
     if (!token || token.role !== 'ADMIN') {
@@ -21,7 +43,7 @@ export async function POST(request: NextRequest) {
     const multipleFiles = formData.getAll('files') as File[];
     
     const files: File[] = singleFile ? [singleFile] : multipleFiles;
-    const folder = formData.get('folder') as string || 'products';
+    const folder = sanitizeFolder(formData.get('folder'));
 
     if (!files || files.length === 0 || (files.length === 1 && !files[0]?.name)) {
       return NextResponse.json(
@@ -30,17 +52,22 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Validar tipos de archivo - ser mas permisivo
-    const allowedTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/webp', 'image/gif'];
+    if (files.length > MAX_UPLOAD_FILES) {
+      return NextResponse.json(
+        { error: `Solo se pueden subir hasta ${MAX_UPLOAD_FILES} imagenes por solicitud` },
+        { status: 400 }
+      );
+    }
+
     for (const file of files) {
-      if (!file.type || (!allowedTypes.includes(file.type) && !file.type.startsWith('image/'))) {
+      if (!file.type || !allowedTypes.has(file.type)) {
         return NextResponse.json(
           { error: `Tipo de archivo no permitido: ${file.type || 'desconocido'}. Use JPG, PNG, WebP o GIF.` },
           { status: 400 }
         );
       }
       // Limitar tamaño a 10MB
-      if (file.size > 10 * 1024 * 1024) {
+      if (file.size > MAX_UPLOAD_SIZE) {
         return NextResponse.json(
           { error: 'El archivo excede el tamaño maximo de 10MB' },
           { status: 400 }
@@ -87,6 +114,14 @@ export async function POST(request: NextRequest) {
  */
 export async function DELETE(request: NextRequest) {
   try {
+    const limited = rateLimit(request, {
+      keyPrefix: 'upload:delete',
+      limit: 40,
+      windowMs: 60_000,
+    });
+
+    if (limited) return limited;
+
     const token = await getToken({ req: request, secret: process.env.NEXTAUTH_SECRET });
     if (!token || token.role !== 'ADMIN') {
       return NextResponse.json({ error: 'No autorizado' }, { status: 401 });

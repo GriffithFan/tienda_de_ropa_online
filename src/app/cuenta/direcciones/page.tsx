@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from 'react'
 import { motion } from 'framer-motion'
+import toast from 'react-hot-toast'
 import { 
   MapPin, 
   Plus, 
@@ -14,13 +15,14 @@ import {
 
 interface Address {
   id: string
-  firstName: string
-  lastName: string
-  address: string
+  label: string | null
+  street: string
+  number: string
+  floor: string | null
+  apartment: string | null
   city: string
   province: string
   postalCode: string
-  phone: string
   isDefault: boolean
 }
 
@@ -33,13 +35,14 @@ export default function DireccionesPage() {
   const [deleteConfirm, setDeleteConfirm] = useState<string | null>(null)
 
   const [formData, setFormData] = useState({
-    firstName: '',
-    lastName: '',
-    address: '',
+    label: '',
+    street: '',
+    number: '',
+    floor: '',
+    apartment: '',
     city: '',
     province: '',
     postalCode: '',
-    phone: '',
     isDefault: false,
   })
 
@@ -63,6 +66,7 @@ export default function DireccionesPage() {
       setAddresses(data)
     } catch (err) {
       console.error(err)
+      toast.error('No se pudieron cargar tus direcciones')
     } finally {
       setLoading(false)
     }
@@ -72,25 +76,27 @@ export default function DireccionesPage() {
     if (address) {
       setEditingAddress(address)
       setFormData({
-        firstName: address.firstName,
-        lastName: address.lastName,
-        address: address.address,
+        label: address.label || '',
+        street: address.street,
+        number: address.number,
+        floor: address.floor || '',
+        apartment: address.apartment || '',
         city: address.city,
         province: address.province,
         postalCode: address.postalCode,
-        phone: address.phone,
         isDefault: address.isDefault,
       })
     } else {
       setEditingAddress(null)
       setFormData({
-        firstName: '',
-        lastName: '',
-        address: '',
+        label: '',
+        street: '',
+        number: '',
+        floor: '',
+        apartment: '',
         city: '',
         province: '',
         postalCode: '',
-        phone: '',
         isDefault: addresses.length === 0,
       })
     }
@@ -116,18 +122,25 @@ export default function DireccionesPage() {
       const res = await fetch(url, {
         method,
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(formData),
+        body: JSON.stringify({
+          ...formData,
+          label: formData.label.trim() || null,
+          floor: formData.floor.trim() || null,
+          apartment: formData.apartment.trim() || null,
+        }),
       })
 
       if (!res.ok) {
-        throw new Error('Error al guardar direccion')
+        const data = await res.json().catch(() => null)
+        throw new Error(data?.error || 'Error al guardar direccion')
       }
 
       await fetchAddresses()
       closeModal()
+      toast.success(editingAddress ? 'Direccion actualizada' : 'Direccion agregada')
     } catch (err) {
       console.error(err)
-      alert('Error al guardar la direccion')
+      toast.error(err instanceof Error ? err.message : 'Error al guardar la direccion')
     } finally {
       setSaving(false)
     }
@@ -143,9 +156,10 @@ export default function DireccionesPage() {
 
       await fetchAddresses()
       setDeleteConfirm(null)
+      toast.success('Direccion eliminada')
     } catch (err) {
       console.error(err)
-      alert('Error al eliminar la direccion')
+      toast.error('Error al eliminar la direccion')
     }
   }
 
@@ -160,9 +174,19 @@ export default function DireccionesPage() {
       if (!res.ok) throw new Error('Error al actualizar direccion')
 
       await fetchAddresses()
+      toast.success('Direccion predeterminada actualizada')
     } catch (err) {
       console.error(err)
+      toast.error('Error al actualizar la direccion')
     }
+  }
+
+  const getAddressLine = (address: Address) => {
+    const details = [address.floor && `Piso ${address.floor}`, address.apartment && `Depto ${address.apartment}`]
+      .filter(Boolean)
+      .join(', ')
+
+    return `${address.street} ${address.number}${details ? ` (${details})` : ''}`
   }
 
   if (loading) {
@@ -235,19 +259,16 @@ export default function DireccionesPage() {
 
               <div className="space-y-2 mb-4">
                 <p className="text-white font-medium">
-                  {address.firstName} {address.lastName}
+                  {address.label || 'Direccion de envio'}
                 </p>
                 <p className="text-sm text-zinc-400">
-                  {address.address}
+                  {getAddressLine(address)}
                 </p>
                 <p className="text-sm text-zinc-400">
                   {address.city}, {address.province}
                 </p>
                 <p className="text-sm text-zinc-400">
                   CP: {address.postalCode}
-                </p>
-                <p className="text-sm text-zinc-400">
-                  Tel: {address.phone}
                 </p>
               </div>
 
@@ -333,45 +354,74 @@ export default function DireccionesPage() {
             </div>
             
             <form onSubmit={handleSubmit} className="p-5 space-y-4">
-              <div className="grid grid-cols-2 gap-4">
+              <div>
+                <label className="block text-sm font-medium text-zinc-300 mb-2">
+                  Etiqueta
+                </label>
+                <input
+                  type="text"
+                  value={formData.label}
+                  onChange={(e) => setFormData({ ...formData, label: e.target.value })}
+                  placeholder="Casa, trabajo, etc."
+                  maxLength={100}
+                  className="w-full px-4 py-2.5 bg-zinc-800 border border-zinc-700 rounded-lg text-white placeholder-zinc-500 focus:outline-none focus:border-zinc-500"
+                />
+              </div>
+
+              <div className="grid grid-cols-[1fr_120px] gap-4">
                 <div>
                   <label className="block text-sm font-medium text-zinc-300 mb-2">
-                    Nombre
+                    Calle
                   </label>
                   <input
                     type="text"
-                    value={formData.firstName}
-                    onChange={(e) => setFormData({ ...formData, firstName: e.target.value })}
+                    value={formData.street}
+                    onChange={(e) => setFormData({ ...formData, street: e.target.value })}
                     required
+                    maxLength={200}
                     className="w-full px-4 py-2.5 bg-zinc-800 border border-zinc-700 rounded-lg text-white placeholder-zinc-500 focus:outline-none focus:border-zinc-500"
                   />
                 </div>
                 <div>
                   <label className="block text-sm font-medium text-zinc-300 mb-2">
-                    Apellido
+                    Numero
                   </label>
                   <input
                     type="text"
-                    value={formData.lastName}
-                    onChange={(e) => setFormData({ ...formData, lastName: e.target.value })}
+                    value={formData.number}
+                    onChange={(e) => setFormData({ ...formData, number: e.target.value })}
                     required
+                    maxLength={20}
                     className="w-full px-4 py-2.5 bg-zinc-800 border border-zinc-700 rounded-lg text-white placeholder-zinc-500 focus:outline-none focus:border-zinc-500"
                   />
                 </div>
               </div>
 
-              <div>
-                <label className="block text-sm font-medium text-zinc-300 mb-2">
-                  Direccion
-                </label>
-                <input
-                  type="text"
-                  value={formData.address}
-                  onChange={(e) => setFormData({ ...formData, address: e.target.value })}
-                  required
-                  placeholder="Calle, numero, piso, depto"
-                  className="w-full px-4 py-2.5 bg-zinc-800 border border-zinc-700 rounded-lg text-white placeholder-zinc-500 focus:outline-none focus:border-zinc-500"
-                />
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-sm font-medium text-zinc-300 mb-2">
+                    Piso
+                  </label>
+                  <input
+                    type="text"
+                    value={formData.floor}
+                    onChange={(e) => setFormData({ ...formData, floor: e.target.value })}
+                    maxLength={10}
+                    className="w-full px-4 py-2.5 bg-zinc-800 border border-zinc-700 rounded-lg text-white placeholder-zinc-500 focus:outline-none focus:border-zinc-500"
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-zinc-300 mb-2">
+                    Departamento
+                  </label>
+                  <input
+                    type="text"
+                    value={formData.apartment}
+                    onChange={(e) => setFormData({ ...formData, apartment: e.target.value })}
+                    maxLength={10}
+                    className="w-full px-4 py-2.5 bg-zinc-800 border border-zinc-700 rounded-lg text-white placeholder-zinc-500 focus:outline-none focus:border-zinc-500"
+                  />
+                </div>
               </div>
 
               <div className="grid grid-cols-2 gap-4">
@@ -405,7 +455,7 @@ export default function DireccionesPage() {
                 </div>
               </div>
 
-              <div className="grid grid-cols-2 gap-4">
+              <div>
                 <div>
                   <label className="block text-sm font-medium text-zinc-300 mb-2">
                     Codigo postal
@@ -414,18 +464,6 @@ export default function DireccionesPage() {
                     type="text"
                     value={formData.postalCode}
                     onChange={(e) => setFormData({ ...formData, postalCode: e.target.value })}
-                    required
-                    className="w-full px-4 py-2.5 bg-zinc-800 border border-zinc-700 rounded-lg text-white placeholder-zinc-500 focus:outline-none focus:border-zinc-500"
-                  />
-                </div>
-                <div>
-                  <label className="block text-sm font-medium text-zinc-300 mb-2">
-                    Telefono
-                  </label>
-                  <input
-                    type="tel"
-                    value={formData.phone}
-                    onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
                     required
                     className="w-full px-4 py-2.5 bg-zinc-800 border border-zinc-700 rounded-lg text-white placeholder-zinc-500 focus:outline-none focus:border-zinc-500"
                   />
